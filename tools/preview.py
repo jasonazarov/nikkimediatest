@@ -17,6 +17,7 @@ Warum es dieses Werkzeug gibt
 Verwendung
   python3 tools/preview.py seed                 Datenbank neu aufbauen + füllen
   python3 tools/preview.py serve                Worker starten (Strg+C beendet)
+  python3 tools/preview.py serve --share 8080   dazu klickbar mit Ein-Klick-Login: /__vorschau
   python3 tools/preview.py shoot [ordner]       seed + serve + Screenshots aller Seiten
   python3 tools/preview.py shoot ordner --only admin,clipper --mobile
 
@@ -370,6 +371,115 @@ def shoot(out_dir: Path, only: set[str] | None, mobile: bool) -> int:
     return problems
 
 
+
+# ------------------------------------------------------ Freigabe zum Klicken
+
+
+ROLE_CARDS = [
+    ("admin", "Administration", "/admin", "Übersicht, Kampagnen, Clipper, Creator, Leads, Agenturen, Fachartikel-Editor"),
+    ("customer", "Kunde", "/app", "Kampagnen, fertige Videos, Mehr Reichweite"),
+    ("clipper", "Clipper", "/work", "Preisstaffelung, zugeordnete Kampagnen, Videos hochladen"),
+    ("creator", "Creator", "/kampagnen", "Eigene und zugewiesene Kampagnen, Verbreiten"),
+    ("agency", "Agentur", "/collaboration", "Marktplatz mit Kampagnen, Creatorn und Clippern, Preise & Marge"),
+]
+
+
+def start_page() -> bytes:
+    cards = "".join(
+        f'<a class="c" href="/__vorschau/{r}"><b>{label}</b><span>{hint}</span><i>Als {label} öffnen →</i></a>'
+        for r, label, _, hint in ROLE_CARDS
+    )
+    pub = "".join(f'<a class="l" href="{u}">{t}</a>' for u, t in [
+        ("/", "Startseite"), ("/agenturen", "Für Agenturen"), ("/personal-brands", "Personal Brands"), ("/investoren", "Investoren"),
+        ("/clipper", "Clipper werden"), ("/creator", "Creator werden"), ("/brands", "Brands"), ("/fachartikel", "Blog / Fachartikel"),
+        ("/fachartikel/was-ist-clipping", "Beispielartikel"), ("/login", "Login-Seite")])
+    return f"""<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nikki Media Vorschau</title><style>
+body{{margin:0;background:#000;color:#eef7f1;font:15px/1.5 system-ui,sans-serif;padding:32px max(16px,4vw)}}
+h1{{font-size:28px;margin:0}} p{{color:#a3b8ac;max-width:70ch}} h2{{font-size:16px;margin:32px 0 12px;color:#9cf6c8}}
+.g{{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}}
+.c{{display:flex;flex-direction:column;gap:6px;padding:18px;border-radius:16px;background:#070d0a;border:1px solid rgba(255,255,255,.1);color:inherit;text-decoration:none}}
+.c:hover{{border-color:#2fe08c}} .c b{{font-size:18px}} .c span{{color:#a3b8ac;font-size:13px}} .c i{{font-style:normal;color:#2fe08c;font-weight:600;margin-top:auto}}
+.l{{display:inline-block;margin:0 8px 8px 0;padding:8px 14px;border-radius:99px;border:1px solid rgba(255,255,255,.14);color:#eef7f1;text-decoration:none}}
+.l:hover{{border-color:#2fe08c}} code{{color:#9cf6c8}}</style></head><body>
+<h1>Nikki Media · lokale Vorschau</h1>
+<p>Alle Daten sind erfundene Testdaten in einer eigenen Datenbank. Klick eine Rolle an, du bist sofort eingeloggt.
+Zurück hierher kommst du jederzeit über <code>/__vorschau</code>. Mails werden nicht verschickt.</p>
+<h2>Dashboards</h2><div class="g">{cards}</div>
+<h2>Öffentliche Seiten</h2><div>{pub}</div></body></html>""".encode()
+
+
+def share(listen_port: int) -> None:
+    """
+    Kleiner Proxy vor dem Worker, damit die Vorschau von außen klickbar ist:
+      - setzt den Host auf 127.0.0.1 (sonst leitet src/index.ts auf nikkimedia.co um)
+      - /__vorschau: Startseite mit Ein-Klick-Login je Rolle (setzt nm_session_<rolle>)
+    Am App-Code ändert sich nichts.
+    """
+    import http.client
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+    tokens = read_tokens()
+    hop = {"connection", "keep-alive", "transfer-encoding", "te", "trailer", "upgrade", "proxy-authorization", "proxy-authenticate"}
+
+    class H(BaseHTTPRequestHandler):
+        protocol_version = "HTTP/1.1"
+
+        def log_message(self, *a):
+            pass
+
+        def _send(self, code: int, body: bytes, headers: list[tuple[str, str]]):
+            self.send_response(code)
+            for k, v in headers:
+                self.send_header(k, v)
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            if self.command != "HEAD":
+                self.wfile.write(body)
+
+        def handle_one(self):
+            path = self.path
+            if path.rstrip("/") == "/__vorschau":
+                return self._send(200, start_page(), [("Content-Type", "text/html; charset=utf-8"), ("Cache-Control", "no-store")])
+            if path.startswith("/__vorschau/"):
+                role = path.split("/")[2]
+                home = dict((r, h) for r, _, h, _ in ROLE_CARDS).get(role)
+                if not home or role not in tokens:
+                    return self._send(404, b"Unbekannte Rolle", [("Content-Type", "text/plain; charset=utf-8")])
+                return self._send(302, b"", [("Location", home),
+                                             ("Set-Cookie", f"nm_session_{role}={tokens[role]}; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800")])
+            length = int(self.headers.get("Content-Length") or 0)
+            data = self.rfile.read(length) if length else None
+            headers = {k: v for k, v in self.headers.items() if k.lower() not in hop and k.lower() != "host"}
+            headers["Host"] = f"127.0.0.1:{PORT}"
+            headers.pop("Accept-Encoding", None)
+            conn = http.client.HTTPConnection("127.0.0.1", PORT, timeout=120)
+            try:
+                conn.request(self.command, path, body=data, headers=headers)
+                res = conn.getresponse()
+                body = res.read()
+            except Exception as e:  # Worker lädt gerade neu
+                return self._send(502, f"Worker nicht erreichbar: {e}".encode(), [("Content-Type", "text/plain; charset=utf-8")])
+            finally:
+                conn.close()
+            out = []
+            for k, v in res.getheaders():
+                if k.lower() in hop or k.lower() == "content-length":
+                    continue
+                if k.lower() == "location":
+                    v = v.replace(f"http://127.0.0.1:{PORT}", "").replace(f"http://localhost:{PORT}", "") or "/"
+                if k.lower() == "set-cookie":
+                    v = v.replace("; Secure", "")  # Vorschau läuft evtl. ohne HTTPS
+                out.append((k, v))
+            self._send(res.status, body, out)
+
+        do_GET = do_POST = do_PUT = do_DELETE = do_PATCH = do_HEAD = do_OPTIONS = handle_one
+
+    srv = ThreadingHTTPServer(("0.0.0.0", listen_port), H)
+    print(f"✓ Vorschau zum Klicken: http://localhost:{listen_port}/__vorschau")
+    srv.serve_forever()
+
+
 # ---------------------------------------------------------------------- Main
 
 
@@ -380,6 +490,7 @@ def main() -> None:
     ap.add_argument("--only", help="Kommagetrennt: public,admin,customer,clipper,creator,agency")
     ap.add_argument("--mobile", action="store_true", help="Handy-Breite 390 px")
     ap.add_argument("--no-seed", action="store_true", help="Vorhandene Vorschau-Datenbank benutzen")
+    ap.add_argument("--share", type=int, metavar="PORT", help="serve: zusätzlich klickbar freigeben (Proxy mit /__vorschau)")
     args = ap.parse_args()
 
     if args.cmd == "seed":
@@ -393,7 +504,10 @@ def main() -> None:
             print("Sitzungen (Cookie nm_session_<rolle>):")
             for role, token in read_tokens().items():
                 print(f"  {role:9} {token}")
-            proc.wait()
+            if args.share:
+                share(args.share)
+            else:
+                proc.wait()
         else:
             problems = shoot(Path(args.out), set(args.only.split(",")) if args.only else None, args.mobile)
             sys.exit(1 if problems else 0)
