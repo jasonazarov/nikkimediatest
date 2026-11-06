@@ -521,3 +521,7 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   füllt das Budget vor und sperrt das Feld, der Server weist jedes andere Budget ab.
 - **Ehemals goldene Kästen** (Preis pro 1.000 Views, Briefing-Streifen, Code einlösen, Freischaltung):
   Klasse `nmw-brand-glass` (Markengrün in Liquid Glass, `dash-whop.css`).
+- **Buttons der Landingpages in Liquid Glass** (Vorgabe des Auftraggebers, Variante A): Haupt-Buttons,
+  „Weiter“ im Formular, Schild über dem Formular, schwebender Button „Jetzt Videos hochladen“ und
+  die Gold-Seiten-Buttons: durchscheinender Grünverlauf, helle Glaskante, weißer Rand, weiße Schrift,
+  schwächerer Schein (`glass.css`, Abschnitt „Buttons in Liquid Glass“).

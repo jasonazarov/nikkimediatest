@@ -295,3 +295,29 @@ img[src*="/img/platforms/"], img[src*="/img/cloud/"], img[src*="icons.duckduckgo
 /* Eingebettetes Instagram-Symbol in den Case-Study-Karten (keine Bilddatei, deshalb nicht vom Logo-Filter erfasst) */
 .igw__ig { color: #2fe08c !important; filter: drop-shadow(0 0 6px rgba(47, 224, 140, .35)); }
 .hero__stage-badge-ic svg { display: block; }
+
+/* ==========================================================================
+   Buttons in Liquid Glass (Vorgabe des Auftraggebers, November 2026, Variante A)
+   Basis bleibt der Grünverlauf, etwas weniger hell und durchscheinend, mit
+   heller Glaskante, feinem weißen Rand und weißer Schrift. Gilt für alle
+   Haupt-Buttons, das Schild über dem Formular und den schwebenden Button.
+   ========================================================================== */
+.btn--primary, .theme-brands .btn--primary, .theme-clipper .btn--primary, .theme-creator .btn--primary,
+.g-btn--gold, .g-act--gold, .hero__stage-badge, .cta-float__in {
+  background: linear-gradient(100deg, rgba(94, 234, 166, .80) 0%, rgba(47, 224, 140, .68) 52%, rgba(15, 138, 82, .78) 100%) !important;
+  color: #fff !important;
+  text-shadow: 0 1px 2px rgba(2, 22, 12, .3);
+  border: 1px solid rgba(255, 255, 255, .3) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), inset 0 -10px 18px rgba(2, 22, 12, .18), 0 10px 26px rgba(47, 224, 140, .26) !important;
+  backdrop-filter: blur(16px) saturate(170%); -webkit-backdrop-filter: blur(16px) saturate(170%);
+}
+.btn--primary:hover, .theme-brands .btn--primary:hover, .theme-clipper .btn--primary:hover, .theme-creator .btn--primary:hover,
+.g-btn--gold:hover, .g-act--gold:hover, .cta-float:hover .cta-float__in {
+  background: linear-gradient(100deg, rgba(94, 234, 166, .9) 0%, rgba(47, 224, 140, .78) 52%, rgba(15, 138, 82, .86) 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6), inset 0 -10px 18px rgba(2, 22, 12, .16), 0 14px 32px rgba(47, 224, 140, .34) !important;
+  filter: none !important;
+}
+.btn--primary svg, .g-btn--gold svg, .g-act--gold svg { color: inherit; }
+.cta-float__ic { background: rgba(255, 255, 255, .18) !important; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35); }
+.cta-float__in::before { opacity: .45; }
+.cta-float__in::after { opacity: .55; }
