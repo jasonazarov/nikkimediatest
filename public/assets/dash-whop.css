@@ -327,3 +327,18 @@ html.nmd .bg-pink-50 { background-color: rgba(47, 224, 140, .08) !important; }
 html.nmd .ring-pink-200 { --tw-ring-color: rgba(47, 224, 140, .45) !important; }
 html.nmd .text-pink-600, html.nmd .text-pink-700 { color: #9cf6c8 !important; }
 html.nmd .text-pink-900 { color: #c9fbe1 !important; }
+
+/* ==========================================================================
+   Marken-Logos (Google Drive, TikTok, YouTube Shorts, Instagram, Facebook …)
+   im Markengrün mit Glas-Optik (Vorgabe des Auftraggebers, November 2026).
+   Der Filter färbt jedes Logo exakt auf #2fe08c (berechnet mit einem
+   Filter-Löser, Abweichung < 1); dazu ein weicher grüner Schein.
+   ========================================================================== */
+html.nmd img[src*="/img/platforms/"], html.nmd img[src*="/img/cloud/"], html.nmd img[src*="icons.duckduckgo.com"] {
+  filter: brightness(0) saturate(100%) invert(63%) sepia(58%) saturate(504%) hue-rotate(99deg) brightness(101%) contrast(95%) drop-shadow(0 0 6px rgba(47, 224, 140, .35)) !important;
+}
+html.nmd .nm-brand-ico path { fill: #2fe08c !important; }
+html.nmd .nm-brand-ico path[fill="#FFFFFF"], html.nmd .nm-brand-ico path[fill="#ffffff"] { fill: #02160c !important; }
+html.nmd .nm-brand-ico { filter: drop-shadow(0 0 5px rgba(47, 224, 140, .35)); }
+/* Kleine Logos in „Virale Clips“: Glaskachel statt weißem Hintergrund */
+html.nmd .nmv__plat img { background: rgba(4, 14, 9, .6) !important; box-shadow: inset 0 0 0 1px rgba(47, 224, 140, .45); padding: 2px; }

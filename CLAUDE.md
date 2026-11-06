@@ -509,5 +509,9 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   oder Pink mehr, alles Markengrün im Liquid-Glass-Stil (`dash-whop.css`, Abschnitt „Markenfarbe
   überall“). Die Unterscheidungen bleiben über die FORM: **eigene Kampagne = volles Grün**,
   **zugewiesene Kampagne = Glas mit grüner Kante** (ersetzt das frühere Blau); Clipper-Chip = volles
-  Grün, Creator-Chip = Glas mit grünem Ring. Ausnahmen mit Absicht: Plattform-Logos (TikTok,
-  Facebook, LinkedIn, Instagram-Ring), Amber als Warnfarbe, Google-Blau in der Snippet-Vorschau.
+  Grün, Creator-Chip = Glas mit grünem Ring. Ausnahmen mit Absicht: Amber als Warnfarbe,
+  Google-Blau in der Snippet-Vorschau, die Länderflaggen auf der DACH-Karte.
+- **Marken-Logos ebenfalls im Markengrün** (Google Drive, TikTok, YouTube, Instagram, X, Facebook,
+  LinkedIn, Favicons fremder Clouds): CSS-Filter auf `img[src*="/img/platforms/"]`, `/img/cloud/` und
+  Favicons (in `glass.css` und `dash-whop.css`, Filter exakt auf #2fe08c berechnet); die eingebetteten
+  Admin-Logos tragen die Klasse `nm-brand-ico`. Instagram-Ringe auf der Startseite sind grün.

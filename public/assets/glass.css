@@ -266,3 +266,17 @@ option { background: #04100a; color: #eef7f1; }
 .btn--primary, .theme-brands .btn--primary, .theme-clipper .btn--primary, .theme-creator .btn--primary, .g-btn--gold, .g-act--gold {
   background: linear-gradient(180deg, #8ff3bf 0%, #2fe08c 55%, #17a865 100%) !important; color: #02160c !important;
 }
+
+/* ==========================================================================
+   Marken-Logos (Google Drive, TikTok, YouTube Shorts, Instagram, Facebook …)
+   im Markengrün mit Glas-Optik (Vorgabe des Auftraggebers, November 2026).
+   Der Filter färbt jedes Logo exakt auf #2fe08c (berechnet mit einem
+   Filter-Löser, Abweichung < 1); dazu ein weicher grüner Schein.
+   ========================================================================== */
+img[src*="/img/platforms/"], img[src*="/img/cloud/"], img[src*="icons.duckduckgo.com"] {
+  filter: brightness(0) saturate(100%) invert(63%) sepia(58%) saturate(504%) hue-rotate(99deg) brightness(101%) contrast(95%) drop-shadow(0 0 6px rgba(47, 224, 140, .35)) !important;
+}
+/* Instagram-Ringe um die Profilbilder: Markengrün statt Instagram-Verlauf */
+.igw__av, .igembed__av { background: conic-gradient(from 200deg, #8ff3bf, #2fe08c, #17a865, #8ff3bf) !important; }
+.igembed__ph .igembed__av, .igembed__av { background: conic-gradient(from 200deg, #8ff3bf, #2fe08c, #17a865, #8ff3bf) !important; }
+.igembed__logo { background: linear-gradient(135deg, #8ff3bf, #2fe08c 52%, #17a865) !important; color: #02160c !important; box-shadow: 0 10px 26px rgba(47, 224, 140, .28) !important; }
