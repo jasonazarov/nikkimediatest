@@ -481,7 +481,7 @@ export const noAccessPage = (area: Pick<WorkArea, 'kind'> = CLIPPER_WORK_AREA): 
 const noAccess = (message: string, logoutArea?: 'creator') => `<!doctype html>
 <html lang="de"><head><meta charset="utf-8"><title>Noch kein Arbeitsbereich | Nikki Media</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://cdn.tailwindcss.com"></script></head>
+<link rel="stylesheet" href="/assets/tw.css"></head>
 <body class="grid min-h-screen place-items-center bg-slate-950 p-6 text-center font-sans text-white">
   <div>
     <h1 class="text-2xl font-bold">Noch kein Arbeitsbereich</h1>

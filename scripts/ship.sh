@@ -24,6 +24,10 @@ BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 # ---------------------------------------------------------------- 1. Typen
 step "1/6  Typen prüfen"
 npx tsc --noEmit || fail "TypeScript meldet Fehler. Kein Deploy mit kaputten Typen."
+# Tailwind ist vorgebaut (public/assets/tw.css). Neu bauen, damit keine Klasse
+# fehlt, die seit dem letzten Bau dazugekommen ist.
+npm run --silent css >/dev/null 2>&1 || fail "Tailwind-CSS ließ sich nicht bauen (npm run css)."
+ok "Tailwind-CSS gebaut"
 ok "tsc --noEmit sauber"
 
 # ----------------------------------------------------------- 2. Login-Test

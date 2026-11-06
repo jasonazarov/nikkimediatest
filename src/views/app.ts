@@ -18,6 +18,8 @@ import {
   type Kpi,
   type NavItem,
   type ThumbView,
+  quickActions,
+  howItWorks,
 } from './layout'
 import { formatBytes } from '../lib/r2'
 import { DEFAULT_DIAL, dialOptions, splitPhone } from '../lib/phone'
@@ -457,6 +459,11 @@ export function projectsPage(o: {
       </header>
 
       ${o.projects.length ? kpiBar(kpis, 'mb-6') : ''}
+      ${area.home === '/app' ? quickActions([
+        ...(area.videosHref ? [{ label: 'Fertige Videos', href: area.videosHref, icon: 'film', primary: true }] : []),
+        { label: 'Mehr Reichweite', href: '#mehr-reichweite', icon: 'trend' },
+        { label: 'Einstellungen', href: '/app/einstellungen', icon: 'cog' },
+      ]) : ''}
       ${pausedNote ? `<div class="mb-5">${pausedNote}</div>` : ''}
 
       ${
@@ -498,7 +505,12 @@ export function projectsPage(o: {
             <button type="button" id="project-save" class="rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-2">${t.createButton}</button>
           </div>
         </div>
-      </div>`
+      </div>
+      ${area.home === '/app' ? howItWorks('So funktioniert NIKKI MEDIA', 'Du zahlst nur für echte Views', [
+        { title: 'Material hochladen', text: 'Lege eine Kampagne an und lade dein Rohmaterial hoch, als Datei oder als Link zu deiner Cloud.', icon: 'upload' },
+        { title: 'Clipper verbreiten', text: 'Unser Netzwerk aus Clippern und Creatorn schneidet kurze Clips und postet sie auf TikTok, Instagram und YouTube.', icon: 'scissors' },
+        { title: 'Echte Views zählen', text: 'Die Zahlen kommen direkt von den Plattformen. Abgerechnet wird nach erreichten Views, nicht nach Aufwand.', icon: 'trend' },
+      ]) : ''}`
 
   return shell({
     title: t.listTitle,

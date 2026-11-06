@@ -19,6 +19,7 @@ import {
   type Kpi,
   type PayTierView,
   type ThumbView,
+  quickActions,
 } from './layout'
 import { CREATOR_CAMPAIGN_AREA } from './app'
 import { campaignHero, countHead, glyph, kpiLine, reachKpis, reachStamp, statusBadge, viewsMeta } from './work'
@@ -471,6 +472,12 @@ export function overviewPage(o: {
   const body =
     pageTitle('Dein Kampagnen-Dashboard', SUBTITLE[p.goal] ?? SUBTITLE.beides) +
     payTierTable(o.tiers, 'mb-8') +
+    quickActions([
+      { label: 'Clips hochladen', href: '/kampagnen/upload', icon: 'upload', primary: true },
+      { label: 'Verbreiten', href: '/kampagnen/verbreiten', icon: 'film' },
+      { label: 'Zugewiesene Kampagnen', href: '/kampagnen/finden', icon: 'inbox' },
+      { label: 'Meine Accounts', href: '/kampagnen/accounts', icon: 'link' },
+    ]) +
     banner +
     active +
     kpis +
@@ -1578,7 +1585,7 @@ export const settingUpPage = (): string => `<!doctype html>
 <html lang="de"><head><meta charset="utf-8"><title>Kampagnen-Bereich wird eingerichtet | Nikki Media</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<script src="https://cdn.tailwindcss.com"></script></head>
+<link rel="stylesheet" href="/assets/tw.css"></head>
 <body class="grid min-h-screen place-items-center bg-black p-6 text-center font-sans text-white">
   <div>
     <h1 class="text-2xl font-bold">Dein Kampagnen-Bereich wird gerade eingerichtet</h1>

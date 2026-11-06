@@ -8,8 +8,8 @@
 
    Die Seiten selbst wurden NICHT umgeschrieben: Ihre hellen Tailwind-Klassen
    (bg-white, text-slate-900 …) werden unten auf Glas und Dunkel umgelegt.
-   Deshalb `!important`: Tailwind per CDN schreibt sein CSS zur Laufzeit NACH
-   diesem Stylesheet in die Seite.
+   Deshalb `!important`: so gewinnt die Umfärbung sicher gegen die
+   Tailwind-Klassen aus /assets/tw.css (früher per CDN zur Laufzeit eingefügt).
    ========================================================================== */
 
 html.nmd {
@@ -37,92 +37,7 @@ html.nmd ::selection { background: rgba(47, 224, 140, .35); }
 html.nmd h1, html.nmd h2, html.nmd h3 { color: inherit; }
 html.nmd .font-display { font-family: "Bricolage Grotesque", Geist, system-ui, sans-serif; font-stretch: 88%; }
 
-/* ---------- Rahmen ---------- */
-.nmd-frame { display: flex; min-height: 100%; flex-direction: column; }
-@media (min-width: 1024px) { .nmd-frame { flex-direction: row; padding: 12px 0 12px 12px; gap: 12px; } }
-
-.nmd-side {
-  background: var(--d-glass); border-bottom: 1px solid var(--d-edge);
-  backdrop-filter: var(--d-blur); -webkit-backdrop-filter: var(--d-blur);
-  position: relative; z-index: 40;
-}
-@media (min-width: 1024px) {
-  .nmd-side {
-    position: sticky; top: 12px; height: calc(100vh - 24px); width: 252px; flex-shrink: 0; overflow-y: auto;
-    border: 1px solid var(--d-edge); border-radius: 22px; box-shadow: var(--d-lift);
-    display: flex; flex-direction: column;
-  }
-}
-.nmd-side__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; }
-@media (min-width: 1024px) { .nmd-side__top { padding: 16px 14px 10px; } }
-.nmd-brand { display: flex; align-items: center; gap: 11px; padding: 6px; margin: -6px; border-radius: 14px; color: var(--d-text); }
-.nmd-brand:hover { background: rgba(255, 255, 255, .04); }
-.nmd-brand__mark {
-  display: grid; place-items: center; width: 36px; height: 36px; border-radius: 11px; flex: none;
-  font: 800 1.05rem/1 "Bricolage Grotesque", Geist, sans-serif; color: #02160c;
-  background: linear-gradient(150deg, #b8fbd9, #2fe08c 55%, #0f8a52);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, .25) inset, 0 6px 18px rgba(47, 224, 140, .25);
-}
-.nmd-brand__txt { font: 700 .98rem/1.15 "Bricolage Grotesque", Geist, sans-serif; letter-spacing: -.01em; }
-.nmd-brand__txt small { display: block; margin-top: 2px; font: 500 .74rem/1.2 Geist, system-ui, sans-serif; color: var(--d-soft); letter-spacing: 0; }
-.nmd-burger { padding: 8px; border-radius: 10px; color: var(--d-text); border: 1px solid var(--d-edge); background: rgba(255, 255, 255, .04); }
-@media (min-width: 1024px) { .nmd-burger { display: none; } }
-
-.nmd-side__nav { padding: 4px 10px 14px; }
-@media (min-width: 1024px) { .nmd-side__nav { flex: 1; display: flex !important; flex-direction: column; } }
-.nmd-group { margin: 12px 10px 6px; font-size: .74rem; font-weight: 500; color: var(--d-soft); }
-.nmd-nav {
-  position: relative; display: flex; align-items: center; gap: 11px; margin-bottom: 2px; padding: 9px 10px; border-radius: 12px;
-  font-size: .9rem; font-weight: 500; color: var(--d-mute); transition: background .15s ease, color .15s ease;
-}
-.nmd-nav:hover { color: var(--d-text); background: rgba(255, 255, 255, .045); }
-.nmd-nav.is-on {
-  color: var(--d-text);
-  background: linear-gradient(180deg, rgba(255, 255, 255, .11), rgba(255, 255, 255, .05));
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, .09) inset, 0 1px 0 rgba(255, 255, 255, .12) inset, 0 6px 16px rgba(0, 0, 0, .35);
-}
-.nmd-nav.is-on svg { color: var(--d-gold); }
-.nmd-nav[hidden] { display: none; }
-.nmd-nav__txt { display: flex; min-width: 0; flex-direction: column; line-height: 1.2; }
-.nmd-nav__txt small { margin-top: 2px; font-size: .7rem; color: var(--d-soft); }
-.nmd-nav__lock { margin-left: auto; color: var(--d-gold-hi); }
-.nmd-nav:focus-visible, .nmd-logout:focus-visible, .nmd-search input:focus-visible, .nmd-brand:focus-visible { outline: 2px solid var(--d-gold-hi); outline-offset: 2px; }
-
-.nmd-me { margin-top: 18px; padding: 12px 4px 0; border-top: 1px solid var(--d-line); }
-@media (min-width: 1024px) { .nmd-me { margin-top: auto; } }
-.nmd-me__row { display: flex; align-items: center; gap: 11px; padding: 6px 8px; }
-.nmd-me__av {
-  display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 50%;
-  background: linear-gradient(150deg, rgba(47, 224, 140, .3), rgba(47, 224, 140, .08)); box-shadow: 0 0 0 1px rgba(47, 224, 140, .3) inset;
-  font-size: .72rem; font-weight: 600; color: var(--d-gold-hi);
-}
-.nmd-me__name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .88rem; font-weight: 600; color: var(--d-text); }
-.nmd-me__mail { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .76rem; color: var(--d-soft); }
-.nmd-logout { margin-top: 4px; width: 100%; padding: 9px 10px; border-radius: 12px; text-align: left; font-size: .88rem; font-weight: 500; color: var(--d-mute); background: transparent; }
-.nmd-logout:hover { color: var(--d-text); background: rgba(255, 255, 255, .05); }
-
-.nmd-main { min-width: 0; flex: 1; display: flex; flex-direction: column; }
-.nmd-top {
-  position: sticky; top: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  padding: 10px clamp(16px, 3vw, 36px); background: rgba(0, 0, 0, .45);
-  backdrop-filter: var(--d-blur); -webkit-backdrop-filter: var(--d-blur); border-bottom: 1px solid var(--d-line);
-}
-@media (min-width: 1024px) {
-  .nmd-top { top: 12px; margin-right: 12px; border: 1px solid var(--d-edge); border-radius: 18px; background: var(--d-glass); box-shadow: var(--d-lift); padding: 10px 14px 10px 20px; }
-}
-.nmd-crumb { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: .9rem; color: var(--d-soft); }
-.nmd-crumb b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: var(--d-text); }
-.nmd-crumb svg { width: 14px; height: 14px; flex: none; opacity: .6; }
-@media (max-width: 640px) { .nmd-crumb { display: none; } .nmd-top { justify-content: flex-end; } .nmd-search { flex: 1 1 auto; } }
-.nmd-search { display: flex; align-items: center; gap: 10px; flex: 0 1 320px; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--d-edge); background: rgba(0, 0, 0, .3); color: var(--d-soft); }
-.nmd-search svg { width: 17px; height: 17px; flex: none; }
-html.nmd .nmd-search input { flex: 1; min-width: 0; padding: 0 !important; border: 0 !important; background: transparent !important; box-shadow: none !important; font-size: .88rem; color: var(--d-text); }
-.nmd-search input::-webkit-search-cancel-button { display: none; }
-.nmd-search kbd { padding: 1px 7px; border-radius: 6px; border: 1px solid var(--d-edge); font: .72rem Geist, sans-serif; color: var(--d-soft); }
-.nmd-top__right { display: flex; align-items: center; gap: 12px; }
-@media (max-width: 560px) { .nmd-search kbd { display: none; } .nmd-search { flex-basis: 160px; } }
-.nmd-content { flex: 1; padding: 26px clamp(16px, 3vw, 36px) 96px; }
-@media (min-width: 1024px) { .nmd-content { padding: 28px 30px 96px 18px; } }
+/* Rahmen (Kopfzeile, Seitenleiste, Inhalt) und Whop-Bausteine: /assets/dash-whop.css */
 
 /* ---------- Grün statt Blau ---------- */
 html.nmd .bg-brand, html.nmd .bg-brand.text-white, html.nmd .hover\:bg-brand:hover, html.nmd .group:hover .group-hover\:bg-brand {

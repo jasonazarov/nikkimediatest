@@ -12,7 +12,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply nikki-media --local",
     "db:migrate:remote": "wrangler d1 migrations apply nikki-media --remote",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "css": "tailwindcss -c tailwind.config.cjs -i styles/tailwind.css -o public/assets/tw.css --minify"
   },
   "dependencies": {
     "aws4fetch": "^1.0.20",
@@ -22,6 +23,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260804.1",
     "drizzle-kit": "^0.31.6",
+    "tailwindcss": "^3.4.17",
     "typescript": "^5.9.3",
     "wrangler": "^4.42.0"
   }

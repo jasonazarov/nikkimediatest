@@ -1,0 +1,243 @@
+/* ==========================================================================
+   NIKKI MEDIA, Dashboards: App-Rahmen und Bausteine im Whop-Aufbau
+   (November 2026, nur Optik)
+
+   Lädt NACH dash-glass.css. dash-glass.css färbt die hellen Tailwind-Klassen
+   der Seiten auf Grün-Schwarz um; diese Datei liefert:
+
+     1. den Rahmen: Kopfzeile über die ganze Breite, feste Seitenleiste mit
+        Arbeitsbereich-Kacheln und Menügruppen, Schublade auf dem Handy
+     2. die Bausteine aus layout.ts (nmw-…): Kennzahl-Karten, Schnellaktionen,
+        „So funktioniert's“, Hinweisbanner, Leerzustände, Kampagnen-Karten
+
+   Keine Klasse, ID oder data-Attribut, an dem JavaScript hängt, wird hier
+   umbenannt; es kommen nur Klassen dazu.
+   ========================================================================== */
+
+html.nmd {
+  --w-top: 60px;
+  --w-side: 264px;
+  --w-bg: #000;
+  --w-panel: #050906;
+  --w-card: #070d0a;
+  --w-card-2: #0b1510;
+  --w-line: rgba(255, 255, 255, .075);
+  --w-line-2: rgba(255, 255, 255, .12);
+  --w-text: #eef7f1;
+  --w-mute: #a3b8ac;
+  --w-soft: #6f8379;
+  --w-green: #2fe08c;
+  --w-green-hi: #9cf6c8;
+  --w-green-soft: rgba(47, 224, 140, .12);
+  --w-warn: #fbbf24;
+  --w-red: #f87171;
+  --w-r: 16px;
+  --w-r-sm: 11px;
+}
+
+/* -------------------------------------------------------------- 1. Rahmen */
+
+.nmw-top {
+  position: sticky; top: 0; z-index: 60; height: var(--w-top);
+  display: flex; align-items: center; gap: 14px; padding: 0 16px;
+  background: rgba(0, 0, 0, .82); border-bottom: 1px solid var(--w-line);
+  backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%);
+}
+@media (min-width: 1024px) { .nmw-top { padding: 0 20px 0 22px; } }
+
+.nmd-brand { display: flex; align-items: center; gap: 10px; padding: 4px; border-radius: 12px; color: var(--w-text); flex: none; }
+.nmd-brand:hover { background: rgba(255, 255, 255, .04); }
+.nmd-brand__mark {
+  display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; flex: none;
+  font: 800 1rem/1 "Bricolage Grotesque", Geist, sans-serif; color: #02160c;
+  background: linear-gradient(150deg, #b8fbd9, #2fe08c 55%, #0f8a52);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .25) inset, 0 6px 18px rgba(47, 224, 140, .25);
+}
+.nmd-brand__txt { font: 700 .98rem/1.1 "Bricolage Grotesque", Geist, sans-serif; letter-spacing: -.01em; }
+.nmd-brand__txt small { display: block; margin-top: 2px; font: 500 .72rem/1.2 Geist, system-ui, sans-serif; color: var(--w-soft); }
+@media (max-width: 520px) { .nmd-brand__txt small { display: none; } }
+
+.nmd-burger { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; color: var(--w-text); border: 1px solid var(--w-line-2); background: rgba(255, 255, 255, .04); flex: none; }
+@media (min-width: 1024px) { .nmd-burger { display: none; } }
+
+/* Suche mittig wie bei Whop */
+.nmd-search {
+  display: flex; align-items: center; gap: 10px; flex: 0 1 440px; margin: 0 auto; height: 38px; padding: 0 12px;
+  border-radius: 11px; border: 1px solid var(--w-line-2); background: rgba(255, 255, 255, .045); color: var(--w-soft);
+  transition: border-color .15s ease, background .15s ease;
+}
+.nmd-search:focus-within { border-color: rgba(47, 224, 140, .55); background: rgba(255, 255, 255, .06); }
+.nmd-search svg { width: 17px; height: 17px; flex: none; }
+html.nmd .nmd-search input { flex: 1; min-width: 0; padding: 0 !important; border: 0 !important; background: transparent !important; box-shadow: none !important; outline: none; font-size: .88rem; color: var(--w-text); }
+.nmd-search input::-webkit-search-cancel-button { display: none; }
+.nmd-search kbd { padding: 1px 7px; border-radius: 6px; border: 1px solid var(--w-line-2); font: .72rem Geist, sans-serif; color: var(--w-soft); }
+@media (max-width: 640px) { .nmd-search { flex-basis: 0; flex-grow: 1; } .nmd-search kbd { display: none; } }
+
+.nmd-top__right { display: flex; align-items: center; gap: 10px; flex: none; }
+.nmw-iconbtn { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; color: var(--w-mute); }
+.nmw-iconbtn:hover { color: var(--w-text); background: rgba(255, 255, 255, .06); }
+.nmw-iconbtn svg { width: 19px; height: 19px; }
+.nmw-role { padding: 4px 10px; border-radius: 99px; font-size: .72rem; font-weight: 600; color: var(--w-green-hi); background: var(--w-green-soft); box-shadow: 0 0 0 1px rgba(47, 224, 140, .25) inset; }
+@media (max-width: 760px) { .nmw-role, .nmw-iconbtn { display: none; } }
+.nmd-me__av {
+  display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 50%;
+  background: linear-gradient(150deg, rgba(47, 224, 140, .3), rgba(47, 224, 140, .08)); box-shadow: 0 0 0 1px rgba(47, 224, 140, .3) inset;
+  font-size: .72rem; font-weight: 600; color: var(--w-green-hi);
+}
+
+.nmw-frame { display: flex; min-height: calc(100vh - var(--w-top)); }
+
+/* Seitenleiste */
+.nmd-side {
+  position: fixed; z-index: 70; top: 0; bottom: 0; left: 0; width: min(86vw, var(--w-side));
+  background: var(--w-panel); border-right: 1px solid var(--w-line);
+  transform: translateX(-102%); transition: transform .22s ease; overflow-y: auto; overscroll-behavior: contain;
+}
+body.nmw-open .nmd-side { transform: none; box-shadow: 0 0 60px rgba(0, 0, 0, .7); }
+.nmw-scrim { position: fixed; inset: 0; z-index: 65; background: rgba(0, 0, 0, .6); backdrop-filter: blur(2px); }
+@media (min-width: 1024px) {
+  .nmd-side { position: sticky; top: var(--w-top); height: calc(100vh - var(--w-top)); width: var(--w-side); flex: none; transform: none; z-index: 10; }
+  .nmw-scrim { display: none; }
+}
+.nmd-side__nav { display: flex !important; flex-direction: column; min-height: 100%; padding: 14px 12px 16px; }
+
+.nmw-ws { display: flex; align-items: center; gap: 8px; padding: 2px 2px 14px; margin-bottom: 4px; border-bottom: 1px solid var(--w-line); }
+.nmw-ws__tile {
+  display: grid; place-items: center; width: 46px; height: 46px; border-radius: 13px; flex: none;
+  font: 700 .85rem/1 Geist, sans-serif; color: var(--w-mute); background: rgba(255, 255, 255, .05); box-shadow: 0 0 0 1px var(--w-line-2) inset;
+}
+.nmw-ws__tile.is-on {
+  font: 800 1.15rem/1 "Bricolage Grotesque", Geist, sans-serif; color: var(--w-green-hi);
+  background: linear-gradient(160deg, rgba(47, 224, 140, .28), rgba(47, 224, 140, .06));
+  box-shadow: 0 0 0 2px rgba(156, 246, 200, .55) inset, 0 6px 20px rgba(47, 224, 140, .18);
+}
+.nmw-ws__txt { min-width: 0; padding-left: 4px; line-height: 1.2; }
+.nmw-ws__txt b { display: block; font-size: .86rem; color: var(--w-text); }
+.nmw-ws__txt small { display: block; font-size: .72rem; color: var(--w-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.nmw-group[hidden] { display: none; }
+.nmd-group { margin: 16px 10px 6px; font-size: .74rem; font-weight: 600; letter-spacing: .01em; color: var(--w-soft); }
+.nmd-nav {
+  position: relative; display: flex; align-items: center; gap: 12px; margin-bottom: 2px; padding: 9px 11px; border-radius: 11px;
+  font-size: .92rem; font-weight: 500; color: var(--w-mute); transition: background .15s ease, color .15s ease;
+}
+.nmd-nav svg { width: 20px; height: 20px; }
+.nmd-nav:hover { color: var(--w-text); background: rgba(255, 255, 255, .045); }
+.nmd-nav.is-on { color: var(--w-text); background: rgba(255, 255, 255, .085); box-shadow: inset 2px 0 0 var(--w-green); }
+.nmd-nav.is-on svg { color: var(--w-green); }
+.nmd-nav[hidden] { display: none; }
+.nmd-nav[data-locked] { opacity: .7; }
+.nmd-nav__txt { display: flex; min-width: 0; flex-direction: column; line-height: 1.2; }
+.nmd-nav__txt small { margin-top: 2px; font-size: .7rem; color: var(--w-soft); }
+.nmd-nav__lock { margin-left: auto; color: var(--w-green-hi); }
+.nmd-nav:focus-visible, .nmd-logout:focus-visible, .nmd-brand:focus-visible, .nmw-iconbtn:focus-visible, .nmd-burger:focus-visible { outline: 2px solid var(--w-green-hi); outline-offset: 2px; }
+
+.nmd-me { margin-top: auto; padding: 12px 2px 0; border-top: 1px solid var(--w-line); }
+.nmd-side__nav > .nmw-group:last-of-type { margin-bottom: 18px; }
+.nmd-me__row { display: flex; align-items: center; gap: 11px; padding: 6px 8px; }
+.nmd-me__name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .88rem; font-weight: 600; color: var(--w-text); }
+.nmd-me__mail { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .76rem; color: var(--w-soft); }
+.nmd-logout { margin-top: 4px; width: 100%; padding: 9px 10px; border-radius: 11px; text-align: left; font-size: .88rem; font-weight: 500; color: var(--w-mute); background: transparent; }
+.nmd-logout:hover { color: var(--w-text); background: rgba(255, 255, 255, .05); }
+
+.nmd-main { min-width: 0; flex: 1; display: flex; flex-direction: column; }
+.nmd-content { flex: 1; padding: 26px 16px 110px; }
+@media (min-width: 640px) { .nmd-content { padding: 30px 28px 110px; } }
+@media (min-width: 1280px) { .nmd-content { padding: 34px 40px 110px; } }
+
+/* Seitentitel (pageTitle) */
+.nmd-content header.mb-7 h1 { font-size: clamp(1.6rem, 2.4vw, 2rem); letter-spacing: -.02em; }
+.nmd-content header.mb-7 p { color: var(--w-mute) !important; max-width: 70ch; }
+
+/* ------------------------------------------------------- 2. Bausteine */
+
+/* Karten-Grundform */
+.nmw-card { background: var(--w-card); border: 1px solid var(--w-line); border-radius: var(--w-r); }
+
+/* Kennzahlen (kpiBar): Whop-Stat-Karten statt einer gequetschten Zeile */
+.nmw-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.nmw-stat { padding: 14px 16px; border-radius: 14px; background: var(--w-card); border: 1px solid var(--w-line); min-width: 0; }
+.nmw-stat__label { display: block; font-size: .74rem; font-weight: 500; color: var(--w-mute); text-decoration: underline dotted rgba(255, 255, 255, .25); text-underline-offset: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nmw-stat__value { display: block; margin-top: 6px; font: 700 1.45rem/1.1 "Bricolage Grotesque", Geist, sans-serif; letter-spacing: -.02em; color: var(--w-text); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.nmw-stat__hint { display: block; margin-top: 3px; font-size: .72rem; color: var(--w-soft); }
+
+/* statTile: dieselbe Optik, etwas größer */
+.nmw-tile .nmw-stat__value { font-size: 1.9rem; }
+
+/* Schnellaktionen (Whop: Einzahlen · Akzeptieren · Senden) */
+.nmw-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 28px; }
+.nmw-action {
+  display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 46px; padding: 10px 14px; border-radius: 12px;
+  font-size: .9rem; font-weight: 600; color: var(--w-text); background: rgba(255, 255, 255, .06); border: 1px solid var(--w-line);
+  transition: background .15s ease, border-color .15s ease, transform .15s ease;
+}
+.nmw-action:hover { background: rgba(255, 255, 255, .1); border-color: var(--w-line-2); }
+.nmw-action:active { transform: translateY(1px); }
+.nmw-action svg { width: 18px; height: 18px; color: var(--w-green); flex: none; }
+.nmw-action.is-primary { color: #02160c; background: linear-gradient(180deg, #8ff3bf, #2fe08c 55%, #17a865); border-color: transparent; }
+.nmw-action.is-primary svg { color: inherit; }
+
+/* „So funktioniert's“ (Whop: Werbung-Onboarding mit drei Schrittkarten) */
+.nmw-steps { margin-bottom: 30px; }
+.nmw-steps__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; margin-bottom: 12px; }
+.nmw-steps__eyebrow { font-size: .76rem; font-weight: 600; color: var(--w-green); }
+.nmw-steps__title { font: 700 1.25rem/1.2 "Bricolage Grotesque", Geist, sans-serif; letter-spacing: -.015em; color: var(--w-text); }
+.nmw-steps__grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.nmw-step { position: relative; padding: 18px; border-radius: var(--w-r); background: var(--w-card); border: 1px solid var(--w-line); overflow: hidden; }
+.nmw-step::before { content: ""; position: absolute; inset: 0 0 auto; height: 90px; background: radial-gradient(120px 70px at 30% 0%, rgba(47, 224, 140, .16), transparent 70%); pointer-events: none; }
+.nmw-step__num { position: relative; display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; font: 700 .85rem/1 Geist, sans-serif; color: #02160c; background: var(--w-green); }
+.nmw-step__icon { position: absolute; right: 16px; top: 16px; width: 26px; height: 26px; color: rgba(156, 246, 200, .55); }
+.nmw-step h3 { position: relative; margin-top: 14px; font-size: .98rem; font-weight: 650; color: var(--w-text); }
+.nmw-step p { position: relative; margin-top: 4px; font-size: .84rem; line-height: 1.5; color: var(--w-mute); }
+
+/* Hinweisbanner (Whop: Steuerdaten-Banner) */
+.nmw-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-bottom: 22px; padding: 14px 16px; border-radius: 14px; border: 1px solid rgba(251, 191, 36, .3); background: rgba(251, 191, 36, .08); }
+.nmw-banner.is-info { border-color: rgba(47, 224, 140, .3); background: rgba(47, 224, 140, .07); }
+.nmw-banner__icon { width: 20px; height: 20px; flex: none; color: var(--w-warn); }
+.nmw-banner.is-info .nmw-banner__icon { color: var(--w-green); }
+.nmw-banner__txt { flex: 1 1 260px; min-width: 0; }
+.nmw-banner__txt b { display: block; font-size: .9rem; color: var(--w-text); }
+.nmw-banner__txt span { display: block; margin-top: 2px; font-size: .84rem; color: var(--w-mute); }
+.nmw-banner__btn { padding: 8px 14px; border-radius: 10px; font-size: .84rem; font-weight: 600; color: var(--w-text); border: 1px solid var(--w-line-2); }
+.nmw-banner__btn:hover { background: rgba(255, 255, 255, .06); }
+
+/* Leerzustand mit Illustration */
+.nmw-empty__art { display: block; width: 104px; height: 80px; margin: 0 auto 14px; }
+
+/* Abschnittsüberschrift */
+.nmw-section-title { font: 700 1.2rem/1.2 "Bricolage Grotesque", Geist, sans-serif; letter-spacing: -.015em; }
+
+/* Kampagnen-Karte (campaignCard) im Marktplatz-Stil */
+html.nmd .nmw-camp { background: var(--w-card) !important; border-color: var(--w-line) !important; border-radius: 18px; }
+html.nmd .nmw-camp:hover { border-color: rgba(47, 224, 140, .35) !important; box-shadow: 0 18px 40px rgba(0, 0, 0, .55), 0 0 0 1px rgba(47, 224, 140, .12) !important; }
+html.nmd .nmw-camp h3 { color: var(--w-text) !important; }
+.nmw-thumb-cloud { background: radial-gradient(120% 90% at 50% 0%, #0d2a1b 0%, #050b08 60%, #030604 100%); }
+.nmw-thumb-cloud__logo { display: grid; place-items: center; width: 74px; height: 74px; border-radius: 20px; background: rgba(255, 255, 255, .06); box-shadow: 0 0 0 1px rgba(255, 255, 255, .1) inset, 0 12px 30px rgba(0, 0, 0, .45); }
+.nmw-thumb-cloud__logo img { width: 42px; height: 42px; object-fit: contain; }
+.nmw-thumb-cloud__chip { position: absolute; left: 12px; bottom: 10px; display: inline-flex; max-width: 85%; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 99px; font-size: .7rem; font-weight: 600; color: var(--w-mute); background: rgba(0, 0, 0, .55); box-shadow: 0 0 0 1px var(--w-line-2) inset; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+/* Fortschritt Views / Ziel */
+.nmw-progress { height: 6px; border-radius: 99px; background: rgba(255, 255, 255, .08); overflow: hidden; }
+.nmw-progress > i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #17a865, #2fe08c, #9cf6c8); }
+
+/* Status-Pillen (badge): ruhiger, Whop-ähnlich */
+html.nmd .nmw-pill { font-weight: 600; letter-spacing: .01em; }
+
+/* Tabellen: Kopfzeile wie Whop (klein, gedämpft, feste Linie) */
+html.nmd .nmd-content table thead th { font-size: .72rem; font-weight: 600; letter-spacing: .02em; color: var(--w-soft) !important; }
+html.nmd .nmd-content table tbody tr { transition: background .12s ease; }
+html.nmd .nmd-content table tbody tr:hover { background: rgba(255, 255, 255, .025); }
+
+/* Feste Breite: nichts darf die Seite seitlich verschieben */
+.nmd-content { overflow-x: clip; }
+
+/* kpiBar steht teils in Flex-Zeilen oder trägt w-fit/self-start: als Raster immer volle Breite */
+html.nmd .nmw-stats { width: 100% !important; max-width: 100% !important; flex: 1 1 100%; align-self: stretch !important; }
+.nmw-steps { margin-top: 36px; }
+
+/* Handy: Kopfzeile darf nie breiter als der Bildschirm werden */
+.nmd-search { min-width: 0; }
+@media (max-width: 640px) {
+  .nmw-top { gap: 10px; padding: 0 12px; }
+  .nmd-brand__txt { display: none; }
+}

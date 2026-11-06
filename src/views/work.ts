@@ -21,6 +21,8 @@ import {
   type NavItem,
   type PayTierView,
   type ThumbView,
+  quickActions,
+  howItWorks,
 } from './layout'
 import { formatBytes } from '../lib/r2'
 import { PUBLISH_STATUS, platformLabel, publishStatusLabel, readTargets } from '../lib/publisher'
@@ -574,9 +576,22 @@ export function projectsPage(
   const body =
     pageTitle(t.homeTitle, t.homeSubtitle) +
     payTierTable(o.tiers, 'mb-8') +
+    (area.kind === 'clipper'
+      ? quickActions([
+          { label: t.uploadFinished, href: area.uploadHref, icon: 'upload', primary: true },
+          { label: 'Meine Kampagnen', href: area.active, icon: 'folder' },
+        ])
+      : '') +
     (assigned ? '' : assignBanner()) +
     list +
-    reach
+    reach +
+    (area.kind === 'clipper' && !assigned
+      ? howItWorks('Clipping Area', 'So verdienst du mit Clips', [
+          { title: 'Kampagne zugeordnet bekommen', text: 'NIKKI MEDIA ordnet dir eine Kampagne zu. Du bekommst eine E-Mail, sobald das Rohmaterial bereitsteht.', icon: 'inbox' },
+          { title: 'Clips schneiden und hochladen', text: 'Schneide kurze, starke Clips aus dem Material und lade sie hier als fertige Videos hoch.', icon: 'scissors' },
+          { title: 'Views werden zu Verdienst', text: 'Die Views deiner Clips kommen direkt von den Plattformen. Was du verdienst, zeigt deine Preisstaffelung oben.', icon: 'trend' },
+        ])
+      : '')
 
   return shell({
     title: t.homeTitle,

@@ -53,14 +53,14 @@ import type { AgencyLead, User } from '../db/schema'
 /** Das Menü — gesperrte Punkte tragen ein Schloss. */
 export function agencyNav(locked: boolean): NavItem[] {
   return [
-    { href: '/collaboration', label: 'Übersicht', icon: 'grid' },
-    { href: '/collaboration/kampagnen', label: 'Kampagnen', icon: 'film', locked },
-    { href: '/collaboration/creator', label: 'Creator', icon: 'star', locked },
-    { href: '/collaboration/clipper', label: 'Clipper', icon: 'scissors', locked },
-    { href: '/collaboration/meine', label: 'Meine Kampagnen', icon: 'folder', hint: 'Material hochladen', locked },
-    { href: '/collaboration/buchungen', label: 'Buchungen', icon: 'calendar', locked },
+    { href: '/collaboration', label: 'Übersicht', icon: 'grid', group: 'Collaboration' },
+    { href: '/collaboration/kampagnen', label: 'Kampagnen', icon: 'film', locked, group: 'Marktplatz' },
+    { href: '/collaboration/creator', label: 'Creator', icon: 'star', locked, group: 'Marktplatz' },
+    { href: '/collaboration/clipper', label: 'Clipper', icon: 'scissors', locked, group: 'Marktplatz' },
+    { href: '/collaboration/meine', label: 'Meine Kampagnen', icon: 'folder', hint: 'Material hochladen', locked, group: 'Deine Agentur' },
+    { href: '/collaboration/buchungen', label: 'Buchungen', icon: 'calendar', locked, group: 'Deine Agentur' },
     // Marge der Agentur auf unsere Preise (views/gold-dashboard.ts, lib/upsell.ts).
-    { href: '/collaboration/preise', label: 'Preise & Marge', icon: 'tag', locked },
+    { href: '/collaboration/preise', label: 'Preise & Marge', icon: 'tag', locked, group: 'Deine Agentur' },
   ]
 }
 
@@ -94,7 +94,7 @@ export const AGENCY_CAMPAIGN_AREA: CustomerArea = {
 /* ------------------------------------------------------------- Bausteine */
 
 const GOLD_BTN =
-  'inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#f6dc8f] via-[#d9a63c] to-[#b9831c] px-6 py-3 text-sm font-extrabold text-[#1d1404] shadow-lg shadow-amber-900/20 transition hover:brightness-105 disabled:opacity-40'
+  'inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#9cf6c8] via-[#2fe08c] to-[#17a865] px-6 py-3 text-sm font-extrabold text-[#02160c] shadow-lg shadow-emerald-900/30 transition hover:brightness-105 disabled:opacity-40'
 
 /**
  * Blättern in langen Listen (`?seite=N`). `base` trägt schon alle anderen
@@ -156,7 +156,7 @@ function lockedPreview(): string {
             <p class="mt-2 h-3 w-1/2 rounded bg-slate-100"></p>
           </div>
           <div class="absolute inset-0 flex flex-col items-center justify-center bg-white/70 px-5 text-center backdrop-blur-[1px]">
-            <span class="grid h-11 w-11 place-items-center rounded-full bg-[#0b0a07] text-amber-300 shadow">${LOCK_SVG.replace('h-4 w-4', 'h-5 w-5')}</span>
+            <span class="grid h-11 w-11 place-items-center rounded-full bg-[#04100a] text-brand-2 shadow">${LOCK_SVG.replace('h-4 w-4', 'h-5 w-5')}</span>
             <p class="mt-2.5 font-display text-base font-extrabold">${esc(title)}</p>
             <p class="mt-1 text-xs text-slate-500">${esc(text)}</p>
           </div>
@@ -228,12 +228,12 @@ export function briefingPage(o: { user: User; lead: AgencyLead }): string {
     (p, i) => `
           <label class="group relative block cursor-pointer">
             <input type="radio" name="package" value="${esc(p.value)}" class="peer sr-only">
-            <span class="flex h-full flex-col rounded-2xl border-2 border-white/15 bg-white/5 p-5 transition peer-checked:border-amber-300 peer-checked:bg-amber-300/10 peer-focus-visible:ring-4 peer-focus-visible:ring-amber-300/40 group-hover:border-white/30">
-              <span class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-amber-300">Paket ${i + 1}</span>
+            <span class="flex h-full flex-col rounded-2xl border-2 border-white/15 bg-white/5 p-5 transition peer-checked:border-brand peer-checked:bg-brand/10 peer-focus-visible:ring-4 peer-focus-visible:ring-brand/40 group-hover:border-white/30">
+              <span class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-brand-2">Paket ${i + 1}</span>
               <b class="mt-1.5 font-display text-lg font-extrabold leading-snug">${esc(p.label)}</b>
               <small class="mt-1.5 text-sm leading-relaxed text-white/65">${esc(p.subtitle)}</small>
             </span>
-            <span class="absolute right-4 top-4 hidden h-6 w-6 place-items-center rounded-full bg-amber-300 text-[#1d1404] peer-checked:grid">
+            <span class="absolute right-4 top-4 hidden h-6 w-6 place-items-center rounded-full bg-brand text-[#02160c] peer-checked:grid">
               <svg viewBox="0 0 12 12" fill="none" class="h-3.5 w-3.5"><path d="M2 6.4 4.6 9 10 3.2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
           </label>`,
@@ -242,31 +242,31 @@ export function briefingPage(o: { user: User; lead: AgencyLead }): string {
   const body = `
       ${pageTitle(`Willkommen, ${first}!`, 'Starte jetzt deine Kampagne, drei kurze Angaben, dann geht es los.')}
 
-      <section class="overflow-hidden rounded-3xl bg-gradient-to-br from-[#0b0a07] via-[#1a150b] to-[#3b2a07] text-white shadow-xl" id="briefing">
+      <section class="overflow-hidden rounded-3xl bg-gradient-to-br from-[#010302] via-[#041a0f] to-[#0a4527] ring-1 ring-inset ring-[#2fe08c]/25 text-white shadow-xl" id="briefing">
         <form class="p-6 sm:p-10" data-briefing novalidate>
           <div class="flex flex-wrap items-center justify-between gap-3">
-            <span class="text-xs font-bold uppercase tracking-[.16em] text-amber-300" data-step-label>Schritt 1 von ${total} · Views</span>
+            <span class="text-xs font-bold uppercase tracking-[.16em] text-brand-2" data-step-label>Schritt 1 von ${total} · Views</span>
             <span class="flex gap-1.5" aria-hidden="true">${titles
               .map((_, i) => i + 1)
-              .map((n) => `<i class="h-1.5 w-8 rounded-full ${n === 1 ? 'bg-amber-300' : 'bg-white/15'}" data-dot="${n}"></i>`)
+              .map((n) => `<i class="h-1.5 w-8 rounded-full ${n === 1 ? 'bg-brand' : 'bg-white/15'}" data-dot="${n}"></i>`)
               .join('')}</span>
           </div>
 
           <!-- Schritt 1 — Views -->
           <fieldset class="mt-8" data-step="1">
             <legend class="font-display text-2xl font-extrabold leading-tight sm:text-3xl">Wie viele Views möchtest du in Auftrag geben?</legend>
-            <p class="mt-6 text-center font-display text-5xl font-extrabold tracking-tight text-amber-300 sm:text-6xl"><span data-views-out>${esc(
+            <p class="mt-6 text-center font-display text-5xl font-extrabold tracking-tight text-brand-2 sm:text-6xl"><span data-views-out>${esc(
               viewsShort(VIEW_STEPS[3]),
             )}</span><small class="ml-2 text-xl font-bold text-white/70">Views</small></p>
             <input type="range" name="viewsStep" min="0" max="${VIEW_STEPS.length - 1}" step="1" value="3"
-                   class="mt-8 w-full cursor-pointer accent-amber-400" aria-label="Gewünschte Views">
+                   class="mt-8 w-full cursor-pointer accent-brand" aria-label="Gewünschte Views">
             <div class="mt-2 flex justify-between text-[11px] font-semibold text-white/50 sm:text-xs">${ticks}</div>
           </fieldset>
 
           <!-- Schritt 2 — Budget -->
           <fieldset class="mt-8 hidden" data-step="2">
             <legend class="font-display text-2xl font-extrabold leading-tight sm:text-3xl">Wie viel Budget möchtest du für die Views zur Verfügung stellen?</legend>
-            <label class="mx-auto mt-8 flex max-w-md items-center gap-3 rounded-2xl bg-white px-5 py-4 text-slate-900 shadow-inner ring-4 ring-transparent focus-within:ring-amber-300/50">
+            <label class="mx-auto mt-8 flex max-w-md items-center gap-3 rounded-2xl bg-white px-5 py-4 text-slate-900 shadow-inner ring-4 ring-transparent focus-within:ring-brand/50">
               <input type="text" name="budget" inputmode="decimal" autocomplete="off" maxlength="16" placeholder="z. B. 5.000"
                      class="min-w-0 flex-1 bg-transparent font-display text-3xl font-extrabold outline-none placeholder:text-slate-300">
               <span class="font-display text-3xl font-extrabold text-slate-400">€</span>
@@ -336,7 +336,7 @@ export function briefingPage(o: { user: User; lead: AgencyLead }): string {
     form.querySelectorAll('[data-step]').forEach(function (f) { f.classList.toggle('hidden', Number(f.getAttribute('data-step')) !== step); });
     form.querySelectorAll('[data-dot]').forEach(function (d) {
       var on = Number(d.getAttribute('data-dot')) <= step;
-      d.classList.toggle('bg-amber-300', on); d.classList.toggle('bg-white/15', !on);
+      d.classList.toggle('bg-brand', on); d.classList.toggle('bg-white/15', !on);
     });
     form.querySelector('[data-step-label]').textContent = 'Schritt ' + step + ' von ' + TOTAL + ' · ' + titles[step - 1];
     form.querySelector('[data-back]').classList.toggle('invisible', step === 1);
@@ -398,19 +398,19 @@ export function newCampaignPage(o: { user: User }): string {
     (n) => `
             <label class="cursor-pointer">
               <input type="radio" name="niche" value="${esc(n)}" class="peer sr-only">
-              <span class="inline-flex rounded-full border-2 border-white/15 bg-white/5 px-4 py-2 text-sm font-bold transition hover:border-white/30 peer-checked:border-amber-300 peer-checked:bg-amber-300/15 peer-checked:text-amber-200 peer-focus-visible:ring-4 peer-focus-visible:ring-amber-300/40">${esc(n)}</span>
+              <span class="inline-flex rounded-full border-2 border-white/15 bg-white/5 px-4 py-2 text-sm font-bold transition hover:border-white/30 peer-checked:border-brand peer-checked:bg-brand/15 peer-checked:text-brand-2 peer-focus-visible:ring-4 peer-focus-visible:ring-brand/40">${esc(n)}</span>
             </label>`,
   ).join('')
   const platforms = AGENCY_PLATFORMS.map(
     (p) => `
             <label class="group relative block cursor-pointer">
               <input type="checkbox" name="platforms" value="${esc(p.value)}" class="peer sr-only">
-              <span class="flex h-full flex-col items-center rounded-2xl border-2 border-white/15 bg-white/5 px-4 py-5 text-center transition group-hover:border-white/30 peer-checked:border-amber-300 peer-checked:bg-amber-300/10 peer-focus-visible:ring-4 peer-focus-visible:ring-amber-300/40">
+              <span class="flex h-full flex-col items-center rounded-2xl border-2 border-white/15 bg-white/5 px-4 py-5 text-center transition group-hover:border-white/30 peer-checked:border-brand peer-checked:bg-brand/10 peer-focus-visible:ring-4 peer-focus-visible:ring-brand/40">
                 <span class="grid h-12 w-12 place-items-center rounded-xl bg-white"><img src="/img/platforms/${esc(p.value)}.svg" alt="" class="h-7 w-7"></span>
                 <b class="mt-3 font-display text-base font-extrabold">${esc(p.label)}</b>
                 <small class="text-xs text-white/60">${esc(p.subtitle)}</small>
               </span>
-              <span class="absolute right-3 top-3 hidden h-6 w-6 place-items-center rounded-full bg-amber-300 text-[#1d1404] peer-checked:grid">
+              <span class="absolute right-3 top-3 hidden h-6 w-6 place-items-center rounded-full bg-brand text-[#02160c] peer-checked:grid">
                 <svg viewBox="0 0 12 12" fill="none" class="h-3.5 w-3.5"><path d="M2 6.4 4.6 9 10 3.2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </span>
             </label>`,
@@ -425,19 +425,19 @@ export function newCampaignPage(o: { user: User }): string {
       <a href="${esc(AGENCY_CAMPAIGN_AREA.home)}" class="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-brand">← Meine Kampagnen</a>
       ${pageTitle('Neue Kampagne erstellen', 'Name, Bereich, Plattformen, Views und Budget. Danach siehst du, was 1.000 Views für deine Kampagne kosten.')}
 
-      <section class="overflow-hidden rounded-3xl bg-gradient-to-br from-[#0b0a07] via-[#1a150b] to-[#3b2a07] text-white shadow-xl" id="neue-kampagne">
+      <section class="overflow-hidden rounded-3xl bg-gradient-to-br from-[#010302] via-[#041a0f] to-[#0a4527] ring-1 ring-inset ring-[#2fe08c]/25 text-white shadow-xl" id="neue-kampagne">
         <form class="p-6 sm:p-10" data-new-campaign novalidate>
           <div class="flex flex-wrap items-center justify-between gap-3">
-            <span class="text-xs font-bold uppercase tracking-[.16em] text-amber-300" data-step-label>Schritt 1 von ${titles.length} · Name</span>
+            <span class="text-xs font-bold uppercase tracking-[.16em] text-brand-2" data-step-label>Schritt 1 von ${titles.length} · Name</span>
             <span class="flex gap-1.5" aria-hidden="true">${titles
-              .map((_, i) => `<i class="h-1.5 w-6 rounded-full sm:w-8 ${i === 0 ? 'bg-amber-300' : 'bg-white/15'}" data-dot="${i + 1}"></i>`)
+              .map((_, i) => `<i class="h-1.5 w-6 rounded-full sm:w-8 ${i === 0 ? 'bg-brand' : 'bg-white/15'}" data-dot="${i + 1}"></i>`)
               .join('')}</span>
           </div>
 
           <!-- Schritt 1: Name -->
           <fieldset class="mt-8" data-step="1">
             ${legend('Wie soll die Kampagne heißen?')}
-            <label class="mx-auto mt-8 flex max-w-xl items-center rounded-2xl bg-white px-5 py-4 text-slate-900 shadow-inner ring-4 ring-transparent focus-within:ring-amber-300/50">
+            <label class="mx-auto mt-8 flex max-w-xl items-center rounded-2xl bg-white px-5 py-4 text-slate-900 shadow-inner ring-4 ring-transparent focus-within:ring-brand/50">
               <input type="text" name="campaignName" autocomplete="off" maxlength="80" placeholder="${esc(AGENCY_CAMPAIGN_AREA.text.namePlaceholder)}"
                      class="min-w-0 flex-1 bg-transparent font-display text-2xl font-extrabold outline-none placeholder:text-slate-300">
             </label>
@@ -462,18 +462,18 @@ export function newCampaignPage(o: { user: User }): string {
           <!-- Schritt 4: Views -->
           <fieldset class="mt-8 hidden" data-step="4">
             ${legend('Wie viele Views möchtest du in Auftrag geben?')}
-            <p class="mt-6 text-center font-display text-5xl font-extrabold tracking-tight text-amber-300 sm:text-6xl"><span data-views-out>${esc(
+            <p class="mt-6 text-center font-display text-5xl font-extrabold tracking-tight text-brand-2 sm:text-6xl"><span data-views-out>${esc(
               viewsShort(VIEW_STEPS[3]),
             )}</span><small class="ml-2 text-xl font-bold text-white/70">Views</small></p>
             <input type="range" name="viewsStep" min="0" max="${VIEW_STEPS.length - 1}" step="1" value="3"
-                   class="mt-8 w-full cursor-pointer accent-amber-400" aria-label="Gewünschte Views">
+                   class="mt-8 w-full cursor-pointer accent-brand" aria-label="Gewünschte Views">
             <div class="mt-2 flex justify-between text-[11px] font-semibold text-white/50 sm:text-xs">${ticks}</div>
           </fieldset>
 
           <!-- Schritt 5: Budget -->
           <fieldset class="mt-8 hidden" data-step="5">
             ${legend('Wie viel Budget möchtest du für diese Kampagne in Auftrag geben?')}
-            <label class="mx-auto mt-8 flex max-w-md items-center gap-3 rounded-2xl bg-white px-5 py-4 text-slate-900 shadow-inner ring-4 ring-transparent focus-within:ring-amber-300/50">
+            <label class="mx-auto mt-8 flex max-w-md items-center gap-3 rounded-2xl bg-white px-5 py-4 text-slate-900 shadow-inner ring-4 ring-transparent focus-within:ring-brand/50">
               <input type="text" name="budget" inputmode="decimal" autocomplete="off" maxlength="16" placeholder="z. B. 5.000"
                      class="min-w-0 flex-1 bg-transparent font-display text-3xl font-extrabold outline-none placeholder:text-slate-300">
               <span class="font-display text-3xl font-extrabold text-slate-400">€</span>
@@ -503,7 +503,7 @@ export function newCampaignPage(o: { user: User }): string {
                 dieser Kampagne zu den oben genannten Konditionen (Views und Budget).
               </p>
               <label class="mt-4 flex cursor-pointer items-start gap-3 text-sm font-semibold">
-                <input type="checkbox" name="binding" class="mt-0.5 h-5 w-5 shrink-0 accent-amber-400">
+                <input type="checkbox" name="binding" class="mt-0.5 h-5 w-5 shrink-0 accent-brand">
                 <span>Ich beauftrage diese Kampagne verbindlich.</span>
               </label>
             </div>
@@ -577,7 +577,7 @@ export function newCampaignPage(o: { user: User }): string {
     form.querySelectorAll('[data-step]').forEach(function (f) { f.classList.toggle('hidden', Number(f.getAttribute('data-step')) !== step); });
     form.querySelectorAll('[data-dot]').forEach(function (d) {
       var on = Number(d.getAttribute('data-dot')) <= step;
-      d.classList.toggle('bg-amber-300', on); d.classList.toggle('bg-white/15', !on);
+      d.classList.toggle('bg-brand', on); d.classList.toggle('bg-white/15', !on);
     });
     form.querySelector('[data-step-label]').textContent = 'Schritt ' + step + ' von ' + TOTAL + ' · ' + titles[step - 1];
     form.querySelector('[data-back]').classList.toggle('invisible', step === 1);
@@ -635,7 +635,7 @@ export const CONTACT_HEADLINE = 'NIKKI MEDIA meldet sich bei dir.'
 
 export function waitingPage(o: { user: User; lead: AgencyLead }): string {
   const body = `
-      <section class="overflow-hidden rounded-3xl bg-gradient-to-br from-[#0b0a07] via-[#1a150b] to-[#3b2a07] px-6 py-14 text-center text-white shadow-xl sm:px-12 sm:py-20" data-contact-headline>
+      <section class="overflow-hidden rounded-3xl bg-gradient-to-br from-[#010302] via-[#041a0f] to-[#0a4527] ring-1 ring-inset ring-[#2fe08c]/25 px-6 py-14 text-center text-white shadow-xl sm:px-12 sm:py-20" data-contact-headline>
         <span class="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-[#f6dc8f] to-[#b9831c] text-[#1d1404] shadow-lg">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-8 w-8"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
         </span>
@@ -670,7 +670,7 @@ export function lockedPage(o: { user: User; lead: AgencyLead; title: string; act
   const body = `
       ${pageTitle(o.title)}
       <section class="rounded-3xl border border-slate-200 bg-white px-6 py-14 text-center shadow-sm" data-locked-page>
-        <span class="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#0b0a07] text-amber-300 shadow-lg">${LOCK_SVG.replace(
+        <span class="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#04100a] text-brand-2 shadow-lg">${LOCK_SVG.replace(
           'h-4 w-4',
           'h-7 w-7',
         )}</span>
@@ -890,9 +890,9 @@ export function overviewPage(o: {
         </div>
       </section>
 
-      <section class="flex flex-col gap-5 rounded-2xl bg-gradient-to-r from-[#0b0a07] via-[#1a150b] to-[#3b2a07] px-6 py-6 text-white shadow-sm lg:flex-row lg:items-center lg:justify-between">
+      <section class="flex flex-col gap-5 rounded-2xl bg-gradient-to-r from-[#010302] via-[#041a0f] to-[#0a4527] ring-1 ring-inset ring-[#2fe08c]/25 px-6 py-6 text-white shadow-sm lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p class="text-xs font-bold uppercase tracking-[.16em] text-amber-300">Deine Kampagne</p>
+          <p class="text-xs font-bold uppercase tracking-[.16em] text-brand-2">Deine Kampagne</p>
           <p class="mt-1 font-display text-xl font-extrabold">${esc(agencyPackageLabel(o.lead.package))}</p>
           <p class="mt-1 text-sm text-white/70">${esc(viewsShort(o.lead.viewsTarget))} Views · Budget ${esc(
             o.lead.budgetCents ? formatEuro(o.lead.budgetCents) : '–',

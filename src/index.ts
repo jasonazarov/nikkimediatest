@@ -91,7 +91,7 @@ app.notFound((c) =>
   c.html(
     `<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Seite nicht gefunden | Nikki Media</title>
      <meta name="viewport" content="width=device-width,initial-scale=1">
-     <script src="https://cdn.tailwindcss.com"></script></head>
+     <link rel="stylesheet" href="/assets/tw.css"></head>
      <body class="grid min-h-screen place-items-center bg-black px-6 text-center font-sans text-white">
        <div>
          <p class="text-6xl font-black text-[#2fe08c]">404</p>
@@ -108,7 +108,7 @@ app.onError((err, c) => {
   if (c.req.path.startsWith('/api/')) return c.json({ error: 'Serverfehler.' }, 500)
   return c.html(
     `<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Fehler | Nikki Media</title>
-     <script src="https://cdn.tailwindcss.com"></script></head>
+     <link rel="stylesheet" href="/assets/tw.css"></head>
      <body class="grid min-h-screen place-items-center bg-black px-6 text-center font-sans text-white">
        <div><p class="text-6xl font-black text-[#2fe08c]">500</p>
        <h1 class="mt-4 text-2xl font-bold">Da ist etwas schiefgelaufen</h1>

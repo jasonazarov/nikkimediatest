@@ -25,6 +25,7 @@ import {
   type Kpi,
   type PayTierView,
   type ThumbView,
+  quickActions,
 } from './layout'
 import { formatBytes } from '../lib/r2'
 import { dialOptions, formatPhone, splitPhone, telHref } from '../lib/phone'
@@ -639,8 +640,8 @@ function reachBar(r: { totals: MetricTotalsWithCreators; sync: SyncOverview; pau
   const n = (v: number) => (has ? formatCompact(v, 'en') : '–')
   const paused = metricsPausedNote(r.pausedUntil, 'en', { admin: true })
   return `
-      <div class="mt-3 flex flex-col gap-2 lg:flex-row lg:items-center">
-        <p class="shrink-0 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Reach <span class="font-normal normal-case tracking-normal text-slate-400">· real numbers from Zernio</span></p>
+      <div class="mt-7 flex flex-col gap-3">
+        <h2 class="nmw-section-title">Reach <span class="font-sans text-sm font-normal tracking-normal text-slate-400">· real numbers from Zernio</span></h2>
         ${kpis([
           { label: 'Views', value: n(t.views) },
           { label: 'Likes', value: n(t.likes) },
@@ -732,6 +733,13 @@ export function overviewPage(o: {
 
   const body =
     pageTitle('Overview', 'The current state at a glance.') +
+    quickActions([
+      { label: 'Campaigns', href: '/admin/projekte', icon: 'film', primary: true },
+      { label: 'Leads', href: '/admin/leads', icon: 'inbox' },
+      { label: 'New article', href: '/admin/fachartikel/neu', icon: 'doc' },
+      { label: 'Cooperation codes', href: '/admin/agenturen#codes', icon: 'briefcase' },
+    ]) +
+    `<h2 class="nmw-section-title mb-3">Marketplace</h2>` +
     kpis(numbers) +
     `<p class="mt-1.5 px-1 text-[11px] text-slate-400">${signupHint(o.clipperSignups)} (clippers) · ${signupHint(
       o.creatorSignups,

@@ -577,7 +577,7 @@ appRoutes.get('/einstellungen', async (c) => {
   if (!customer) {
     return c.html(
       `<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Kein Kundenkonto</title>
-       <script src="https://cdn.tailwindcss.com"></script></head>
+       <link rel="stylesheet" href="/assets/tw.css"></head>
        <body class="grid min-h-screen place-items-center bg-slate-50 p-6 text-center font-sans">
          <div><h1 class="text-xl font-bold">Kein Kundenkonto hinterlegt</h1>
          <p class="mt-2 text-slate-600">Bitte wende dich an Nikki Media.</p></div></body></html>`,

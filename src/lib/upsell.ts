@@ -119,7 +119,7 @@ export async function upsellCampaigns(env: Env, user: User): Promise<{ marginPct
   )
     .bind(customer.id)
     .all()
-  const rows = (results ?? []) as ProjectRow[]
+  const rows = (results ?? []) as unknown as ProjectRow[]
   if (!rows.length) return { marginPct, campaigns: [] }
 
   const open = new Set<string>()

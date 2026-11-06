@@ -195,12 +195,7 @@ export function loginPage(o: LoginOptions): string {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,500..800&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = { theme: { extend: {
-    fontFamily: { sans: ['Geist','Inter','system-ui','sans-serif'], display: ['"Bricolage Grotesque"','Geist','system-ui','sans-serif'] },
-    colors: { ink: '#000000', brand: { DEFAULT: '#2fe08c', 2: '#5eeaa6' } } } } }
-</script>
+<link rel="stylesheet" href="/assets/tw.css">
 <!-- Schwarz-Gold wie die Dashboards: dieselbe Umfärbung (html.nmd). -->
 <link rel="stylesheet" href="/assets/dash-glass.css">
 </head>

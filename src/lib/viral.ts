@@ -140,7 +140,7 @@ export async function viralClipsFor(env: Env, user: User, limit = 8): Promise<Vi
   const { results } = await env.DB.prepare(sql)
     .bind(...binds)
     .all()
-  const rows = (results ?? []) as Row[]
+  const rows = (results ?? []) as unknown as Row[]
 
   const canSign = r2Ready(env)
   return Promise.all(

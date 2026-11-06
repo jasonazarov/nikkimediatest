@@ -84,7 +84,7 @@ export async function publishedArticles(env: Env, limit = 50): Promise<Article[]
   )
     .bind(nowSec(), Math.max(1, Math.min(200, limit)))
     .all()
-  return ((results ?? []) as Row[]).map(toArticle)
+  return ((results ?? []) as unknown as Row[]).map(toArticle)
 }
 
 /** Ein veröffentlichter Artikel per Adresse — oder null. */
@@ -98,7 +98,7 @@ export async function articleBySlug(env: Env, slug: string): Promise<Article | n
 /** Alle Artikel für den Admin, neueste zuerst — auch Entwürfe. */
 export async function allArticles(env: Env): Promise<Article[]> {
   const { results } = await env.DB.prepare('SELECT * FROM articles ORDER BY published_at DESC').all()
-  return ((results ?? []) as Row[]).map(toArticle)
+  return ((results ?? []) as unknown as Row[]).map(toArticle)
 }
 
 export async function articleById(env: Env, id: string): Promise<Article | null> {

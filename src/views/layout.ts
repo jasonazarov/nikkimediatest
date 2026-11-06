@@ -88,6 +88,8 @@ export interface NavItem {
   hint?: string
   /** Gesperrt: Schloss rechts neben der Beschriftung (Collaboration-Bereich der Agenturen). */
   locked?: boolean
+  /** Überschrift der Menügruppe (Whop-Aufbau). Ohne Angabe: Name des Bereichs. */
+  group?: string
 }
 
 const ICONS: Record<string, string> = {
@@ -229,24 +231,36 @@ export function shell(o: ShellOptions): string {
   const lang = langFor(o.user.role)
   const logout = lang === 'en' ? 'Log out' : 'Abmelden'
   const menuLabel = lang === 'en' ? 'Menu' : 'Menü'
-  const searchLabel = lang === 'en' ? 'Jump to …' : 'Springe zu …'
+  const searchLabel = lang === 'en' ? 'Search menu …' : 'Menü durchsuchen …'
+  const siteLabel = lang === 'en' ? 'Website' : 'Zur Website'
   const viral = viralPlacement(o)
   const suggest = AGENT_SUGGEST[o.user.role]
   // „Mehr Reichweite“ (lib/upsell.ts): auf der Übersicht von Kunde und Agentur, nie bei gesperrtem Zugang.
   const upsell: 'customer' | 'agency' | null =
     viral && (o.user.role === 'customer' || o.user.role === 'agency') ? o.user.role : null
 
-  const navLinks = o.nav
-    .map((item) => {
-      const on = item.href === o.active
-      return `<a href="${item.href}" class="nmd-nav${on ? ' is-on' : ''}"${on ? ' aria-current="page"' : ''}${
-        item.locked ? ' data-locked' : ''
-      } data-nav-label="${esc(item.label)}">${icon(item.icon)}${
-        item.hint
-          ? `<span class="nmd-nav__txt"><span>${esc(item.label)}</span><small>${esc(item.hint)}</small></span>`
-          : `<span class="nmd-nav__txt"><span>${esc(item.label)}</span></span>`
-      }${item.locked ? `<span class="nmd-nav__lock" title="Gesperrt">${LOCK_SVG}</span>` : ''}</a>`
-    })
+  const link = (item: NavItem) => {
+    const on = item.href === o.active
+    return `<a href="${item.href}" class="nmd-nav${on ? ' is-on' : ''}"${on ? ' aria-current="page"' : ''}${
+      item.locked ? ' data-locked' : ''
+    } data-nav-label="${esc(item.label)}">${icon(item.icon)}${
+      item.hint
+        ? `<span class="nmd-nav__txt"><span>${esc(item.label)}</span><small>${esc(item.hint)}</small></span>`
+        : `<span class="nmd-nav__txt"><span>${esc(item.label)}</span></span>`
+    }${item.locked ? `<span class="nmd-nav__lock" title="Gesperrt">${LOCK_SVG}</span>` : ''}</a>`
+  }
+
+  // Gruppen wie bei Whop („Wachstum“, „Betrieb“ …): aufeinanderfolgende
+  // Punkte mit derselben `group` stehen unter einer Überschrift.
+  const groups: { label: string; items: NavItem[] }[] = []
+  for (const item of o.nav) {
+    const label = item.group ?? ROLE_LABEL[o.user.role]
+    const last = groups[groups.length - 1]
+    if (last && last.label === label) last.items.push(item)
+    else groups.push({ label, items: [item] })
+  }
+  const navGroups = groups
+    .map((g) => `<div class="nmw-group" data-nav-group><p class="nmd-group">${esc(g.label)}</p>${g.items.map(link).join('')}</div>`)
     .join('\n        ')
 
   return `<!DOCTYPE html>
@@ -261,41 +275,47 @@ export function shell(o: ShellOptions): string {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,500..800&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: { extend: {
-      fontFamily: { sans: ['Geist','Inter','system-ui','sans-serif'], display: ['"Bricolage Grotesque"','Geist','system-ui','sans-serif'] },
-      colors: { ink: '#000000', panel: '#060c09', brand: { DEFAULT: '#2fe08c', 2: '#5eeaa6' } }
-    } }
-  }
-</script>
+<link rel="stylesheet" href="/assets/tw.css">
 <link rel="stylesheet" href="/assets/dash-glass.css">
-<style>
-  body { -webkit-font-smoothing: antialiased; }
-  [x-cloak] { display: none; }
-</style>
+<link rel="stylesheet" href="/assets/dash-whop.css">
 </head>
-<body class="h-full font-sans nmd-body">
+<body class="h-full font-sans nmd-body" data-role="${o.user.role}">
 
-<div class="nmd-frame">
+<!-- Kopfzeile über die ganze Breite (Whop-Aufbau) -->
+<header class="nmw-top">
+  <button type="button" class="nmd-burger" aria-label="${esc(menuLabel)}" aria-controls="sidenav" aria-expanded="false" data-nav-toggle>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  </button>
+  <a href="${esc(o.nav[0]?.href ?? '/')}" class="nmd-brand">
+    <span class="nmd-brand__mark" aria-hidden="true">N</span>
+    <span class="nmd-brand__txt">Nikki Media<small>${esc(ROLE_LABEL[o.user.role])}</small></span>
+  </a>
+  <label class="nmd-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input type="search" placeholder="${esc(searchLabel)}" aria-label="${esc(searchLabel)}" data-nav-search autocomplete="off">
+    <kbd>/</kbd>
+  </label>
+  <span class="nmd-top__right">
+    <a href="/" class="nmw-iconbtn" title="${esc(siteLabel)}" aria-label="${esc(siteLabel)}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+    </a>
+    <span class="nmw-role">${esc(ROLE_LABEL[o.user.role])}</span>
+    <span class="nmd-me__av" title="${esc(o.user.fullName)}" aria-hidden="true">${esc(initials)}</span>
+  </span>
+</header>
 
-  <!-- Seitenleiste -->
-  <aside class="nmd-side">
-    <div class="nmd-side__top">
-      <a href="/" class="nmd-brand">
-        <span class="nmd-brand__mark" aria-hidden="true">N</span>
-        <span class="nmd-brand__txt">Nikki Media<small>${esc(ROLE_LABEL[o.user.role])}</small></span>
-      </a>
-      <button type="button" class="nmd-burger" aria-label="${esc(menuLabel)}" aria-controls="sidenav" aria-expanded="false"
-        onclick="var n=document.getElementById('sidenav');n.classList.toggle('hidden');this.setAttribute('aria-expanded',String(!n.classList.contains('hidden')))">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-      </button>
-    </div>
+<div class="nmw-frame">
+  <div class="nmw-scrim" data-nav-toggle hidden></div>
 
-    <nav id="sidenav" class="hidden lg:block nmd-side__nav">
-      <p class="nmd-group">${esc(ROLE_LABEL[o.user.role])}</p>
-        ${navLinks}
+  <!-- Seitenleiste: Arbeitsbereich, gruppierte Punkte, Konto -->
+  <aside class="nmd-side" aria-label="${esc(menuLabel)}">
+    <nav id="sidenav" class="nmd-side__nav">
+      <div class="nmw-ws">
+        <span class="nmw-ws__tile" aria-hidden="true">${esc(initials)}</span>
+        <span class="nmw-ws__tile is-on" aria-hidden="true">N</span>
+        <span class="nmw-ws__txt"><b>Nikki Media</b><small>${esc(ROLE_LABEL[o.user.role])}</small></span>
+      </div>
+        ${navGroups}
 
       <div class="nmd-me">
         <div class="nmd-me__row">
@@ -315,17 +335,6 @@ export function shell(o: ShellOptions): string {
 
   <!-- Inhalt -->
   <div class="nmd-main">
-    <header class="nmd-top">
-      <p class="nmd-crumb"><span>${esc(ROLE_LABEL[o.user.role])}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><b>${esc(o.title)}</b></p>
-      <span class="nmd-top__right">
-      <label class="nmd-search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input type="search" placeholder="${esc(searchLabel)}" aria-label="${esc(searchLabel)}" data-nav-search autocomplete="off">
-        <kbd>/</kbd>
-      </label>
-        <span class="nmd-me__av" aria-hidden="true">${esc(initials)}</span>
-      </span>
-    </header>
     <main class="nmd-content">
       <div class="mx-auto max-w-7xl">
 ${withTopSections(o.body, (viral === 'top' ? viewsSection(o.user.role, lang) + viralSection(o.user.role, lang) : '') + (upsell ? upsellSection(upsell) : ''))}
@@ -336,16 +345,30 @@ ${viral === 'bottom' ? viewsSection(o.user.role, lang) + viralSection(o.user.rol
 </div>
 
 <script>
-/* Sprung-Suche: filtert die Menüpunkte, Enter öffnet den ersten Treffer, „/“ setzt den Fokus. */
+/* Menü auf dem Handy (Schublade) und Sprung-Suche: filtert die Menüpunkte, Enter öffnet den ersten Treffer, „/“ setzt den Fokus. */
 (function () {
+  var body = document.body;
+  var scrim = document.querySelector('.nmw-scrim');
+  var burger = document.querySelector('.nmd-burger');
+  function setOpen(open) {
+    body.classList.toggle('nmw-open', open);
+    if (scrim) scrim.hidden = !open;
+    if (burger) burger.setAttribute('aria-expanded', String(open));
+  }
+  [].forEach.call(document.querySelectorAll('[data-nav-toggle]'), function (el) {
+    el.addEventListener('click', function () { setOpen(!body.classList.contains('nmw-open')); });
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
+
   var box = document.querySelector('[data-nav-search]');
   if (!box) return;
   var links = [].slice.call(document.querySelectorAll('#sidenav [data-nav-label]'));
-  var nav = document.getElementById('sidenav');
+  var groups = [].slice.call(document.querySelectorAll('#sidenav [data-nav-group]'));
   box.addEventListener('input', function () {
     var q = box.value.trim().toLowerCase();
-    if (q && nav.classList.contains('hidden')) nav.classList.remove('hidden');
+    if (q && window.innerWidth < 1024) setOpen(true);
     links.forEach(function (a) { a.hidden = !!q && a.getAttribute('data-nav-label').toLowerCase().indexOf(q) < 0; });
+    groups.forEach(function (g) { g.hidden = !g.querySelector('[data-nav-label]:not([hidden])'); });
   });
   box.addEventListener('keydown', function (e) {
     if (e.key !== 'Enter') return;
@@ -354,7 +377,8 @@ ${viral === 'bottom' ? viewsSection(o.user.role, lang) + viralSection(o.user.rol
   });
   document.addEventListener('keydown', function (e) {
     var t = e.target;
-    if (e.key === '/' && !(t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))) { e.preventDefault(); box.focus(); }
+    var cmdK = (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k';
+    if (cmdK || (e.key === '/' && !(t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))))) { e.preventDefault(); box.focus(); }
   });
 })();
 </script>
@@ -380,14 +404,25 @@ export const card = (inner: string, extra = '') =>
   `<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm ${extra}">${inner}</div>`
 
 export const statTile = (label: string, value: string, hint?: string) => `
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">${esc(label)}</p>
-          <p class="mt-2 font-display text-3xl font-extrabold">${esc(value)}</p>
-          ${hint ? `<p class="mt-1 text-xs text-slate-400">${esc(hint)}</p>` : ''}
+        <div class="nmw-stat nmw-tile">
+          <span class="nmw-stat__label">${esc(label)}</span>
+          <span class="nmw-stat__value">${esc(value)}</span>
+          ${hint ? `<span class="nmw-stat__hint">${esc(hint)}</span>` : ''}
         </div>`
+
+/** Kleine Illustration für Leerzustände (Whop: Grafik → Überschrift → Satz → ein Knopf). */
+const EMPTY_ART = `<svg class="nmw-empty__art" viewBox="0 0 104 80" fill="none" aria-hidden="true">
+  <rect x="18" y="14" width="68" height="52" rx="10" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.14)"/>
+  <rect x="28" y="6" width="48" height="36" rx="8" fill="#0b1510" stroke="rgba(47,224,140,.45)"/>
+  <path d="m47 18 10 6-10 6V18Z" fill="#2fe08c"/>
+  <rect x="28" y="50" width="30" height="5" rx="2.5" fill="rgba(255,255,255,.14)"/>
+  <rect x="28" y="58" width="44" height="4" rx="2" fill="rgba(255,255,255,.08)"/>
+  <circle cx="84" cy="62" r="11" fill="#2fe08c"/><path d="M84 57v10M79 62h10" stroke="#02160c" stroke-width="2.4" stroke-linecap="round"/>
+</svg>`
 
 export const emptyState = (title: string, text: string, action = '') => `
         <div class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
+          ${EMPTY_ART}
           <p class="font-display text-lg font-bold">${esc(title)}</p>
           <p class="mx-auto mt-2 max-w-md text-sm text-slate-500">${esc(text)}</p>
           ${action}
@@ -443,7 +478,7 @@ export const badge = (text: string, tone: 'blue' | 'green' | 'grey' | 'amber' | 
     amber: 'bg-amber-50 text-amber-700 ring-amber-200',
     red: 'bg-red-50 text-red-700 ring-red-200',
   }[tone]
-  return `<span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${tones}">${esc(
+  return `<span class="nmw-pill inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${tones}">${esc(
     text,
   )}</span>`
 }
@@ -451,26 +486,26 @@ export const badge = (text: string, tone: 'blue' | 'green' | 'grey' | 'amber' | 
 /* Navigationen je Rolle */
 
 export const CUSTOMER_NAV: NavItem[] = [
-  { href: '/app', label: 'Meine Kampagnen', icon: 'folder' },
-  { href: '/app/videos', label: 'Fertige Videos', icon: 'film' },
-  { href: '/app/einstellungen', label: 'Einstellungen', icon: 'cog' },
+  { href: '/app', label: 'Meine Kampagnen', icon: 'folder', group: 'Kampagnen' },
+  { href: '/app/videos', label: 'Fertige Videos', icon: 'film', group: 'Kampagnen' },
+  { href: '/app/einstellungen', label: 'Einstellungen', icon: 'cog', group: 'Konto' },
 ]
 
 /** URLs bleiben deutsch (bestehende Links, Lesezeichen) — nur die Beschriftung ist englisch. */
 export const ADMIN_NAV: NavItem[] = [
-  { href: '/admin', label: 'Overview', icon: 'grid' },
-  { href: '/admin/analytics', label: 'Analytics', icon: 'trend' },
-  { href: '/admin/projekte', label: 'Campaigns', icon: 'film' },
-  { href: '/admin/clipper', label: 'Clippers', icon: 'scissors' },
-  { href: '/admin/creator', label: 'Creators', icon: 'users' },
-  { href: '/admin/kunden', label: 'Customers', icon: 'users' },
-  { href: '/admin/leads', label: 'Leads', icon: 'inbox' },
+  { href: '/admin', label: 'Overview', icon: 'grid', group: 'Nikki Media' },
+  { href: '/admin/analytics', label: 'Analytics', icon: 'trend', group: 'Nikki Media' },
+  { href: '/admin/projekte', label: 'Campaigns', icon: 'film', group: 'Marketplace' },
+  { href: '/admin/clipper', label: 'Clippers', icon: 'scissors', group: 'Marketplace' },
+  { href: '/admin/creator', label: 'Creators', icon: 'star', group: 'Marketplace' },
+  { href: '/admin/kunden', label: 'Customers', icon: 'users', group: 'Marketplace' },
+  { href: '/admin/leads', label: 'Leads', icon: 'inbox', group: 'Growth' },
   // Bezeichnung vom Auftraggeber vorgegeben — bewusst deutsch.
-  { href: '/admin/agenturen', label: 'Agenturen', icon: 'briefcase' },
+  { href: '/admin/agenturen', label: 'Agenturen', icon: 'briefcase', group: 'Growth' },
   // Gold-Marktplatz (November 2026). „Fachartikel“ auf Wunsch deutsch wie „Agenturen“.
-  { href: '/admin/fachartikel', label: 'Fachartikel', icon: 'doc' },
-  { href: '/admin/upsells', label: 'Upsells', icon: 'trend' },
-  { href: '/admin/passwort', label: 'Password', icon: 'cog' },
+  { href: '/admin/fachartikel', label: 'Fachartikel', icon: 'doc', group: 'Growth' },
+  { href: '/admin/upsells', label: 'Upsells', icon: 'tag', group: 'Growth' },
+  { href: '/admin/passwort', label: 'Password', icon: 'cog', group: 'Account' },
 ]
 
 /**
@@ -482,18 +517,18 @@ export const ADMIN_NAV: NavItem[] = [
  * den Punkten darüber.
  */
 export const CREATOR_NAV: NavItem[] = [
-  { href: '/kampagnen', label: 'Übersicht', icon: 'grid' },
-  { href: '/kampagnen/meine', label: 'Meine Kampagnen', icon: 'folder', hint: 'von dir angelegt' },
-  { href: '/kampagnen/finden', label: 'Zugewiesene Kampagnen', icon: 'inbox', hint: 'von NIKKI MEDIA zugewiesen' },
-  { href: '/kampagnen/verbreiten', label: 'Verbreiten', icon: 'film' },
-  { href: '/kampagnen/upload', label: 'Clips hochladen', icon: 'upload' },
-  { href: '/kampagnen/accounts', label: 'Meine Accounts', icon: 'link' },
+  { href: '/kampagnen', label: 'Übersicht', icon: 'grid', group: 'Creator' },
+  { href: '/kampagnen/meine', label: 'Meine Kampagnen', icon: 'folder', hint: 'von dir angelegt', group: 'Kampagnen' },
+  { href: '/kampagnen/finden', label: 'Zugewiesene Kampagnen', icon: 'inbox', hint: 'von NIKKI MEDIA zugewiesen', group: 'Kampagnen' },
+  { href: '/kampagnen/verbreiten', label: 'Verbreiten', icon: 'film', group: 'Arbeit' },
+  { href: '/kampagnen/upload', label: 'Clips hochladen', icon: 'upload', group: 'Arbeit' },
+  { href: '/kampagnen/accounts', label: 'Meine Accounts', icon: 'link', group: 'Konto' },
 ]
 
 /** Clipper-Navigation — deutsch, wie der ganze Arbeitsbereich. */
 export const WORK_NAV: NavItem[] = [
-  { href: '/work', label: 'Meine Kampagnen', icon: 'folder' },
-  { href: '/work/upload', label: 'Fertige Videos hochladen', icon: 'upload' },
+  { href: '/work', label: 'Meine Kampagnen', icon: 'folder', group: 'Clipping Area' },
+  { href: '/work/upload', label: 'Fertige Videos hochladen', icon: 'upload', group: 'Clipping Area' },
 ]
 
 /* ==========================================================================
@@ -526,18 +561,69 @@ export interface Kpi {
  * daneben, getrennt durch feine Linien. Ersetzt die großen `statTile`-Kacheln.
  */
 export const kpiBar = (items: Kpi[], extra = '') => `
-        <div class="flex flex-wrap items-center gap-x-1 gap-y-1 rounded-xl border border-slate-200 bg-white/80 px-2 py-1.5 text-sm shadow-sm backdrop-blur ${extra}">
+        <div class="nmw-stats ${extra}" data-kpis>
           ${items
             .map(
-              (k, i) => `<span class="inline-flex items-baseline gap-1.5 px-2.5 py-1 ${i ? 'sm:border-l sm:border-slate-200' : ''}">
-            <b class="font-display text-[15px] font-extrabold tabular-nums text-slate-900">${esc(k.value)}</b>
-            <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">${esc(k.label)}</span>${
-              k.hint ? `<span class="text-[11px] text-slate-400">${esc(k.hint)}</span>` : ''
-            }
-          </span>`,
+              (k) => `<div class="nmw-stat">
+            <span class="nmw-stat__label">${esc(k.label)}</span>
+            <b class="nmw-stat__value">${esc(k.value)}</b>${k.hint ? `<span class="nmw-stat__hint">${esc(k.hint)}</span>` : ''}
+          </div>`,
             )
             .join('')}
         </div>`
+
+/* ------------------------------------------------- Whop-Bausteine (nmw) */
+
+export interface QuickAction {
+  label: string
+  href: string
+  /** Name aus ICONS (folder, upload, film …). */
+  icon: string
+  primary?: boolean
+}
+
+/**
+ * Schnellaktionen als Reihe gleich breiter Knöpfe (Whop: Einzahlen ·
+ * Akzeptieren · Senden). Nur Links auf Seiten, die es schon gibt.
+ */
+export const quickActions = (items: QuickAction[]) =>
+  items.length
+    ? `<nav class="nmw-actions" aria-label="Schnellaktionen">${items
+        .map((a) => `<a href="${esc(a.href)}" class="nmw-action${a.primary ? ' is-primary' : ''}">${icon(a.icon)}<span>${esc(a.label)}</span></a>`)
+        .join('')}</nav>`
+    : ''
+
+export interface Step {
+  title: string
+  text: string
+  icon: string
+}
+
+/** „So funktioniert's“ in drei Karten (Whop: Onboarding der Werbung, sinngemäß für Clipping). */
+export const howItWorks = (eyebrow: string, title: string, steps: Step[]) => `
+      <section class="nmw-steps" aria-label="${esc(title)}">
+        <div class="nmw-steps__head"><div><p class="nmw-steps__eyebrow">${esc(eyebrow)}</p><h2 class="nmw-steps__title">${esc(title)}</h2></div></div>
+        <div class="nmw-steps__grid">${steps
+          .map(
+            (st, i) => `<article class="nmw-step"><span class="nmw-step__num">${i + 1}</span><span class="nmw-step__icon">${icon(st.icon)}</span>
+            <h3>${esc(st.title)}</h3><p>${esc(st.text)}</p></article>`,
+          )
+          .join('')}</div>
+      </section>`
+
+/** Hinweisbanner (Whop: Banner „Steuerdaten bestätigen“). `tone` info = grün, warn = amber. */
+export const noticeBanner = (title: string, text: string, o: { tone?: 'info' | 'warn'; href?: string; cta?: string } = {}) => `
+      <div class="nmw-banner${o.tone === 'info' ? ' is-info' : ''}" role="status">
+        <svg class="nmw-banner__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg>
+        <div class="nmw-banner__txt"><b>${esc(title)}</b><span>${esc(text)}</span></div>
+        ${o.href && o.cta ? `<a class="nmw-banner__btn" href="${esc(o.href)}">${esc(o.cta)}</a>` : ''}
+      </div>`
+
+/** Fortschrittsbalken Views gegen Ziel, 0–100 %. */
+export const progressBar = (value: number, goal: number) => {
+  const pct = goal > 0 ? Math.max(0, Math.min(100, (value / goal) * 100)) : 0
+  return `<div class="nmw-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct)}"><i style="width:${pct.toFixed(1)}%"></i></div>`
+}
 
 /** Was `campaignThumb` braucht — dieselbe Form wie `CampaignThumb` in lib/thumbs.ts. */
 export type ThumbView =
@@ -586,15 +672,15 @@ export function campaignThumb(thumb: ThumbView | undefined, name: string, extra 
     // auf 80 px gezogenes Favicon verschwommen — dort steht die Weltkugel
     // groß und das Favicon klein daneben.
     const main = thumb.provider.bundled
-      ? `<img src="/img/cloud/${esc(thumb.provider.id)}.svg" alt="" loading="lazy" decoding="async" class="h-20 w-20 object-contain drop-shadow-sm sm:h-24 sm:w-24">`
-      : `<span class="relative">
-          <img src="/img/cloud/web.svg" alt="" class="h-20 w-20 opacity-80 sm:h-24 sm:w-24">
+      ? `<span class="nmw-thumb-cloud__logo"><img src="/img/cloud/${esc(thumb.provider.id)}.svg" alt="" loading="lazy" decoding="async"></span>`
+      : `<span class="nmw-thumb-cloud__logo relative">
+          <img src="/img/cloud/web.svg" alt="" class="opacity-80">
           <img src="https://icons.duckduckgo.com/ip3/${esc(encodeURIComponent(thumb.host))}.ico" alt="" loading="lazy" decoding="async"
-               class="absolute -bottom-1 -right-1 h-8 w-8 rounded-lg bg-white p-1 shadow" onerror="this.remove()">
+               class="absolute -bottom-1 -right-1 !h-7 !w-7 rounded-lg bg-white p-1 shadow" onerror="this.remove()">
         </span>`
-    return `<div class="${frame} grid place-items-center bg-gradient-to-br from-white via-slate-50 to-slate-200">
+    return `<div class="${frame} nmw-thumb-cloud grid place-items-center">
       ${main}
-      <span class="absolute bottom-2.5 left-3 inline-flex max-w-[85%] items-center gap-1.5 truncate rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-slate-600 shadow-sm">
+      <span class="nmw-thumb-cloud__chip">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3 w-3 shrink-0"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
         <span class="truncate">${esc(thumb.provider.bundled ? thumb.provider.label : thumb.host)}</span>
       </span>
@@ -665,7 +751,7 @@ export interface CampaignCardOptions {
  * darin nicht zugleich die Karte öffnen.
  */
 export const campaignCard = (o: CampaignCardOptions) => `
-        <article class="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg">
+        <article class="nmw-camp group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg">
           <a href="${esc(o.href)}" class="block focus:outline-none focus-visible:ring-4 focus-visible:ring-brand/30">
             ${o.origin ? originStrip(o.origin.kind, o.origin.lang ?? 'de') : ''}
             <div class="relative">
