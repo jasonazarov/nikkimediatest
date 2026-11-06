@@ -280,3 +280,5 @@ img[src*="/img/platforms/"], img[src*="/img/cloud/"], img[src*="icons.duckduckgo
 .igw__av, .igembed__av { background: conic-gradient(from 200deg, #8ff3bf, #2fe08c, #17a865, #8ff3bf) !important; }
 .igembed__ph .igembed__av, .igembed__av { background: conic-gradient(from 200deg, #8ff3bf, #2fe08c, #17a865, #8ff3bf) !important; }
 .igembed__logo { background: linear-gradient(135deg, #8ff3bf, #2fe08c 52%, #17a865) !important; color: #02160c !important; box-shadow: 0 10px 26px rgba(47, 224, 140, .28) !important; }
+/* Eingebettetes Instagram-Symbol in den Case-Study-Karten (keine Bilddatei, deshalb nicht vom Logo-Filter erfasst) */
+.igw__ig { color: #2fe08c !important; filter: drop-shadow(0 0 6px rgba(47, 224, 140, .35)); }
