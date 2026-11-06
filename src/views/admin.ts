@@ -3923,6 +3923,8 @@ export function campaignDetailPage(o: {
     publishError: string | null
     /** Bei Agentur-Kampagnen: das Briefing, über das sie entstand. */
     briefing?: Briefing | null
+    /** Bei Kunden-Kampagnen aus „Neue Kampagne“: Laufzeit und gewünschte Reichweite. */
+    request?: { durationDays: number; views: number | null } | null
   }
   /** `role: 'creator'` heißt: Die Kampagne ist die eigene eines Creators. */
   owner: {
@@ -4092,6 +4094,13 @@ export function campaignDetailPage(o: {
                   .filter(Boolean)
                   .join(' · '),
               )}</span></dd>`
+                  : ''
+              }${
+                p.request
+                  ? `<dt class="mt-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Customer request</dt>
+              <dd class="mt-0.5 font-semibold text-slate-700" data-request-info>${esc(`${p.request.durationDays} days`)}${
+                p.request.views ? ` · ${esc(p.request.views.toLocaleString('en-GB'))} views` : ''
+              }<span class="block text-xs font-normal text-slate-500">Runtime and desired reach from the customer's campaign form</span></dd>`
                   : ''
               }
               <dt class="mt-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Team</dt>

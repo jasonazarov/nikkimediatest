@@ -29,6 +29,7 @@ import {
   type VideoCard,
 } from '../views/app'
 import type { AppEnv } from '../lib/types'
+import { customerNewCampaignPage } from '../views/customer-new'
 import type { Customer, Folder, Project } from '../db/schema'
 
 export const appRoutes = new Hono<AppEnv>()
@@ -172,6 +173,13 @@ appRoutes.get('/', async (c) => {
   const customer = await customerForUser(c.env, c.get('user').id)
   if (!customer) return c.redirect('/app/einstellungen', 302)
   return renderCustomerProjects(c, CUSTOMER_AREA, customer)
+})
+
+/** „Neue Kampagne“: Name, Laufzeit, Reichweite (views/customer-new.ts). */
+appRoutes.get('/neu', async (c) => {
+  const customer = await customerForUser(c.env, c.get('user').id)
+  if (!customer) return c.redirect('/app/einstellungen', 302)
+  return c.html(customerNewCampaignPage({ user: c.get('user') }))
 })
 
 /* ------------------------------------ 2 — Ordner innerhalb einer Kampagne */

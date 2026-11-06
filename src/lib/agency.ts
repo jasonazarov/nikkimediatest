@@ -127,6 +127,10 @@ export const VIEWS_MIN = 100_000
 export const VIEWS_MAX = 10_000_000
 export const VIEWS_STEP = 50_000
 export const VIEWS_DEFAULT = 1_000_000
+/** Laufzeit einer Kunden-Kampagne in Tagen (Formular „Neue Kampagne“ im Kunden-Dashboard). */
+export const CAMPAIGN_DURATIONS = [30, 60, 90] as const
+export const isValidDuration = (d: number) => (CAMPAIGN_DURATIONS as readonly number[]).includes(d)
+
 export const isValidViews = (v: number) => Number.isInteger(v) && v >= VIEWS_MIN && v <= VIEWS_MAX && v % VIEWS_STEP === 0
 
 const labelIn = (list: readonly { value: string; label: string }[], value: string | null | undefined) =>

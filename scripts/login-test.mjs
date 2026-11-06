@@ -426,6 +426,23 @@ try {
     zaehle(`SELECT count(*) AS n FROM project_links l JOIN projects p ON p.id = l.project_id JOIN customers c ON c.id = p.customer_id JOIN users u ON u.id = c.user_id WHERE u.email='${NEU_KUNDE}';`) === 1,
   )
 
+  // „Neue Kampagne“ im Kunden-Dashboard: Laufzeit und Reichweite hängen an der Kampagne
+  const kundeCookie = (kundeNeu.headers.get('set-cookie') ?? '').split(/,(?=\s*nm_)/).map((c) => c.trim().split(';')[0]).find((c) => c.startsWith('nm_session_customer=')) ?? ''
+  const kundePost = (daten) => hole('/api/app/projects', { method: 'POST', headers: { 'content-type': 'application/json', cookie: kundeCookie }, body: JSON.stringify(daten) })
+  const formularSeite = await hole('/app/neu', { headers: { cookie: kundeCookie } })
+  pruefe('Kunde: Formular „Neue Kampagne“ ist erreichbar', formularSeite.status === 200 && (await formularSeite.text()).includes('data-customer-campaign'), `HTTP ${formularSeite.status}`)
+  const falscheLaufzeit = await kundePost({ name: 'Herbst', durationDays: 45, views: 1000000 })
+  const falscheViews = await kundePost({ name: 'Herbst', durationDays: 60, views: 1234567 })
+  pruefe('Kunde: falsche Laufzeit und Reichweite werden abgewiesen', falscheLaufzeit.status === 400 && falscheViews.status === 400, `HTTP ${falscheLaufzeit.status}/${falscheViews.status}`)
+  const kundeKampagne = await kundePost({ name: 'Herbst-Aktion', durationDays: 60, views: 2350000 })
+  const kundeKampagneBody = await kundeKampagne.json().catch(() => ({}))
+  pruefe(
+    'Kunde: Kampagne mit Laufzeit 60 Tage und 2.350.000 Views ist angelegt',
+    kundeKampagne.status === 200 &&
+      zaehle(`SELECT count(*) AS n FROM projects WHERE id='${kundeKampagneBody.id}' AND briefing_duration_days=60 AND briefing_views=2350000;`) === 1,
+    `HTTP ${kundeKampagne.status} → ${JSON.stringify(kundeKampagneBody)}`,
+  )
+
   const kundeNochmal = await json('/api/leads', { ...kundenDaten, cloudLink: 'https://evil.example/fremd' })
   const kundeNochmalBody = await kundeNochmal.json().catch(() => ({}))
   pruefe(
@@ -686,7 +703,7 @@ try {
   pruefe(
     'Weitere Kampagne entsteht mit ihrem Briefing',
     zweite.status === 200 &&
-      String(zweiteBody.redirect) === `/collaboration/meine/${zweiteBody.id}` &&
+      String(zweiteBody.redirect) === `/collaboration/meine/${zweiteBody.id}?angelegt=1` &&
       zaehle(`SELECT count(*) AS n FROM projects WHERE id='${String(zweiteBody.id).replace(/'/g, '')}' AND name='Kunde Sommer' AND briefing_views=500000 AND briefing_budget_cents=250000 AND briefing_niche='Gastronomie' AND briefing_platforms='["tiktok","instagram"]';`) === 1,
     `HTTP ${zweite.status} → ${JSON.stringify(zweiteBody)}`,
   )

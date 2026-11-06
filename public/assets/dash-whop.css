@@ -505,3 +505,33 @@ html.nmd .nmg dl.divide-y { background: rgba(255, 255, 255, .04) !important; bor
 .nmg input[name="binding"] { accent-color: #2fe08c; }
 
 @media (prefers-reduced-motion: reduce) { html.nmd section.nmg::before { animation: none; } .nmg-st, .nmg-st i { transition: none; } }
+
+/* ---------- Glückwunsch nach dem Anlegen einer Kampagne (Vorgabe des Auftraggebers, November 2026) ---------- */
+.nmg-pop { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, .6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: nmgFade .25s ease-out; }
+.nmg-pop[hidden] { display: none; }
+.nmg-pop__card {
+  position: relative; width: min(440px, 100%); padding: 34px 28px 28px; border-radius: 24px; text-align: center; color: #eef7f1;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .02)), rgba(4, 12, 8, .92);
+  border: 1px solid rgba(47, 224, 140, .35); box-shadow: 0 30px 80px rgba(0, 0, 0, .6), 0 0 60px rgba(47, 224, 140, .18), inset 0 1px 0 rgba(255, 255, 255, .14);
+  animation: nmgPop .4s cubic-bezier(.2, .9, .25, 1.2);
+}
+.nmg-pop__ic { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 50%; color: #02160c; background: radial-gradient(circle at 35% 35%, #d6fde9, #2fe08c 60%, #17a865); box-shadow: 0 0 0 8px rgba(47, 224, 140, .14), 0 0 40px rgba(47, 224, 140, .7); }
+.nmg-pop__ic svg { width: 32px; height: 32px; }
+.nmg-pop__card h2 { margin: 0 0 8px; font-size: 26px; font-weight: 800; }
+.nmg-pop__card p { margin: 0; font-size: 15.5px; line-height: 1.5; }
+.nmg-pop__card .nmg-pop__sub { margin-top: 10px; font-size: 13.5px; color: rgba(255, 255, 255, .65); }
+.nmg-pop__btn {
+  margin-top: 22px; padding: 12px 26px; border-radius: 12px; font-weight: 800; font-size: 14px; color: #fff; cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, .3); background: linear-gradient(100deg, rgba(94, 234, 166, .8), rgba(47, 224, 140, .68) 52%, rgba(15, 138, 82, .78));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 10px 26px rgba(47, 224, 140, .25);
+}
+@keyframes nmgFade { from { opacity: 0; } }
+@keyframes nmgPop { from { opacity: 0; transform: translateY(12px) scale(.94); } }
+@media (prefers-reduced-motion: reduce) { .nmg-pop, .nmg-pop__card { animation: none; } }
+
+/* Laufzeit-Kacheln im Kunden-Formular „Neue Kampagne“ (views/customer-new.ts) */
+.nmg-choice { border: 1px solid rgba(255, 255, 255, .12); background: linear-gradient(160deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .02)); transition: transform .2s, border-color .2s, box-shadow .2s; }
+label:hover .nmg-choice { transform: translateY(-2px); border-color: rgba(47, 224, 140, .4); }
+input:checked + .nmg-choice { border-color: rgba(47, 224, 140, .85); background: linear-gradient(160deg, rgba(47, 224, 140, .16), rgba(47, 224, 140, .04)); box-shadow: 0 0 0 1px rgba(47, 224, 140, .5), 0 0 26px rgba(47, 224, 140, .3); }
+input:checked + .nmg-choice b { color: #9cf6c8; text-shadow: 0 0 20px rgba(47, 224, 140, .5); }
+input:focus-visible + .nmg-choice { outline: 2px solid #9cf6c8; outline-offset: 2px; }

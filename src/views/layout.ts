@@ -172,6 +172,9 @@ export type PushArea = 'customer' | 'agency' | 'creator'
  * nichts anzubieten gibt. Auf der Übersicht mit allen laufenden Kampagnen,
  * auf einer Kampagnenseite (`projectId`) nur für diese eine.
  */
+/** Marke im Seiteninhalt: hier statt oben steht „Kampagne pushen“ (siehe shell). */
+export const PUSH_MARK = '<!--nm:push-->'
+
 export const upsellSection = (area: PushArea, projectId?: string) => `
       <section class="nmu nmu--push" ${projectId ? 'id="kampagne-pushen"' : 'id="mehr-reichweite"'} data-upsell data-area="${area}"${
         projectId ? ` data-project="${esc(projectId)}"` : ''
@@ -249,8 +252,11 @@ export function shell(o: ShellOptions): string {
   const suggest = AGENT_SUGGEST[o.user.role]
   // „Kampagne pushen“ (lib/upsell.ts): auf der Übersicht von Kunde, Agentur und Creator, nie bei gesperrtem Zugang.
   // Beim Creator steht es unter dem Inhalt, weil oben die Preisstaffelung bleiben muss.
+  // Setzt die Seite die Marke PUSH_MARK, steht „Kampagne pushen“ dort statt oben
+  // (Kunden-Übersicht: erst „Meine Kampagnen“, dann pushen; Vorgabe des Auftraggebers).
   const upsell: PushArea | null =
     viral && !o.push && (o.user.role === 'customer' || o.user.role === 'agency' || o.user.role === 'creator') ? o.user.role : null
+  const pushAt = !!upsell && o.body.includes(PUSH_MARK)
 
   const link = (item: NavItem) => {
     const on = item.href === o.active
@@ -345,6 +351,17 @@ export function shell(o: ShellOptions): string {
   </span>
 </header>
 
+<!-- Glückwunsch nach dem Anlegen einer Kampagne (?angelegt=1; Kunde, Agentur, Creator) -->
+<div class="nmg-pop" id="nmg-pop" hidden>
+  <div class="nmg-pop__card" role="dialog" aria-modal="true" aria-labelledby="nmg-pop-t">
+    <span class="nmg-pop__ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7.5"/></svg></span>
+    <h2 id="nmg-pop-t">Glückwunsch!</h2>
+    <p>Du hast deine Kampagne erfolgreich bei <b>NIKKI MEDIA</b> angelegt.</p>
+    <p class="nmg-pop__sub">Als Nächstes: Lade dein Rohmaterial hoch oder füge einen Cloud-Link ein.</p>
+    <button type="button" class="nmg-pop__btn" data-pop-close>Weiter</button>
+  </div>
+</div>
+
 <div class="nmw-frame">
   <div class="nmw-scrim" data-nav-toggle hidden></div>
 
@@ -378,7 +395,7 @@ export function shell(o: ShellOptions): string {
   <div class="nmd-main">
     <main class="nmd-content">
       <div class="mx-auto max-w-7xl">
-${withTopSections(o.body, (viral === 'top' ? viewsSection(o.user.role, lang) + viralSection(o.user.role, lang) : '') + (upsell && viral === 'top' ? upsellSection(upsell) : ''))}
+${withTopSections(pushAt ? o.body.replace(PUSH_MARK, upsellSection(upsell!)) : o.body, (viral === 'top' ? viewsSection(o.user.role, lang) + viralSection(o.user.role, lang) : '') + (upsell && viral === 'top' && !pushAt ? upsellSection(upsell) : ''))}
 ${viral === 'bottom' ? (upsell ? upsellSection(upsell) : '') + viewsSection(o.user.role, lang) + viralSection(o.user.role, lang) : ''}
       </div>
     </main>
@@ -400,6 +417,21 @@ ${viral === 'bottom' ? (upsell ? upsellSection(upsell) : '') + viewsSection(o.us
     el.addEventListener('click', function () { setOpen(!body.classList.contains('nmw-open')); });
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
+
+  // Glückwunsch-Popup, wenn gerade eine Kampagne angelegt wurde (?angelegt=1).
+  // Der Zusatz verschwindet sofort aus der Adresse, damit Neuladen ihn nicht wiederholt.
+  var pop = document.getElementById('nmg-pop');
+  if (pop && /[?&]angelegt=1(&|$)/.test(location.search)) {
+    var url = new URL(location.href); url.searchParams.delete('angelegt');
+    history.replaceState(null, '', url.pathname + (url.searchParams.toString() ? '?' + url.searchParams : '') + url.hash);
+    pop.hidden = false;
+    var popBtn = pop.querySelector('[data-pop-close]');
+    var popClose = function () { pop.hidden = true; };
+    popBtn.addEventListener('click', popClose);
+    pop.addEventListener('click', function (e) { if (e.target === pop) popClose(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') popClose(); });
+    popBtn.focus();
+  }
 
   // Profilmenü oben rechts: Klick öffnet, Klick daneben oder Esc schließt.
   var meBtn = document.querySelector('[data-me-toggle]'), meMenu = document.getElementById('nmw-menu');

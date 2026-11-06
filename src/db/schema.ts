@@ -169,6 +169,8 @@ export const projects = sqliteTable(
     briefingPackage: text('briefing_package'),
     /** Bereich (INDUSTRIES) und Plattformen (JSON-Array) aus „Neue Kampagne“, seit 0022. */
     briefingNiche: text('briefing_niche'),
+    /** Laufzeit in Tagen (30/60/90), aus „Neue Kampagne“ im Kunden-Dashboard (Migration 0024). */
+    briefingDurationDays: integer('briefing_duration_days'),
     briefingPlatforms: text('briefing_platforms'),
     createdAt: integer('created_at').notNull().$defaultFn(now),
   },

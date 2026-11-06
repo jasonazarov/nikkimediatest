@@ -21,6 +21,7 @@ import {
   quickActions,
   howItWorks,
   upsellSection,
+  PUSH_MARK,
   type PushArea,
 } from './layout'
 import { formatBytes } from '../lib/r2'
@@ -153,6 +154,8 @@ export const CUSTOMER_AREA: CustomerArea = {
   home: '/app',
   projectHref: (id) => `/app/projekt/${id}`,
   folderHref: (id) => `/app/ordner/${id}`,
+  // „Neue Kampagne“ öffnet das Formular mit Laufzeit und Reichweite (views/customer-new.ts).
+  newHref: '/app/neu',
   openAfterCreate: false,
   accounts: 'project',
   videosHref: '/app/videos',
@@ -494,6 +497,8 @@ export function projectsPage(o: {
             )
       }
 
+      ${area.home === '/app' ? PUSH_MARK : ''}
+
       <!-- Modal: Neue Kampagne / Umbenennen -->
       <div id="project-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4">
         <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
@@ -584,7 +589,7 @@ export function projectsPage(o: {
         ? `function (data) {
       // Neu angelegt: direkt hinein, dort geht es mit dem Material weiter.
       if (!editing && data.id) {
-        window.location.href = ${jsText(area.projectHref('{id}'))}.replace('{id}', encodeURIComponent(data.id));
+        window.location.href = ${jsText(area.projectHref('{id}'))}.replace('{id}', encodeURIComponent(data.id)) + '?angelegt=1';
         return;
       }
       window.location.reload();

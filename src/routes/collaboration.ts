@@ -708,7 +708,8 @@ collaborationApi.post('/briefing', async (c) => {
     ]),
   )
 
-  return c.json({ ok: true, unlocked: unlock, redirect: unlock ? '/collaboration?freigeschaltet=1' : '/collaboration' })
+  // ?angelegt=1: Glückwunsch-Popup (shell()) — die erste Kampagne ist angelegt.
+  return c.json({ ok: true, unlocked: unlock, redirect: unlock ? '/collaboration?freigeschaltet=1&angelegt=1' : '/collaboration?angelegt=1' })
 })
 
 /**
@@ -766,7 +767,7 @@ collaborationApi.post('/campaigns', async (c) => {
     )
   }
 
-  return c.json({ ok: true, id: project.id, redirect: AGENCY_CAMPAIGN_AREA.projectHref(project.id) })
+  return c.json({ ok: true, id: project.id, redirect: `${AGENCY_CAMPAIGN_AREA.projectHref(project.id)}?angelegt=1` })
 })
 
 /**

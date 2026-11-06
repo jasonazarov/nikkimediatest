@@ -986,6 +986,34 @@ export function mailInvestorAdmin(
   })
 }
 
+/** Kunde legt im Dashboard eine Kampagne an (Laufzeit, Reichweite) → Jason. Zusätzlich zum Eintrag aus dem ersten Formular. */
+export function mailCustomerCampaignAdmin(
+  env: Env,
+  o: { projectId: string; campaign: string; fullName: string; company: string | null; email: string; phone: string | null; duration: string; views: string },
+) {
+  return send(env, {
+    to: env.ADMIN_EMAIL,
+    replyTo: o.email,
+    subject: `Neue Kampagne (Kunde): ${o.campaign} (${o.company || o.fullName})`,
+    html: layout(
+      env,
+      'Neue Kampagne',
+      h1('Ein Kunde hat eine Kampagne angelegt') +
+        p('Weitere Angaben zu einem bestehenden Kunden. Laufzeit und Reichweite hängen an der Kampagne.') +
+        dl([
+          ['Kampagne', o.campaign],
+          ['Name', o.fullName],
+          ['Firma', o.company || '–'],
+          ['E-Mail', o.email],
+          ['Telefon', o.phone || '–'],
+          ['Laufzeit', o.duration],
+          ['Gewünschte Reichweite', o.views],
+        ]) +
+        button(`${env.APP_URL}/admin/projekte/${o.projectId}`, 'Kampagne im Admin öffnen'),
+    ),
+  })
+}
+
 /** 8 — Upsell „Mehr Reichweite“ aus einem Dashboard → Jason */
 export function mailUpsellAdmin(
   env: Env,

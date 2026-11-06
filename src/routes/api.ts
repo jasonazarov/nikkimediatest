@@ -136,6 +136,7 @@ import {
   mailAgencySignupAdmin,
   mailAgencyUnlocked,
   mailAgencyWelcome,
+  mailCustomerCampaignAdmin,
 } from '../lib/mail'
 import {
   AGENCY_CLIENTS,
@@ -159,6 +160,8 @@ import {
   normalizeCooperationCode,
   openCooperationCode,
   releaseCooperationCode,
+  isValidDuration,
+  isValidViews,
 } from '../lib/agency'
 import { finishCustomThumb, removeCustomThumb, startCustomThumb } from '../lib/thumbs'
 import type { AppEnv } from '../lib/types'
@@ -1182,6 +1185,14 @@ appApi.post('/projects', async (c) => {
   const name = str(body.name, 80)
   if (!name) return c.json({ error: 'Bitte gib einen Namen ein.' }, 400)
 
+  // Kunden-Formular „Neue Kampagne“ (/app/neu): Laufzeit und Reichweite. Ohne diese
+  // Angaben bleibt es beim bloßen Namen (Creator, ältere Aufrufe).
+  const withBrief = user.role === 'customer' && (body.durationDays !== undefined || body.views !== undefined)
+  const durationDays = Number(body.durationDays)
+  const views = Number(body.views)
+  if (withBrief && !isValidDuration(durationDays)) return c.json({ error: 'Bitte wähle die Laufzeit: 30, 60 oder 90 Tage.' }, 400)
+  if (withBrief && !isValidViews(views)) return c.json({ error: 'Bitte wähle die gewünschte Reichweite.' }, 400)
+
   // Der Startordner heißt neutral „Rohmaterial“ — ein Ordner, der genauso
   // heißt wie das Projekt, das ihn enthält, verwirrt nur.
   const project = await createProject(c.env, {
@@ -1189,6 +1200,23 @@ appApi.post('/projects', async (c) => {
     name,
     folderName: 'Rohmaterial',
   })
+  if (withBrief) {
+    await getDb(c.env)
+      .update(schema.projects)
+      .set({ briefingViews: views, briefingDurationDays: durationDays })
+      .where(eq(schema.projects.id, project.id))
+    // Zusätzlich zum Eintrag aus dem ersten Formular: die weiteren Angaben per Mail.
+    await mailCustomerCampaignAdmin(c.env, {
+      projectId: project.id,
+      campaign: name,
+      fullName: user.fullName,
+      company: customer.company,
+      email: user.email,
+      phone: user.phone,
+      duration: `${durationDays} Tage`,
+      views: `${views.toLocaleString('de-DE')} Views`,
+    }).catch(() => false)
+  }
   await audit(c.env, {
     actorId: user.id,
     action: 'project.created',
@@ -1197,6 +1225,7 @@ appApi.post('/projects', async (c) => {
     payload: {
       name,
       by: user.role === 'customer' ? 'kunde' : user.role === 'creator' ? 'creator' : 'agentur',
+      ...(withBrief ? { durationDays, views } : {}),
     },
   })
   return c.json({ ok: true, id: project.id })

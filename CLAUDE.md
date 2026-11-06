@@ -571,3 +571,15 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   Klick springt hin. Views per Regler 100.000 bis 10 Mio. in 50.000er-Schritten (`VIEWS_MIN/MAX/STEP`, Server
   prüft `isValidViews`), mit Live-Preis; Budget und Übersicht rechnen sofort mit. Beim Absenden springt das Formular
   zum ersten Abschnitt mit fehlender Angabe. Das Feld heißt weiter `viewsStep`, trägt jetzt aber die Views selbst.
+- **„Neue Kampagne“ im Kunden-Dashboard** (Vorgabe des Auftraggebers, November 2026; `src/views/customer-new.ts`,
+  Route `/app/neu`, Migration 0024): Glas-Fenster wie bei den Agenturen mit Name, Laufzeit (30/60/90 Tage,
+  `CAMPAIGN_DURATIONS`), Reichweite (Regler wie bei Agenturen) und Übersicht; kein fester Preis, nur „CPM ~5 €“.
+  Die Kampagne entsteht erst beim Absenden (`POST /api/app/projects` mit `durationDays` und `views`);
+  `projects.briefing_duration_days` und `briefing_views` hängen an ihr und stehen im Admin auf der Kampagnenseite
+  („Customer request“). Der CRM-Eintrag aus dem ersten Formular bleibt wie bisher; die weiteren Angaben kommen
+  zusätzlich per Mail an `ADMIN_EMAIL` (`mailCustomerCampaignAdmin`). In der Kunden-Übersicht steht „Meine
+  Kampagnen“ vor „Kampagne pushen“ (`PUSH_MARK` in `layout.ts`).
+- **Glückwunsch-Popup nach dem Anlegen einer Kampagne** (Vorgabe des Auftraggebers, November 2026; `shell()` in
+  `layout.ts`, Styles `dash-whop.css`): erscheint bei `?angelegt=1` in jedem Dashboard. Gesetzt nach „Neue
+  Kampagne“ von Kunde, Agentur und Creator und nach dem ersten Agentur-Briefing. Der Zusatz verschwindet sofort
+  aus der Adresse. Bausteine der Glas-Formulare: `src/views/form-window.ts`.

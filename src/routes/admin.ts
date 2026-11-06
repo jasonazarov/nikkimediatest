@@ -1714,6 +1714,9 @@ adminRoutes.get('/projekte/:id', async (c) => {
         creatorDistribution: row.project.creatorDistribution === 1,
         publishError: row.project.publishError,
         briefing: projectBriefing(row.project),
+        request: row.project.briefingDurationDays
+          ? { durationDays: row.project.briefingDurationDays, views: row.project.briefingViews }
+          : null,
       },
       owner: {
         customerId: row.customerId,
