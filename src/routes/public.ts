@@ -74,6 +74,17 @@ publicRoutes.get('/llms.txt', async (c) =>
 publicRoutes.get('/impressum', (c) => c.html(impressumPage()))
 publicRoutes.get('/datenschutz', (c) => c.html(datenschutzPage()))
 
+/*
+ * Impressum und Datenschutz tragen „noindex“ und stehen deshalb nicht mehr in
+ * der Sitemap (beides zusammen widerspricht sich für Suchmaschinen).
+ */
+/** Letzte inhaltliche Änderung der Landingpages, für <lastmod> in der Sitemap. */
+const SITE_UPDATED = '2026-11-06'
+
+/* /blog ist die Adresse, die Leute tippen; der Blog heißt Fachartikel. */
+publicRoutes.get('/blog', (c) => c.redirect('/fachartikel', 301))
+publicRoutes.get('/blog/:slug', (c) => c.redirect(`/fachartikel/${encodeURIComponent(c.req.param('slug'))}`, 301))
+
 publicRoutes.get('/robots.txt', (c) =>
   c.text(
     `User-agent: *
@@ -86,6 +97,11 @@ Disallow: /collaboration
 Disallow: /login
 Disallow: /api
 
+# GEO: KI-Suchdienste dürfen die öffentlichen Seiten lesen und zitieren.
+# Dieselben Sperren wie oben, damit Dashboards nie in Antworten landen.
+${['GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'PerplexityBot', 'Perplexity-User', 'ClaudeBot', 'Claude-SearchBot', 'Claude-User', 'Google-Extended', 'Applebot-Extended', 'Bingbot']
+  .map((bot) => `User-agent: ${bot}\nAllow: /\nDisallow: /app\nDisallow: /admin\nDisallow: /work\nDisallow: /kampagnen\nDisallow: /collaboration\nDisallow: /login\nDisallow: /api\n`)
+  .join('\n')}
 # Kurzfassung für Sprachmodelle: ${c.env.APP_URL}/llms.txt
 
 Sitemap: ${c.env.APP_URL}/sitemap.xml
@@ -100,17 +116,15 @@ publicRoutes.get('/sitemap.xml', async (c) => {
   return c.body(
     `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>${c.env.APP_URL}/</loc><priority>1.0</priority></url>
-  <url><loc>${c.env.APP_URL}/clipper</loc><priority>0.8</priority></url>
-  <url><loc>${c.env.APP_URL}/creator</loc><priority>0.8</priority></url>
-  <url><loc>${c.env.APP_URL}/brands</loc><priority>0.8</priority></url>
-  <url><loc>${c.env.APP_URL}/agenturen</loc><priority>0.8</priority></url>
-  <url><loc>${c.env.APP_URL}/personal-brands</loc><priority>0.8</priority></url>
-  <url><loc>${c.env.APP_URL}/investoren</loc><priority>0.6</priority></url>
-  <url><loc>${c.env.APP_URL}/fachartikel</loc><priority>0.7</priority></url>
+  <url><loc>${c.env.APP_URL}/</loc><lastmod>${SITE_UPDATED}</lastmod><priority>1.0</priority></url>
+  <url><loc>${c.env.APP_URL}/clipper</loc><lastmod>${SITE_UPDATED}</lastmod><priority>0.8</priority></url>
+  <url><loc>${c.env.APP_URL}/creator</loc><lastmod>${SITE_UPDATED}</lastmod><priority>0.8</priority></url>
+  <url><loc>${c.env.APP_URL}/brands</loc><lastmod>${SITE_UPDATED}</lastmod><priority>0.8</priority></url>
+  <url><loc>${c.env.APP_URL}/agenturen</loc><lastmod>${SITE_UPDATED}</lastmod><priority>0.8</priority></url>
+  <url><loc>${c.env.APP_URL}/personal-brands</loc><lastmod>${SITE_UPDATED}</lastmod><priority>0.8</priority></url>
+  <url><loc>${c.env.APP_URL}/investoren</loc><lastmod>${SITE_UPDATED}</lastmod><priority>0.6</priority></url>
+  <url><loc>${c.env.APP_URL}/fachartikel</loc><lastmod>${articles[0] ? new Date(Math.max(...articles.map((a) => a.updatedAt)) * 1000).toISOString().slice(0, 10) : SITE_UPDATED}</lastmod><priority>0.7</priority></url>
 ${articles.map((a) => `  <url><loc>${articleUrl(a)}</loc><lastmod>${new Date(a.updatedAt * 1000).toISOString().slice(0, 10)}</lastmod><priority>0.7</priority></url>`).join('\n')}
-  <url><loc>${c.env.APP_URL}/impressum</loc><priority>0.2</priority></url>
-  <url><loc>${c.env.APP_URL}/datenschutz</loc><priority>0.2</priority></url>
 </urlset>
 `,
     200,

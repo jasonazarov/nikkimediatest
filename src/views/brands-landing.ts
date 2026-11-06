@@ -19,6 +19,7 @@
  *
  * Styles: /assets/site.css · Verhalten: /assets/site.js + /assets/stepper.js
  */
+import { breadcrumbs, clippingService, geoHead, ldGraph, ORGANIZATION } from './seo'
 import { INDUSTRIES } from '../lib/domain'
 import { AGENCY_CLIENTS, AGENCY_FOOTAGE, AGENCY_KINDS, AGENCY_PLATFORMS, AGENCY_SOCIALS, AGENCY_SOURCES } from '../lib/agency'
 import { DEFAULT_DIAL, dialOptions } from '../lib/phone'
@@ -237,10 +238,11 @@ export const brandsLandingPage = (): string => `<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nikki Media für Agenturen | Clipping im Hintergrund für eure Kunden</title>
-<meta name="description" content="Die Clipping-Agentur hinter eurer Agentur: NIKKI MEDIA schneidet, postet und verbreitet Kurzvideos für eure Kunden, über eine ganze Clipping-Armee, Influencer und UGC. Eure Kundenbeziehung bleibt eure.">
+<title>Clipping für Agenturen und ihre Kunden | Nikki Media</title>
+<meta name="description" content="Die Clipping-Agentur hinter eurer Agentur: Nikki Media schneidet, postet und verbreitet Kurzvideos für eure Kunden, im Hintergrund und nach euren Vorgaben.">
 <meta name="theme-color" content="#000000">
 <link rel="canonical" href="https://nikkimedia.co/brands">
+${geoHead('/brands')}
 
 <meta property="og:type" content="website">
 <meta property="og:locale" content="de_DE">
@@ -248,7 +250,6 @@ export const brandsLandingPage = (): string => `<!DOCTYPE html>
 <meta property="og:url" content="https://nikkimedia.co/brands">
 <meta property="og:title" content="Nikki Media für Agenturen">
 <meta property="og:description" content="Eure Kunden gehen viral, wir liefern im Hintergrund. Schnitt, Upload und Reichweite über eine ganze Clipping-Armee.">
-<meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -257,18 +258,11 @@ export const brandsLandingPage = (): string => `<!DOCTYPE html>
 <link rel="stylesheet" href="/assets/glass.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%232563eb'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='15' font-weight='bold' fill='white' text-anchor='middle'%3ENM%3C/text%3E%3C/svg%3E">
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  "name": "Nikki Media",
-  "description": "Nikki Media ist die Clipping-Agentur für Agenturen aus allen Branchen und ihre Kunden: Schnitt, Upload und Verbreitung von Kurzvideos über eine Clipping-Armee, Influencer und UGC.",
-  "url": "https://nikkimedia.co/brands",
-  "areaServed": ["DE", "AT", "CH"],
-  "founder": { "@type": "Person", "name": "Jason Azarov" },
-  "telephone": "+43 676 5990071"
-}
-</script>
+${ldGraph(
+  ORGANIZATION,
+  clippingService('Clipping für Agenturen', 'Nikki Media liefert Agenturen Reichweite für ihre Kunden: Schnitt, Upload und Verbreitung von Kurzvideos über ein Netzwerk aus Clippern und Creatorn.', 'Agenturen'),
+  breadcrumbs([{ name: 'Nikki Media', path: '/' }, { name: 'Für Agenturen', path: '/brands' }]),
+)}
 </head>
 <body class="page-home theme-brands">
 

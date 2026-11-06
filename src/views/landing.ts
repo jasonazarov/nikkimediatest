@@ -9,6 +9,7 @@
  *
  * Styles: /assets/site.css · Verhalten: /assets/site.js + /assets/stepper.js
  */
+import { breadcrumbs, clippingService, geoHead, ldGraph, ORGANIZATION } from './seo'
 import { INDUSTRIES } from '../lib/domain'
 import { DEFAULT_DIAL, dialOptions } from '../lib/phone'
 import { esc, jsonScript } from './layout'
@@ -53,17 +54,17 @@ export const landingPage = (articlesHtml = ''): string => `<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nikki Media | Clipping-Agentur für den DACH-Raum | Millionen organische Views</title>
-<meta name="description" content="Nikki Media ist die Clipping-Agentur für den deutschsprachigen Raum: Massen an Fan-Accounts erstellen aus deinem Rohmaterial virale 9:16-Clips und posten sie auf Instagram, TikTok, YouTube und Facebook. Fester Preis pro 1.000 Views, vor Kampagnenstart gemeinsam vereinbart.">
+<title>Clipping-Agentur DACH | Millionen organische Views | Nikki Media</title>
+<meta name="description" content="Clipping-Agentur für Deutschland, Österreich und die Schweiz: Clipper machen aus deinem Rohmaterial virale Kurzvideos. Abgerechnet pro 1.000 echte Views.">
 <meta name="theme-color" content="#000000">
 <link rel="canonical" href="https://nikkimedia.co/">
+${geoHead('/')}
 
 <meta property="og:type" content="website">
 <meta property="og:locale" content="de_DE">
 <meta property="og:site_name" content="Nikki Media">
 <meta property="og:title" content="Nikki Media | Clipping-Agentur für den DACH-Raum">
 <meta property="og:description" content="Hunderte Clipper posten deine Marke auf Instagram, TikTok, YouTube und Facebook. Millionen organische Views: zum festen Preis pro 1.000 Views.">
-<meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -72,18 +73,11 @@ export const landingPage = (articlesHtml = ''): string => `<!DOCTYPE html>
 <link rel="stylesheet" href="/assets/glass.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%232563eb'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='15' font-weight='bold' fill='white' text-anchor='middle'%3ENM%3C/text%3E%3C/svg%3E">
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  "name": "Nikki Media",
-  "description": "Clipping-Agentur für den deutschsprachigen Raum. Virale Kurzvideos für Content Creator, Brands und Digital Creator auf Instagram, TikTok, YouTube und Facebook.",
-  "areaServed": ["DE", "AT", "CH"],
-  "founder": { "@type": "Person", "name": "Jason Azarov" },
-  "telephone": "+43 676 5990071",
-  "priceRange": "$$"
-}
-</script>
+${ldGraph(
+  ORGANIZATION,
+  clippingService('Clipping für Unternehmen und Marken', 'Clipper schneiden aus dem Rohmaterial von Unternehmen und Marken virale 9:16-Clips und posten sie über viele Accounts auf TikTok, Instagram, YouTube und Facebook.', 'Unternehmen und Marken'),
+  breadcrumbs([{ name: 'Nikki Media', path: '/' }]),
+)}
 </head>
 <body class="page-home">
 

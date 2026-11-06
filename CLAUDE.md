@@ -234,7 +234,8 @@ Stand, sind über die Historie aber noch einsehbar.
 
 Hono + TypeScript auf Cloudflare Workers, D1 mit Drizzle, serverseitig
 gerendertes HTML. Die Landingpages bringen ihr eigenes Design-System mit
-(`public/assets/site.css`), die Dashboards nutzen Tailwind per CDN.
+(`public/assets/site.css`), die Dashboards nutzen Tailwind, seit November 2026
+vorgebaut als `public/assets/tw.css` (`npm run css`, läuft in `npm run ship` mit).
 Kein React, kein Build-Framework, kein `localStorage`/`sessionStorage`.
 
 **Rollen und Bereiche.** Kunde (`/app`, deutsch), Clipper (`/work`,
@@ -471,3 +472,31 @@ oder Abläufen.
   heutigen Views der Clips nach ihrem Veröffentlichungstag (`metrics_sync.published_at`);
   ein echter Tagesverlauf bräuchte tägliche Schnappschüsse und damit eine Migration.
   Test: `npx tsx tests/gold/analytics.test.ts`.
+
+---
+
+### Whop-Aufbau der Dashboards, SEO/GEO und Blog (November 2026, nur Optik)
+
+Ausgangsstand ist die Green-Vorschau (erster Commit). Keine Änderung an Datenbank,
+Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist das.
+
+- **Tailwind ohne CDN:** `tailwind.config.cjs` + `styles/tailwind.css` → `public/assets/tw.css`.
+  Neue Tailwind-Klasse in einer View → `npm run css` (macht `ship.sh` automatisch).
+- **App-Rahmen** (`shell()` in `layout.ts`, Styles `public/assets/dash-whop.css`): Kopfzeile über
+  die ganze Breite mit zentraler Suche („/“ oder Strg/Cmd+K), feste Seitenleiste mit
+  Arbeitsbereich-Kacheln und **Menügruppen** (`NavItem.group`), auf dem Handy eine Schublade.
+  `#sidenav`, `data-nav-search`, `data-nav-label` und das Logout-Formular sind unverändert.
+- **Bausteine** in `layout.ts`: `kpiBar` = Stat-Karten, `quickActions`, `howItWorks`,
+  `noticeBanner`, `progressBar`, Leerzustand mit Illustration. Nur Links auf bestehende Seiten.
+- **SEO/GEO** (`src/views/seo.ts`): `geoHead(path)` hinter jedem Canonical (hreflang de-DE/de-AT/
+  de-CH/x-default, og:image, Twitter), `ldGraph(ORGANIZATION, clippingService(…), faqPage(…),
+  breadcrumbs(…))`. robots.txt erlaubt KI-Suchdienste ausdrücklich (Dashboards bleiben gesperrt),
+  `/llms.txt` mit Fakten. Impressum/Datenschutz bleiben noindex und stehen nicht in der Sitemap.
+  Vorschaubild: `python3 tools/og_image.py`.
+- **Blog** (`/fachartikel`, `/blog` leitet um): Kartenraster, Kurzantwort-Box, Inhaltsverzeichnis,
+  Lesezeit, Autorenbox, Aufruf am Ende, Article/BreadcrumbList/Speakable. Editor unter
+  `/admin/fachartikel`: Formatierungsleiste, Vorschau, Google-Snippet, SEO/GEO-Check.
+  Neue Formatierung: `### `, `1. `, `> `, `**fett**`, `[Text](https://…)` bzw. `[Text](/pfad)`.
+- **Werkzeuge in Python** (`tools/`): `preview.py` (lokale Testdatenbank, Worker, Screenshots je
+  Rolle), `seo_audit.py` (prüft alle öffentlichen Seiten), `guard.py` (Backend-Wächter),
+  `og_image.py` (Vorschaubild). Wettbewerb: `docs/WETTBEWERB_DACH.md`.

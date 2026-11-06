@@ -241,3 +241,25 @@ html.nmd .nmw-stats { width: 100% !important; max-width: 100% !important; flex: 
   .nmw-top { gap: 10px; padding: 0 12px; }
   .nmd-brand__txt { display: none; }
 }
+
+/* Fachartikel-Editor: Formatierung, Vorschau, Google-Snippet, Check */
+.nmw-fmt { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.nmw-fmt button { padding: 4px 9px; border-radius: 8px; font-size: .76rem; font-weight: 600; color: var(--w-mute); background: rgba(255, 255, 255, .05); border: 1px solid var(--w-line); }
+.nmw-fmt button:hover { color: var(--w-text); border-color: var(--w-line-2); }
+.nmw-fmt button.is-accent { color: var(--w-green-hi); border-color: rgba(47, 224, 140, .35); }
+.nmw-preview { min-height: 380px; padding: 18px 20px; border-radius: 12px; border: 1px solid var(--w-line-2); background: rgba(0, 0, 0, .35); font-size: .98rem; line-height: 1.7; color: #d5e3da; }
+.nmw-preview h2 { margin: 1.2em 0 .4em; font: 700 1.3rem/1.2 "Bricolage Grotesque", Geist, sans-serif; color: var(--w-text); }
+.nmw-preview h3 { margin: 1em 0 .3em; font-weight: 700; color: var(--w-text); }
+.nmw-preview p + p, .nmw-preview ul, .nmw-preview ol, .nmw-preview blockquote { margin-top: .9em; }
+.nmw-preview ul { list-style: disc; padding-left: 1.2em; } .nmw-preview ol { list-style: decimal; padding-left: 1.3em; }
+.nmw-preview blockquote { padding: 10px 14px; border-left: 3px solid var(--w-green); background: rgba(47, 224, 140, .06); border-radius: 0 10px 10px 0; }
+.nmw-preview a { color: var(--w-green-hi); text-decoration: underline; }
+.nmw-serp { display: block; margin-top: 10px; padding: 14px; border-radius: 12px; background: #fff; font-family: Arial, sans-serif; }
+.nmw-serp__site { display: block; font-size: 12px; color: #4d5156; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nmw-serp__title { display: block; margin-top: 4px; font-size: 18px; line-height: 1.3; color: #1a0dab; }
+.nmw-serp__desc { display: block; margin-top: 4px; font-size: 13px; line-height: 1.5; color: #4d5156; }
+.nmw-check { margin-top: 8px; display: grid; gap: 6px; font-size: .8rem; color: var(--w-mute); }
+.nmw-check li { display: flex; gap: 8px; }
+.nmw-check li span { width: 14px; flex: none; color: var(--w-soft); }
+.nmw-check li.is-ok { color: var(--w-text); }
+.nmw-check li.is-ok span { color: var(--w-green); }

@@ -16,6 +16,7 @@
  *
  * Styles: /assets/site.css · Verhalten: /assets/site.js + /assets/stepper.js
  */
+import { breadcrumbs, clippingService, geoHead, ldGraph, ORGANIZATION } from './seo'
 import {
   CREATOR_AD_OPENNESS,
   CREATOR_FOLLOWERS,
@@ -272,10 +273,11 @@ export const creatorLandingPage = (): string => `<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nikki Media für Creator | Kampagnen finden &amp; eigene Kampagnen hochladen</title>
-<meta name="description" content="Für Influencer und UGC-Creator: Nimm Kampagnen von Marken an und verdiene mit deinem Content, oder lade deine eigene Kampagne hoch, und unsere Clipper machen daraus Kurzvideos. Ein Zugang, ein Kampagnen-Dashboard.">
+<title>Für Creator: Kampagnen finden &amp; Clips machen lassen | Nikki Media</title>
+<meta name="description" content="Für Influencer und UGC-Creator im DACH-Raum: Kampagnen von Marken annehmen oder aus deinem eigenen Material Clips machen lassen, die Millionen erreichen.">
 <meta name="theme-color" content="#000000">
 <link rel="canonical" href="https://nikkimedia.co/creator">
+${geoHead('/creator')}
 
 <meta property="og:type" content="website">
 <meta property="og:locale" content="de_DE">
@@ -283,7 +285,6 @@ export const creatorLandingPage = (): string => `<!DOCTYPE html>
 <meta property="og:url" content="https://nikkimedia.co/creator">
 <meta property="og:title" content="Nikki Media für Creator | Kampagnen finden &amp; hochladen">
 <meta property="og:description" content="Kampagnen annehmen und damit verdienen, oder eigenes Material hochladen und daraus Clips machen lassen. Für Influencer und UGC-Creator im DACH-Raum.">
-<meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -292,18 +293,11 @@ export const creatorLandingPage = (): string => `<!DOCTYPE html>
 <link rel="stylesheet" href="/assets/glass.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%232563eb'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='15' font-weight='bold' fill='white' text-anchor='middle'%3ENM%3C/text%3E%3C/svg%3E">
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  "name": "Nikki Media",
-  "description": "Nikki Media bringt Creator und Kampagnen zusammen: Influencer und UGC-Creator nehmen Kampagnen von Marken an oder lassen aus ihrem eigenen Material Clips machen.",
-  "url": "https://nikkimedia.co/creator",
-  "areaServed": ["DE", "AT", "CH"],
-  "founder": { "@type": "Person", "name": "Jason Azarov" },
-  "telephone": "+43 676 5990071"
-}
-</script>
+${ldGraph(
+  ORGANIZATION,
+  clippingService('Clipping für Creator', 'Creator lassen aus ihrem eigenen Material Clips schneiden und über das Netzwerk von Nikki Media verbreiten, oder verbreiten Kampagnen von Marken.', 'Creator und Influencer'),
+  breadcrumbs([{ name: 'Nikki Media', path: '/' }, { name: 'Creator werden', path: '/creator' }]),
+)}
 </head>
 <body class="page-home theme-creator">
 

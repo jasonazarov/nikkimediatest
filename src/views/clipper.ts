@@ -16,6 +16,7 @@
  *
  * Styles: /assets/site.css · Verhalten: /assets/site.js + /assets/stepper.js
  */
+import { breadcrumbs, clippingService, geoHead, ldGraph, ORGANIZATION } from './seo'
 import { CLIPPER_AVAILABILITY, CLIPPER_EXPERIENCE, CLIPPER_WORK_STATUS, PLATFORMS } from '../lib/domain'
 import { DEFAULT_DIAL, dialOptions } from '../lib/phone'
 import { esc, jsonScript } from './layout'
@@ -221,10 +222,11 @@ export const clipperLandingPage = (): string => `<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nikki Media | Clipper werden | Bezahlt pro 1.000 Views</title>
-<meta name="description" content="Nikki Media sucht Clipper: Schneide kurze Videos, poste sie auf Instagram, TikTok, YouTube und Facebook, und werde pro 1.000 Views bezahlt. Keine Erfahrung nötig.">
+<title>Clipper werden: bezahlt pro 1.000 Views | Nikki Media</title>
+<meta name="description" content="Werde Clipper bei Nikki Media: Schneide kurze Videos, poste sie auf TikTok, Instagram, YouTube und Facebook und verdiene pro 1.000 Views. Ohne Erfahrung.">
 <meta name="theme-color" content="#000000">
 <link rel="canonical" href="https://nikkimedia.co/clipper">
+${geoHead('/clipper')}
 
 <meta property="og:type" content="website">
 <meta property="og:locale" content="de_DE">
@@ -232,7 +234,6 @@ export const clipperLandingPage = (): string => `<!DOCTYPE html>
 <meta property="og:url" content="https://nikkimedia.co/clipper">
 <meta property="og:title" content="Nikki Media | Clipper werden">
 <meta property="og:description" content="Bezahlt pro 1.000 Views: Schneide kurze Videos und poste sie auf Instagram, TikTok, YouTube und Facebook. Keine Erfahrung nötig.">
-<meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -241,18 +242,10 @@ export const clipperLandingPage = (): string => `<!DOCTYPE html>
 <link rel="stylesheet" href="/assets/glass.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%232563eb'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='15' font-weight='bold' fill='white' text-anchor='middle'%3ENM%3C/text%3E%3C/svg%3E">
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  "name": "Nikki Media",
-  "description": "Nikki Media ist das Clipper-Netzwerk für den deutschsprachigen Raum: Clipper werden dafür bezahlt, Videos anzuschauen und auf Instagram, TikTok, YouTube und Facebook zu posten.",
-  "url": "https://nikkimedia.co/clipper",
-  "areaServed": ["DE", "AT", "CH"],
-  "founder": { "@type": "Person", "name": "Jason Azarov" },
-  "telephone": "+43 676 5990071"
-}
-</script>
+${ldGraph(
+  ORGANIZATION,
+  breadcrumbs([{ name: 'Nikki Media', path: '/' }, { name: 'Clipper werden', path: '/clipper' }]),
+)}
 </head>
 <body class="page-home theme-clipper">
 

@@ -18,6 +18,7 @@
  *
  * Keine langen Gedankenstriche in sichtbaren Texten (Vorgabe, siehe CLAUDE.md).
  */
+import { breadcrumbs, clippingService, faqPage, geoHead, ldGraph, ORGANIZATION } from './seo'
 import { DEFAULT_DIAL, dialOptions } from '../lib/phone'
 import { PRICE_PER_MILLION_EUR, faqFor, type FaqAudience } from '../lib/faq'
 import { INVESTOR_KINDS, INVESTOR_TICKETS } from '../lib/investors'
@@ -349,6 +350,13 @@ const faqBlock = (audience: FaqAudience) => `
   </div>
 </section>`
 
+/** Zielgruppe der Leistung im JSON-LD (seo.ts). */
+const SERVICE_AUDIENCE: Record<Variant, string> = {
+  agenturen: 'Agenturen',
+  'personal-brands': 'Personal Brands',
+  investoren: 'Investoren und Auftraggeber',
+}
+
 export function goldPage(o: PageOptions): string {
   return `<!DOCTYPE html>
 <html lang="de">
@@ -359,12 +367,19 @@ export function goldPage(o: PageOptions): string {
 <meta name="description" content="${esc(o.description)}">
 <meta name="theme-color" content="#000000">
 <link rel="canonical" href="https://nikkimedia.co/${o.variant}">
+${geoHead(`/${o.variant}`)}
 <meta property="og:type" content="website">
 <meta property="og:locale" content="de_DE">
 <meta property="og:site_name" content="Nikki Media">
 <meta property="og:title" content="${esc(o.title)}">
 <meta property="og:description" content="${esc(o.description)}">
 ${goldHeadLinks()}
+${ldGraph(
+  ORGANIZATION,
+  clippingService(o.title.split(' | ')[0], o.description, SERVICE_AUDIENCE[o.variant]),
+  faqPage(o.faqAudience, `/${o.variant}`),
+  breadcrumbs([{ name: 'Nikki Media', path: '/' }, { name: o.title.split(':')[0], path: `/${o.variant}` }]),
+)}
 </head>
 <body class="gold page-home theme-brands g-${o.variant}">
 
@@ -456,9 +471,9 @@ export const agenturenPage = (articles: Article[] = []): string =>
   goldPage({
     articles,
     variant: 'agenturen',
-    title: 'Nikki Media für Agenturen | Reichweite für eure Kunden',
+    title: 'Clipping für Agenturen: Reichweite für eure Kunden | Nikki Media',
     description:
-      'Bringt eure Kunden zu Nikki Media: Über 5.000 Clipper und unsere Creator sorgen für Omnipräsenz auf TikTok, Instagram, YouTube und Facebook. 1 Mio. Views ab 5.000 €, ihr behaltet Kunde und Marge.',
+      'Bringt eure Kunden zu Nikki Media: Über 5.000 Clipper sorgen für Omnipräsenz auf TikTok, Instagram und YouTube. 1 Mio. Views ab 5.000 €, ihr behaltet die Marge.',
     h1: 'Ihr bringt die Kunden.<br>Wir bringen die Omnipräsenz.',
     lead:
       'Euer Kunde will Reichweite, ihr wollt kein Clipping-Team aufbauen. Bei uns bucht ihr Views wie Ware: Über 5.000 Clipper und unsere Creator schneiden, posten und verbreiten. Die Kundenbeziehung und die Marge bleiben bei euch.',
@@ -521,9 +536,9 @@ export const personalBrandsPage = (articles: Article[] = []): string =>
   goldPage({
     articles,
     variant: 'personal-brands',
-    title: 'Nikki Media für Personal Brands | Omnipräsenz durch Clipping',
+    title: 'Personal Brand Clipping: Omnipräsenz im Feed | Nikki Media',
     description:
-      'Dein Gesicht in jedem Feed: Nikki Media macht aus Podcasts, Interviews und Livestreams hunderte Clips, die über viele Accounts laufen. 1 Mio. organische Views ab 5.000 €.',
+      'Dein Gesicht in jedem Feed: Nikki Media macht aus Podcasts, Interviews und Livestreams hunderte Clips über viele Accounts. 1 Mio. Views ab 5.000 €.',
     h1: 'Dein Gesicht.<br>In jedem Feed.',
     lead:
       'Aus einem Podcast, einem Interview oder einem Livestream schneiden unsere Clipper hunderte Clips und posten sie über viele Accounts gleichzeitig. Deine Zielgruppe sieht dich überall, du postest nichts selbst und zahlst nur für echte Views.',
@@ -600,7 +615,7 @@ export const investorenPage = (articles: Article[] = []): string =>
   goldPage({
     articles,
     variant: 'investoren',
-    title: 'Nikki Media für Investoren | Der Marktplatz für organische Reichweite',
+    title: 'Investoren: Marktplatz für organische Reichweite | Nikki Media',
     description:
       'Nikki Media verbindet Auftraggeber, Agenturen, über 5.000 Clipper und Creator auf einer Plattform. Gespräche mit Investoren führt Gründer Jason Azarov persönlich.',
     h1: 'Der Marktplatz für<br>organische Reichweite.',

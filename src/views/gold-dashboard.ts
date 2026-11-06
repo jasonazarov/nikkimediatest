@@ -211,7 +211,24 @@ export function adminArticleEditPage(o: { user: User; article: Article | null })
         <div class="space-y-5">
           ${field('art-title', 'Title', `<input id="art-title" maxlength="${ARTICLE_LIMITS.title}" class="${inputCls}" value="${esc(a?.title ?? '')}">`, 'Phrase it like a question people ask, e.g. “Was kostet Clipping 2026?”')}
           ${field('art-excerpt', 'Summary', `<textarea id="art-excerpt" rows="3" maxlength="${ARTICLE_LIMITS.excerpt}" class="${inputCls}">${esc(a?.excerpt ?? '')}</textarea>`, 'One or two sentences that answer the title directly. AI assistants quote this first.')}
-          ${field('art-body', 'Article text', `<textarea id="art-body" rows="16" maxlength="${ARTICLE_LIMITS.body}" class="${inputCls} font-mono text-sm">${esc(a?.body ?? '')}</textarea>`, 'Blank line = new paragraph · “## ” = subheading · “- ” = list item. Optional if you link an external article.')}
+          <div>
+            <div class="mb-1.5 flex flex-wrap items-center justify-between gap-2">
+              <label for="art-body" class="block text-sm font-semibold text-slate-600">Article text</label>
+              <span class="nmw-fmt" role="toolbar" aria-label="Formatting">
+                <button type="button" data-fmt="h2" title="Subheading">H2</button>
+                <button type="button" data-fmt="h3" title="Small subheading">H3</button>
+                <button type="button" data-fmt="bold" title="Bold"><b>B</b></button>
+                <button type="button" data-fmt="ul" title="List">• List</button>
+                <button type="button" data-fmt="ol" title="Numbered list">1. List</button>
+                <button type="button" data-fmt="quote" title="Key takeaway">❝</button>
+                <button type="button" data-fmt="link" title="Link">Link</button>
+                <button type="button" data-preview-toggle class="is-accent">Preview</button>
+              </span>
+            </div>
+            <textarea id="art-body" rows="18" maxlength="${ARTICLE_LIMITS.body}" class="${inputCls} font-mono text-sm">${esc(a?.body ?? '')}</textarea>
+            <div id="art-preview" class="nmw-preview" hidden></div>
+            <p class="mt-1.5 text-xs text-slate-400">Blank line = paragraph · “## ” / “### ” = subheading · “- ” = list · “1. ” = numbered list · “> ” = key takeaway · **bold** · [text](https://…). Optional if you link an external article.</p>
+          </div>
           ${field('art-url', 'External article (optional)', `<input id="art-url" type="url" maxlength="${ARTICLE_LIMITS.url}" placeholder="https://…" class="${inputCls}" value="${esc(a?.sourceUrl ?? '')}">`, 'E.g. a guest article in a trade magazine. Must start with https://.')}
         </div>
       `)}
@@ -221,10 +238,20 @@ export function adminArticleEditPage(o: { user: User; article: Article | null })
             ${field('art-slug', 'Address', `<input id="art-slug" maxlength="90" class="${inputCls}" value="${esc(a?.slug ?? '')}" placeholder="from title">`, '/fachartikel/…')}
             ${field('art-author', 'Author', `<input id="art-author" maxlength="${ARTICLE_LIMITS.author}" class="${inputCls}" value="${esc(a?.author ?? 'Jason Azarov')}">`)}
             ${field('art-date', 'Publish date', `<input id="art-date" type="datetime-local" class="${inputCls}" value="${esc(localInput(a?.publishedAt ?? Math.floor(Date.now() / 1000)))}">`, 'Berlin time. A future date schedules the article.')}
-            <label class="flex items-center gap-3 text-sm font-semibold"><input id="art-published" type="checkbox" class="h-5 w-5 accent-amber-400" ${!a || a.published ? 'checked' : ''}> Published</label>
+            <label class="flex items-center gap-3 text-sm font-semibold"><input id="art-published" type="checkbox" class="h-5 w-5 accent-brand" ${!a || a.published ? 'checked' : ''}> Published</label>
             <button id="art-save" type="button" class="inline-flex w-full items-center justify-center rounded-xl bg-brand px-4 py-3 text-sm font-semibold text-white hover:bg-brand-2">${a ? 'Save changes' : 'Publish article'}</button>
             ${a ? `<a href="/fachartikel/${esc(a.slug)}" target="_blank" rel="noopener" class="block text-center text-sm font-semibold text-brand hover:underline">View live</a>` : ''}
           </div>
+        `)}
+        ${card(`
+          <p class="text-sm font-semibold text-slate-600">Google preview</p>
+          <div class="nmw-serp" aria-live="polite">
+            <span class="nmw-serp__site">nikkimedia.co › fachartikel › <span data-serp-slug>${esc(a?.slug ?? '…')}</span></span>
+            <span class="nmw-serp__title" data-serp-title></span>
+            <span class="nmw-serp__desc" data-serp-desc></span>
+          </div>
+          <p class="mt-5 text-sm font-semibold text-slate-600">SEO &amp; AI-search check</p>
+          <ul class="nmw-check" data-seo-check></ul>
         `)}
         ${a ? card(`<button id="art-delete" type="button" class="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-100">Delete article</button>`) : ''}
         <a href="/admin/fachartikel" class="block text-sm font-semibold text-slate-500 hover:text-slate-800">Back to all articles</a>
@@ -268,6 +295,80 @@ export function adminArticleEditPage(o: { user: User; article: Article | null })
       .catch(function () { show('Deleting failed.', false); });
   });
   if (/[?&]saved=1/.test(location.search)) show('Article published.', true);
+})();
+/* Editor-Helfer: Formatierung, Vorschau, Google-Snippet, SEO/GEO-Check. Nur Anzeige, gespeichert wird oben. */
+(function () {
+  var body = document.getElementById('art-body');
+  var title = document.getElementById('art-title');
+  var excerpt = document.getElementById('art-excerpt');
+  var slug = document.getElementById('art-slug');
+  var preview = document.getElementById('art-preview');
+  function esc(t) { return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function inline(t) {
+    return esc(t).replace(/\\*\\*([^*]+)\\*\\*/g, '<strong>$1</strong>')
+      .replace(/\\[([^\\]]+)\\]\\((https?:\\/\\/[^\\s)]+|\\/[^\\s)]*)\\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  }
+  function render(src) {
+    return src.replace(/\\r\\n/g, '\\n').split(/\\n{2,}/).map(function (b) { return b.trim(); }).filter(Boolean).map(function (b) {
+      if (b.indexOf('### ') === 0) return '<h3>' + inline(b.slice(4)) + '</h3>';
+      if (b.indexOf('## ') === 0) return '<h2>' + inline(b.slice(3)) + '</h2>';
+      var ls = b.split('\\n');
+      if (ls.every(function (l) { return /^[-•]\\s+/.test(l); })) return '<ul>' + ls.map(function (l) { return '<li>' + inline(l.replace(/^[-•]\\s+/, '')) + '</li>'; }).join('') + '</ul>';
+      if (ls.every(function (l) { return /^\\d+[.)]\\s+/.test(l); })) return '<ol>' + ls.map(function (l) { return '<li>' + inline(l.replace(/^\\d+[.)]\\s+/, '')) + '</li>'; }).join('') + '</ol>';
+      if (ls.every(function (l) { return /^>\\s?/.test(l); })) return '<blockquote>' + ls.map(function (l) { return inline(l.replace(/^>\\s?/, '')); }).join('<br>') + '</blockquote>';
+      return '<p>' + ls.map(inline).join('<br>') + '</p>';
+    }).join('');
+  }
+  function wrap(before, after, line) {
+    var s = body.selectionStart, e = body.selectionEnd, v = body.value, sel = v.slice(s, e);
+    if (line) {
+      var start = v.lastIndexOf('\\n', s - 1) + 1;
+      var lines = v.slice(start, e).split('\\n').map(function (l, i) { return (typeof before === 'function' ? before(i) : before) + l; });
+      body.value = v.slice(0, start) + lines.join('\\n') + v.slice(e);
+    } else {
+      body.value = v.slice(0, s) + before + (sel || 'Text') + after + v.slice(e);
+    }
+    body.focus(); update();
+  }
+  var actions = {
+    h2: function () { wrap('## ', '', true); }, h3: function () { wrap('### ', '', true); },
+    bold: function () { wrap('**', '**'); }, ul: function () { wrap('- ', '', true); },
+    ol: function () { wrap(function (i) { return (i + 1) + '. '; }, '', true); }, quote: function () { wrap('> ', '', true); },
+    link: function () { var u = prompt('Link (https://…)', 'https://'); if (u) wrap('[', '](' + u + ')'); }
+  };
+  [].forEach.call(document.querySelectorAll('[data-fmt]'), function (b) { b.addEventListener('click', function () { actions[b.getAttribute('data-fmt')](); }); });
+  var toggle = document.querySelector('[data-preview-toggle]');
+  toggle.addEventListener('click', function () {
+    var on = preview.hidden; preview.hidden = !on; body.hidden = on;
+    toggle.textContent = on ? 'Edit' : 'Preview';
+    if (on) preview.innerHTML = render(body.value) || '<p class="text-slate-400">Nothing to preview yet.</p>';
+  });
+  function cut(t, n) { return t.length > n ? t.slice(0, n - 1).replace(/\\s+\\S*$/, '') + ' …' : t; }
+  function update() {
+    var t = title.value.trim(), d = excerpt.value.trim(), b = body.value;
+    var full = t.length + 14 <= 65 ? t + ' | Nikki Media' : t;
+    document.querySelector('[data-serp-title]').textContent = cut(full || 'Title of the article', 62);
+    document.querySelector('[data-serp-desc]').textContent = cut(d || 'The summary appears here. It answers the title in one or two sentences.', 160);
+    document.querySelector('[data-serp-slug]').textContent = slug.value.trim() || '(from title)';
+    var words = (d + ' ' + b).split(/\\s+/).filter(Boolean).length;
+    var h2 = (b.match(/(^|\\n\\n)## /g) || []).length;
+    var links = (b.match(/\\]\\(\\//g) || []).length;
+    var checks = [
+      [t.length >= 30 && t.length <= 65, 'Title 30–65 characters (now ' + t.length + ')'],
+      [/\\?|wie|was|warum|wann|welche|kosten/i.test(t), 'Title asks or answers a real question'],
+      [d.length >= 110 && d.length <= 165, 'Summary 110–165 characters (now ' + d.length + ')'],
+      [words >= 600, 'At least 600 words (now ' + words + ')'],
+      [h2 >= 2, 'At least two “## ” subheadings (now ' + h2 + ')'],
+      [/\\d/.test(b), 'Contains concrete numbers (prices, views, dates)'],
+      [links >= 1, 'Links to another page of nikkimedia.co, e.g. [Clipper werden](/clipper)'],
+      [/(^|\\n\\n)> /.test(b) || /(^|\\n\\n)(- |1\\. )/.test(b), 'Has a list or key takeaway (AI assistants quote these)']
+    ];
+    document.querySelector('[data-seo-check]').innerHTML = checks.map(function (c) {
+      return '<li class="' + (c[0] ? 'is-ok' : '') + '"><span aria-hidden="true">' + (c[0] ? '✓' : '○') + '</span>' + esc(c[1]) + '</li>';
+    }).join('');
+  }
+  [title, excerpt, body, slug].forEach(function (el) { el.addEventListener('input', update); });
+  update();
 })();`
 
   return shell({ title: a ? a.title : 'New article', user: o.user, nav: ADMIN_NAV, active: '/admin/fachartikel', body, script })
