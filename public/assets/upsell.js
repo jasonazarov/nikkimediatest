@@ -65,7 +65,7 @@
         return o.discountPct.toLocaleString('de-DE') + ' % auf +' + o.percent + ' %';
       }).join(', ') + '.'));
     }
-    terms.appendChild(el('span', 'nmu__time', 'Das zusätzliche Budget wird spätestens 5 Werktage nach Bestätigung ' + (area === 'agency' ? 'eurer' : 'deiner') + ' Anfrage in der Kampagne hinterlegt.'));
+    terms.appendChild(el('span', 'nmu__time', 'Zahlungsziel für das zusätzliche Budget: 5 Werktage nach Bestätigung ' + (area === 'agency' ? 'eurer' : 'deiner') + ' Anfrage.'));
     body.appendChild(terms);
 
     var grid = el('div', 'nmu__grid');
@@ -82,7 +82,7 @@
       if (o.discountPct > 0) card.appendChild(el('span', 'nmu__save', '−' + o.discountPct.toLocaleString('de-DE') + ' % Push-Rabatt'));
       card.appendChild(el('span', 'nmu__note', agencyPrice
         ? 'Euer Kundenpreis · unser Preis ' + euro(o.priceCents) + (state.marginPct ? ' · ' + state.marginPct + ' % Marge' : '')
-        : 'Wird spätestens 5 Werktage nach Bestätigung in deiner Kampagne freigeschaltet.'));
+        : 'Zahlbar innerhalb von 5 Werktagen nach Bestätigung.'));
       var btn = el('button', 'nmu__btn', o.pending ? 'Angefragt' : 'Kampagne pushen');
       btn.type = 'button';
       btn.disabled = !!o.pending;

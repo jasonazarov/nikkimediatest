@@ -562,8 +562,9 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   (`PUSH_DISCOUNT_PCT`), NUR für Agentur und Kunde, nicht für Creator. Der Server rechnet (`priceCents` nach Rabatt,
   `listPriceCents` davor, `discountPct`); die Agentur-Marge kommt auf den rabattierten Preis. Gespeichert und in der
   Mail an `ADMIN_EMAIL` steht der rabattierte Preis mit Hinweis auf den Rabatt. Über den Angeboten immer fett:
-  „Kampagnen-Push-Angebote sind nur innerhalb des vereinbarten Kampagnenzeitraums möglich.“ Dazu: „Das zusätzliche
-  Budget wird spätestens 5 Werktage nach Bestätigung deiner/eurer Anfrage in der Kampagne hinterlegt.“
+  „Kampagnen-Push-Angebote sind nur innerhalb des vereinbarten Kampagnenzeitraums möglich.“ Dazu: „Zahlungsziel für das
+  zusätzliche Budget: 5 Werktage nach Bestätigung deiner/eurer Anfrage.“ Auf den Karten (Kunde, Creator):
+  „Zahlbar innerhalb von 5 Werktagen nach Bestätigung.“
 - **Briefing und „Neue Kampagne“ als ein Fenster** (Vorgabe des Auftraggebers, November 2026; `src/views/collaboration.ts`,
   `viewsControl`, `stationsBar`, `ONE_PAGE_JS`; Styles `dash-whop.css` „Formular als ein Fenster“): kein Schritt für
   Schritt mehr, alle Abschnitte untereinander in einem Glas-Fenster, Stations-Leiste bleibt beim Scrollen stehen,
