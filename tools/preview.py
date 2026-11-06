@@ -300,7 +300,8 @@ def start_server() -> subprocess.Popen:
         except Exception:
             time.sleep(0.5)
     stop_server(proc)
-    sys.exit("Worker kam nicht hoch.")
+    log = (STATE / "worker.log").read_text(errors="replace")[-2500:] if (STATE / "worker.log").exists() else ""
+    sys.exit(f"✘ Worker kam nicht hoch. Letzte Zeilen aus .wrangler/preview-state/worker.log:\n{log}")
 
 
 def stop_server(proc: subprocess.Popen) -> None:
@@ -483,6 +484,21 @@ def share(listen_port: int) -> None:
 # ---------------------------------------------------------------------- Main
 
 
+def check_tools() -> None:
+    """Vorab prüfen, was die Vorschau braucht, und klar sagen, was fehlt."""
+    if sys.version_info < (3, 9):
+        sys.exit(f"✘ Python {sys.version.split()[0]} ist zu alt. Bitte Python 3.9 oder neuer installieren (python.org).")
+    node = shutil.which("node")
+    if not node:
+        sys.exit("✘ Node.js fehlt. Bitte die LTS-Version von nodejs.org installieren und das Terminal neu öffnen.")
+    ver = subprocess.run([node, "-v"], capture_output=True, text=True).stdout.strip()
+    if int(ver.lstrip("v").split(".")[0] or 0) < 20:
+        sys.exit(f"✘ Node.js {ver} ist zu alt. Bitte die LTS-Version (20 oder neuer) von nodejs.org installieren.")
+    if not (ROOT / "node_modules" / "wrangler").exists():
+        sys.exit("✘ Abhängigkeiten fehlen. Bitte zuerst im Ordner des Projekts ausführen:  npm ci")
+    print(f"✓ Python {sys.version.split()[0]}, Node.js {ver}, Abhängigkeiten vorhanden")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("cmd", choices=["seed", "serve", "shoot"])
@@ -493,6 +509,7 @@ def main() -> None:
     ap.add_argument("--share", type=int, metavar="PORT", help="serve: zusätzlich klickbar freigeben (Proxy mit /__vorschau)")
     args = ap.parse_args()
 
+    check_tools()
     if args.cmd == "seed":
         seed()
         return
