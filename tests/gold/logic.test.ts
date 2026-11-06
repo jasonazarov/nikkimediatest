@@ -24,13 +24,17 @@ let pass = 0; const ok = (name: string, fn: () => any) => Promise.resolve(fn()).
     assert.equal(r.campaigns.length, 1)
     const c = r.campaigns[0]
     assert.equal(c.baseSource, 'briefing'); assert.equal(c.perThousandCents, 400)
-    assert.deepEqual(c.offers.map(o => [o.percent, o.extraViews, o.priceCents]), [[20,400000,160000],[35,700000,280000],[50,1000000,400000]])
-    assert.equal(c.offers[0].clientPriceCents, 160000) // Marge 0
+    // Listenpreis 4 €/1.000, dann Push-Rabatt 5 / 7,5 / 11 % (nur Agentur und Kunde)
+    assert.deepEqual(c.offers.map(o => [o.percent, o.extraViews, o.listPriceCents, o.discountPct, o.priceCents]),
+      [[20,400000,160000,5,152000],[35,700000,280000,7.5,259000],[50,1000000,400000,11,356000]])
+    assert.equal(c.offers[0].clientPriceCents, 152000) // Marge 0
+    assert.equal(c.offers[0].clientListPriceCents, 160000)
   })
   await ok('Marge 30 % wird gespeichert und auf den Kundenpreis gerechnet', async () => {
     assert.equal(await U.setMargin(env, agency, 30), 30)
     const r = await U.upsellCampaigns(env, agency)
-    assert.equal(r.marginPct, 30); assert.equal(r.campaigns[0].offers[1].clientPriceCents, 364000)
+    assert.equal(r.marginPct, 30); assert.equal(r.campaigns[0].offers[1].clientPriceCents, 336700) // Marge auf den rabattierten Preis
+    assert.equal(r.campaigns[0].offers[1].clientListPriceCents, 364000)
   })
   await ok('Marge: ungültige Werte und falsche Rolle abgewiesen', async () => {
     assert.ok('error' in (await U.setMargin(env, agency, -5) as any))
@@ -47,7 +51,7 @@ let pass = 0; const ok = (name: string, fn: () => any) => Promise.resolve(fn()).
     const r = await U.upsellCampaigns(env, cust)
     assert.deepEqual(r.campaigns.map(c => c.id), ['pc'])
     const c = r.campaigns[0]
-    assert.equal(c.baseSource, 'default'); assert.equal(c.offers[0].priceCents, 100000); assert.equal(c.offers[0].clientPriceCents, null)
+    assert.equal(c.baseSource, 'default'); assert.equal(c.offers[0].listPriceCents, 100000); assert.equal(c.offers[0].priceCents, 95000); assert.equal(c.offers[0].clientPriceCents, null)
   })
   await ok('Erreichte Views werden Basis, sobald es Zahlen gibt', async () => {
     x(`INSERT INTO deliverables (id,project_id,r2_key,filename,created_at) VALUES ('d1','pc','k','f.mp4',?)`, now)
@@ -57,7 +61,7 @@ let pass = 0; const ok = (name: string, fn: () => any) => Promise.resolve(fn()).
   })
   await ok('Anfrage anlegen, Doppelklick wird abgewiesen, Status „pending“', async () => {
     const r: any = await U.createUpsell(env, cust, 'pc', 35)
-    assert.ok(r.id); assert.equal(r.offer.priceCents, 410500)
+    assert.ok(r.id); assert.equal(r.offer.listPriceCents, 410500); assert.equal(r.offer.priceCents, 379713) // 7,5 % Push-Rabatt
     const again: any = await U.createUpsell(env, cust, 'pc', 35); assert.equal(again.status, 409)
     const c = (await U.upsellCampaigns(env, cust)).campaigns[0]
     assert.deepEqual(c.offers.map(o => o.pending), [false, true, false])
@@ -75,14 +79,15 @@ let pass = 0; const ok = (name: string, fn: () => any) => Promise.resolve(fn()).
     const creator: any = { id: 'ucr', role: 'creator' }
     const r = await U.upsellCampaigns(env, creator)
     assert.deepEqual(r.campaigns.map(c => c.id), ['pcr']); assert.equal(r.campaigns[0].offers[2].clientPriceCents, null)
+    assert.ok(r.campaigns[0].offers.every(o => o.discountPct === 0 && o.priceCents === o.listPriceCents)) // Creator: kein Push-Rabatt
     assert.equal((await U.createUpsell(env, creator, 'pc', 20) as any).status, 404)
     const made: any = await U.createUpsell(env, creator, 'pcr', 20); assert.ok(made.id)
     x(`DELETE FROM upsell_requests WHERE id = ?`, made.id)
   })
-  await ok('Agentur-Anfrage speichert Kundenpreis mit Marge', async () => {
+  await ok('Agentur-Anfrage speichert rabattierten Preis und Kundenpreis mit Marge', async () => {
     const r: any = await U.createUpsell(env, agency, 'pa', 50)
     const row: any = db.raw.prepare('SELECT price_cents, client_price_cents FROM upsell_requests WHERE id=?').get(r.id)
-    assert.equal(row.price_cents, 400000); assert.equal(row.client_price_cents, 520000)
+    assert.equal(row.price_cents, 356000); assert.equal(row.client_price_cents, 462800) // nach 11 % Push-Rabatt, Marge 30 % darauf
   })
   await ok('Admin-Liste: offene zuerst; Status setzen; ungültiger Status abgewiesen', async () => {
     const list = await U.allUpsells(env); assert.equal(list.length, 2); assert.ok(list.every(l => l.status === 'offen'))

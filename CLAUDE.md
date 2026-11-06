@@ -551,3 +551,16 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   Punkten und Gruppen wie die Seitenleiste und „Abmelden“. Erzeugt in `shell()` aus derselben Liste wie
   `#sidenav` (also immer gleich), Styles in `dash-whop.css` („Profilmenü oben rechts“). Schließt per Klick
   daneben oder Esc.
+- **Push-Rabatt und Bedingungen bei „Kampagne pushen“** (Vorgabe des Auftraggebers, November 2026; `src/lib/upsell.ts`,
+  `public/assets/upsell.js`): +20 % → 5 %, +35 % → 7,5 %, +50 % → 11 % Rabatt auf unseren Preis
+  (`PUSH_DISCOUNT_PCT`), NUR für Agentur und Kunde, nicht für Creator. Der Server rechnet (`priceCents` nach Rabatt,
+  `listPriceCents` davor, `discountPct`); die Agentur-Marge kommt auf den rabattierten Preis. Gespeichert und in der
+  Mail an `ADMIN_EMAIL` steht der rabattierte Preis mit Hinweis auf den Rabatt. Über den Angeboten immer fett:
+  „Kampagnen-Push-Angebote sind nur innerhalb des vereinbarten Kampagnenzeitraums möglich.“ Dazu: „Das zusätzliche
+  Budget wird spätestens 5 Werktage nach Bestätigung deiner/eurer Anfrage in der Kampagne hinterlegt.“
+- **Briefing und „Neue Kampagne“ als ein Fenster** (Vorgabe des Auftraggebers, November 2026; `src/views/collaboration.ts`,
+  `viewsControl`, `stationsBar`, `ONE_PAGE_JS`; Styles `dash-whop.css` „Formular als ein Fenster“): kein Schritt für
+  Schritt mehr, alle Abschnitte untereinander in einem Glas-Fenster, Stations-Leiste bleibt beim Scrollen stehen,
+  Klick springt hin. Views per Regler 100.000 bis 10 Mio. in 50.000er-Schritten (`VIEWS_MIN/MAX/STEP`, Server
+  prüft `isValidViews`), mit Live-Preis; Budget und Übersicht rechnen sofort mit. Beim Absenden springt das Formular
+  zum ersten Abschnitt mit fehlender Angabe. Das Feld heißt weiter `viewsStep`, trägt jetzt aber die Views selbst.

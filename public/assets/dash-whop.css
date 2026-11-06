@@ -393,3 +393,115 @@ html.nmd .nmw-brand-glass .border-amber-300 { border-color: rgba(47, 224, 140, .
 .nmw-menu a[data-locked] { opacity: .7; }
 .nmw-menu__sep { height: 1px; margin: 5px 4px; background: rgba(255, 255, 255, .08); }
 .nmw-menu__out { color: #f3b4b4; }
+
+/* ---------- Kampagne pushen: Bedingungen und Push-Rabatt (Vorgabe des Auftraggebers, November 2026) ---------- */
+.nmu__terms { display: flex; flex-direction: column; gap: 2px; margin: .5rem 0 .9rem; font-size: 13px; line-height: 1.5; }
+.nmu__only { font-weight: 800; color: #fff; }
+.nmu__disc { color: #9cf6c8; }
+.nmu__time { color: rgba(255, 255, 255, .7); }
+.nmu__was { display: block; font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, .45); text-decoration: line-through; text-decoration-color: rgba(243, 180, 180, .8); }
+.nmu__save {
+  align-self: flex-start; width: max-content; display: inline-flex; align-items: center; margin: 2px 0 4px; padding: 2px 8px; border-radius: 99px;
+  font-size: 11.5px; font-weight: 700; color: #02160c; background: linear-gradient(180deg, #9cf6c8, #2fe08c); box-shadow: 0 0 14px rgba(47, 224, 140, .45);
+}
+
+/* ---------- Formular als ein Fenster (Briefing, Neue Kampagne; Vorgabe des Auftraggebers, November 2026) ----------
+   Markup: viewsControl, stationsBar, ONE_PAGE_JS in src/views/collaboration.ts. Alle Abschnitte untereinander,
+   Stations-Leiste bleibt beim Scrollen stehen. overflow: clip statt hidden, sonst klebt die Leiste nicht. */
+html.nmd section.nmg {
+  position: relative; isolation: isolate; overflow: clip; border-radius: 28px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .015) 40%, rgba(255, 255, 255, .03)), rgba(3, 9, 6, .82);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 255, 255, .12), inset 0 0 0 1px rgba(47, 224, 140, .18);
+  backdrop-filter: blur(22px) saturate(140%); -webkit-backdrop-filter: blur(22px) saturate(140%);
+}
+html.nmd section.nmg::before {
+  content: ""; position: absolute; inset: -20%; z-index: -1; pointer-events: none; filter: blur(50px); opacity: .9;
+  background:
+    radial-gradient(32% 38% at 15% 15%, rgba(47, 224, 140, .42), transparent 70%),
+    radial-gradient(30% 34% at 88% 88%, rgba(16, 185, 129, .34), transparent 70%),
+    radial-gradient(22% 26% at 70% 10%, rgba(156, 246, 200, .14), transparent 70%);
+  animation: nmgFloat 18s ease-in-out infinite alternate;
+}
+@keyframes nmgFloat { to { transform: translate(6%, 4%) scale(1.08); } }
+html.nmd section.nmg::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; border-top: 1px solid rgba(255, 255, 255, .22); background: linear-gradient(180deg, rgba(255, 255, 255, .09), transparent 22%); }
+
+/* Stations-Leiste */
+.nmg-stations {
+  position: sticky; top: 76px; z-index: 5; display: flex; gap: 6px; margin: 0 -8px 8px; padding: 8px; border-radius: 16px;
+  background: rgba(4, 10, 7, .78); border: 1px solid rgba(255, 255, 255, .08); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+}
+.nmg-st {
+  display: flex; align-items: center; gap: 8px; flex: 1 1 0; min-width: 0; padding: 8px 10px; border-radius: 12px; font-size: 12.5px; font-weight: 600;
+  color: rgba(255, 255, 255, .45); text-decoration: none; background: rgba(255, 255, 255, .03); border: 1px solid rgba(255, 255, 255, .08); transition: all .35s;
+}
+.nmg-st i { display: grid; place-items: center; flex: none; width: 22px; height: 22px; border-radius: 50%; font-style: normal; font-size: 11.5px; font-weight: 800; background: rgba(255, 255, 255, .08); color: rgba(255, 255, 255, .6); transition: all .35s; }
+.nmg-st span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nmg-st:hover { border-color: rgba(47, 224, 140, .35); color: #fff; }
+.nmg-st.is-done { color: #c9ffe4; border-color: rgba(47, 224, 140, .25); }
+.nmg-st.is-done i { background: rgba(47, 224, 140, .25); color: #c9ffe4; }
+.nmg-st.is-now { color: #fff; border-color: rgba(47, 224, 140, .7); background: linear-gradient(160deg, rgba(47, 224, 140, .18), rgba(47, 224, 140, .05)); box-shadow: 0 0 22px rgba(47, 224, 140, .28); }
+.nmg-st.is-now i { background: #2fe08c; color: #02160c; box-shadow: 0 0 14px rgba(47, 224, 140, .9); }
+@media (max-width: 760px) { .nmg-st span { display: none; } .nmg-st { flex: 0 0 auto; } }
+
+/* Abschnitte mit leuchtender Nummer */
+.nmg form { counter-reset: nmg; }
+.nmg-sec { counter-increment: nmg; padding: 34px 0 30px; border-top: 1px solid rgba(255, 255, 255, .07); scroll-margin-top: 150px; transition: box-shadow .3s; border-radius: 4px; }
+.nmg-sec:first-of-type { border-top: 0; }
+.nmg-sec > legend { display: flex; align-items: center; gap: 12px; float: left; width: 100%; }
+.nmg-sec > legend + * { clear: both; }
+.nmg-sec > legend::before {
+  content: counter(nmg); display: inline-grid; place-items: center; flex: none; width: 30px; height: 30px; border-radius: 50%;
+  font-size: 14px; font-weight: 800; color: #02160c; background: linear-gradient(180deg, #9cf6c8, #2fe08c); box-shadow: 0 0 16px rgba(47, 224, 140, .55);
+}
+.nmg-sec.is-missing { box-shadow: 0 0 0 1px rgba(248, 113, 113, .55), 0 0 30px rgba(248, 113, 113, .15); }
+.nmg-miss { margin-top: 14px; padding: 8px 12px; border-radius: 10px; font-size: 13.5px; font-weight: 600; color: #fecaca; background: rgba(239, 68, 68, .14); border: 1px solid rgba(248, 113, 113, .35); }
+
+/* Eingabefelder als Glas */
+.nmg-field {
+  padding: 16px 20px; border-radius: 16px; color: #fff; background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 10px 30px rgba(0, 0, 0, .35); backdrop-filter: blur(12px); transition: border-color .2s, box-shadow .2s;
+}
+.nmg-field:focus-within { border-color: rgba(47, 224, 140, .7); box-shadow: 0 0 0 4px rgba(47, 224, 140, .15), 0 0 28px rgba(47, 224, 140, .25); }
+html.nmd .nmg-field input { color: #fff !important; background: transparent !important; box-shadow: none !important; }
+.nmg-field input::placeholder { color: rgba(255, 255, 255, .28); }
+.nmg-field input[readonly] { cursor: default; }
+.nmg-field__unit { color: rgba(255, 255, 255, .45); }
+
+/* Bereich, Plattformen, Pakete: Glas, ausgewählt leuchtet grün */
+html.nmd .nmg input[name="niche"] + span { border: 1px solid rgba(255, 255, 255, .14) !important; background: rgba(255, 255, 255, .04) !important; transition: all .2s; }
+html.nmd .nmg input[name="niche"] + span:hover { border-color: rgba(47, 224, 140, .45) !important; }
+html.nmd .nmg input[name="niche"]:checked + span { border-color: rgba(47, 224, 140, .85) !important; background: rgba(47, 224, 140, .16) !important; color: #c9ffe4 !important; box-shadow: 0 0 18px rgba(47, 224, 140, .35); }
+html.nmd .nmg input[name="platforms"] + span, html.nmd .nmg input[name="package"] + span {
+  border: 1px solid rgba(255, 255, 255, .12) !important; background: linear-gradient(160deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .02)) !important; transition: transform .2s, border-color .2s, box-shadow .2s;
+}
+html.nmd .nmg label:hover input[name="platforms"] + span, html.nmd .nmg label:hover input[name="package"] + span { transform: translateY(-2px); border-color: rgba(47, 224, 140, .4) !important; }
+html.nmd .nmg input[name="platforms"]:checked + span, html.nmd .nmg input[name="package"]:checked + span {
+  border-color: rgba(47, 224, 140, .85) !important; background: linear-gradient(160deg, rgba(47, 224, 140, .16), rgba(47, 224, 140, .04)) !important; box-shadow: 0 0 0 1px rgba(47, 224, 140, .5), 0 0 26px rgba(47, 224, 140, .3);
+}
+html.nmd .nmg input[name="platforms"] + span > span:first-child { background: rgba(255, 255, 255, .06) !important; border: 1px solid rgba(255, 255, 255, .12); }
+
+/* Views: leuchtende Zahl, Regler mit grünem Leuchtpunkt, Live-Preis */
+.nmg-views { margin-top: 24px; text-align: center; font-family: var(--font-display, inherit); font-size: clamp(2.6rem, 6vw, 3.75rem); font-weight: 800; letter-spacing: -.02em; color: #9cf6c8; text-shadow: 0 0 30px rgba(47, 224, 140, .45); }
+.nmg-views small { margin-left: 8px; font-size: 1.25rem; font-weight: 700; color: rgba(255, 255, 255, .7); text-shadow: none; }
+.nmg-range { -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 28px; margin-top: 2rem; background: transparent; cursor: pointer; --p: 0%; }
+.nmg-range::-webkit-slider-runnable-track { height: 6px; border-radius: 99px; background: linear-gradient(90deg, #17a865, #2fe08c var(--p), rgba(255, 255, 255, .1) var(--p)); }
+.nmg-range::-moz-range-track { height: 6px; border-radius: 99px; background: rgba(255, 255, 255, .1); }
+.nmg-range::-moz-range-progress { height: 6px; border-radius: 99px; background: linear-gradient(90deg, #17a865, #2fe08c); }
+.nmg-range::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 22px; height: 22px; margin-top: -8px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .85);
+  background: radial-gradient(circle at 35% 35%, #d6fde9, #2fe08c 55%, #17a865); box-shadow: 0 0 0 5px rgba(47, 224, 140, .18), 0 0 18px 4px rgba(47, 224, 140, .75); transition: box-shadow .2s;
+}
+.nmg-range::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .85); background: #2fe08c; box-shadow: 0 0 0 5px rgba(47, 224, 140, .18), 0 0 18px 4px rgba(47, 224, 140, .75); }
+.nmg-range:active::-webkit-slider-thumb, .nmg-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 8px rgba(47, 224, 140, .22), 0 0 26px 8px rgba(47, 224, 140, .85); }
+.nmg-range:focus-visible { outline: none; }
+.nmg-ticks { display: flex; justify-content: space-between; margin-top: .5rem; font-size: 12px; font-weight: 600; color: rgba(255, 255, 255, .5); }
+.nmg-est { display: flex; justify-content: center; margin-top: 1.4rem; }
+.nmg-est span { padding: 8px 16px; border-radius: 99px; font-size: 14px; font-weight: 600; color: #c9ffe4; background: rgba(47, 224, 140, .08); border: 1px solid rgba(47, 224, 140, .3); }
+.nmg-est b { color: #fff; }
+
+/* Übersicht und Auftrag */
+html.nmd .nmg dl.divide-y { background: rgba(255, 255, 255, .04) !important; border: 1px solid rgba(255, 255, 255, .1); }
+.nmg [data-sum="perThousand"] { text-shadow: 0 0 24px rgba(47, 224, 140, .5); }
+.nmg input[name="binding"] { accent-color: #2fe08c; }
+
+@media (prefers-reduced-motion: reduce) { html.nmd section.nmg::before { animation: none; } .nmg-st, .nmg-st i { transition: none; } }

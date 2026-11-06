@@ -24,7 +24,10 @@ import {
   AGENCY_PACKAGES,
   AGENCY_PLATFORMS,
   BOOKING_STATUS_LABEL,
-  VIEW_STEPS,
+  VIEWS_DEFAULT,
+  VIEWS_MAX,
+  VIEWS_MIN,
+  VIEWS_STEP,
   agencyPackageLabel,
   viewsShort,
   type Briefing,
@@ -216,6 +219,73 @@ const REDEEM_JS = `
     });
   });`
 
+/* ------------------------------------- Formular als ein ganzes Fenster */
+
+/*
+ * Briefing und „Neue Kampagne“ (Vorgabe des Auftraggebers, November 2026):
+ * kein Schritt-für-Schritt mehr, sondern ein Glas-Fenster mit allen
+ * Abschnitten zum Scrollen. Oben eine Stations-Leiste, die beim Scrollen
+ * stehen bleibt; Views per Regler in 50.000er-Schritten mit Live-Preis.
+ * Styles: dash-whop.css, Abschnitt „Formular als ein Fenster“.
+ */
+const VIEW_TICKS = ['100.000', '2,5 Mio.', '5 Mio.', '7,5 Mio.', '10 Mio.'].map((t) => `<span>${t}</span>`).join('')
+
+const viewsControl = () => `
+            <p class="nmg-views"><span data-views-out>${VIEWS_DEFAULT.toLocaleString('de-DE')}</span><small>Views</small></p>
+            <input type="range" name="viewsStep" min="${VIEWS_MIN}" max="${VIEWS_MAX}" step="${VIEWS_STEP}" value="${VIEWS_DEFAULT}"
+                   class="nmg-range" aria-label="Gewünschte Views">
+            <div class="nmg-ticks" aria-hidden="true">${VIEW_TICKS}</div>
+            <p class="nmg-est" data-views-est></p>`
+
+const stationsBar = (titles: string[]) => `<div class="hidden" aria-hidden="true"><span data-step-label></span>${titles
+  .map((_, i) => `<i data-dot="${i + 1}"></i>`)
+  .join('')}</div>
+          <nav class="nmg-stations" aria-label="Abschnitte">${titles
+            .map((t, i) => `<a href="#abschnitt-${i + 1}" class="nmg-st" data-station="${i + 1}"><i>${i + 1}</i><span>${esc(t)}</span></a>`)
+            .join('')}</nav>`
+
+/** Gemeinsamer Teil beider Skripte; setzt range, form, bounds, euro, prepareBudget voraus. */
+const ONE_PAGE_JS = `
+  function onViews() {
+    var v = Number(range.value), b = bounds();
+    form.querySelector('[data-views-out]').textContent = v.toLocaleString('de-DE');
+    range.style.setProperty('--p', ((v - Number(range.min)) / (Number(range.max) - Number(range.min)) * 100) + '%');
+    var est = form.querySelector('[data-views-est]');
+    if (est) {
+      var fixed = b.max === b.min, per = Math.round(b.min * 1000 / v) / 100;
+      est.innerHTML = '<span>≈ <b>' + euro(b.min / 100, false) + (fixed ? '' : (b.max == null ? ' und mehr' : ' bis ' + euro(b.max / 100, false))) +
+        '</b>' + (fixed ? ' bei ' + euro(per, true) + ' je 1.000 Views' : ' für diese Views') + '</span>';
+    }
+    prepareBudget();
+    if (typeof summary === 'function') summary();
+  }
+  /* Beim Absenden: zum Abschnitt mit der fehlenden Angabe springen und ihn markieren. */
+  function jumpTo(n, quiet) {
+    var f = form.querySelector('fieldset[data-step="' + n + '"]');
+    if (!f) return;
+    f.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (quiet) return;
+    var m = f.querySelector('.nmg-miss');
+    if (!m) { m = document.createElement('p'); m.className = 'nmg-miss'; m.setAttribute('role', 'alert'); f.appendChild(m); }
+    m.textContent = err.textContent;
+    f.classList.add('is-missing');
+    setTimeout(function () { f.classList.remove('is-missing'); if (m.parentNode) m.parentNode.removeChild(m); }, 4000);
+  }
+  /* Stations-Leiste: aktueller Abschnitt leuchtet, darüber ein Haken; Klick springt hin. */
+  var stationLinks = form.querySelectorAll('[data-station]');
+  function stations() {
+    var cur = 0;
+    form.querySelectorAll('fieldset[data-step]').forEach(function (f, i) { if (f.getBoundingClientRect().top < 260) cur = i; });
+    stationLinks.forEach(function (a, i) {
+      a.classList.toggle('is-done', i < cur); a.classList.toggle('is-now', i === cur);
+      a.querySelector('i').textContent = i < cur ? '✓' : String(i + 1);
+    });
+  }
+  window.addEventListener('scroll', stations, { passive: true });
+  stationLinks.forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); jumpTo(Number(a.getAttribute('data-station')), true); }); });
+  onViews();
+  stations();`
+
 /* ---------------------------------------------------------- 1 — Briefing */
 
 /**
@@ -227,7 +297,6 @@ export function briefingPage(o: { user: User; lead: AgencyLead }): string {
   const first = o.user.fullName.split(' ')[0]
   const titles = ['Views', 'Budget', 'Auftrag']
   const total = titles.length
-  const ticks = VIEW_STEPS.map((v) => `<span>${esc(viewsShort(v))}</span>`).join('')
   const packages = AGENCY_PACKAGES.map(
     (p, i) => `
           <label class="group relative block cursor-pointer">
@@ -246,40 +315,29 @@ export function briefingPage(o: { user: User; lead: AgencyLead }): string {
   const body = `
       ${pageTitle(`Willkommen, ${first}!`, 'Starte jetzt deine Kampagne, drei kurze Angaben, dann geht es los.')}
 
-      <section class="overflow-hidden rounded-3xl bg-gradient-to-br from-[#010302] via-[#041a0f] to-[#0a4527] ring-1 ring-inset ring-[#2fe08c]/25 text-white shadow-xl" id="briefing">
+      <section class="nmg text-white" id="briefing">
         <form class="p-6 sm:p-10" data-briefing novalidate>
-          <div class="flex flex-wrap items-center justify-between gap-3">
-            <span class="text-xs font-bold uppercase tracking-[.16em] text-brand-2" data-step-label>Schritt 1 von ${total} · Views</span>
-            <span class="flex gap-1.5" aria-hidden="true">${titles
-              .map((_, i) => i + 1)
-              .map((n) => `<i class="h-1.5 w-8 rounded-full ${n === 1 ? 'bg-brand' : 'bg-white/15'}" data-dot="${n}"></i>`)
-              .join('')}</span>
-          </div>
+          ${stationsBar(titles)}
 
           <!-- Schritt 1 — Views -->
-          <fieldset class="mt-8" data-step="1">
+          <fieldset class="nmg-sec" data-step="1" id="abschnitt-1">
             <legend class="font-display text-2xl font-extrabold leading-tight sm:text-3xl">Wie viele Views möchtest du in Auftrag geben?</legend>
-            <p class="mt-6 text-center font-display text-5xl font-extrabold tracking-tight text-brand-2 sm:text-6xl"><span data-views-out>${esc(
-              viewsShort(VIEW_STEPS[3]),
-            )}</span><small class="ml-2 text-xl font-bold text-white/70">Views</small></p>
-            <input type="range" name="viewsStep" min="0" max="${VIEW_STEPS.length - 1}" step="1" value="3"
-                   class="mt-8 w-full cursor-pointer accent-brand" aria-label="Gewünschte Views">
-            <div class="mt-2 flex justify-between text-[11px] font-semibold text-white/50 sm:text-xs">${ticks}</div>
+            ${viewsControl()}
           </fieldset>
 
           <!-- Schritt 2 — Budget -->
-          <fieldset class="mt-8 hidden" data-step="2">
+          <fieldset class="nmg-sec" data-step="2" id="abschnitt-2">
             <legend class="font-display text-2xl font-extrabold leading-tight sm:text-3xl">Wie viel Budget möchtest du für die Views zur Verfügung stellen?</legend>
-            <label class="mx-auto mt-8 flex max-w-md items-center gap-3 rounded-2xl bg-white px-5 py-4 text-slate-900 shadow-inner ring-4 ring-transparent focus-within:ring-brand/50">
+            <label class="nmg-field mx-auto mt-8 flex max-w-md items-center gap-3">
               <input type="text" name="budget" inputmode="decimal" autocomplete="off" maxlength="16" placeholder="z. B. 5.000"
-                     class="min-w-0 flex-1 bg-transparent font-display text-3xl font-extrabold outline-none placeholder:text-slate-300">
-              <span class="font-display text-3xl font-extrabold text-slate-400">€</span>
+                     class="min-w-0 flex-1 bg-transparent font-display text-3xl font-extrabold outline-none">
+              <span class="nmg-field__unit font-display text-3xl font-extrabold">€</span>
             </label>
             <p class="mx-auto mt-4 max-w-md text-center text-sm text-white/70" data-budget-hint>Dein Budget für die gewählten Views.</p>
           </fieldset>
 
           <!-- Schritt 3 — Auftrag -->
-          <fieldset class="mt-8 hidden" data-step="3">
+          <fieldset class="nmg-sec" data-step="3" id="abschnitt-3">
             <legend class="font-display text-2xl font-extrabold leading-tight sm:text-3xl">Was möchtest du beauftragen?</legend>
             <div class="mt-6 grid gap-3 lg:grid-cols-3">${packages}
             </div>
@@ -287,11 +345,11 @@ export function briefingPage(o: { user: User; lead: AgencyLead }): string {
 
           <p class="mt-6 hidden rounded-xl bg-red-500/15 px-4 py-3 text-sm font-semibold text-red-200 ring-1 ring-inset ring-red-400/30" data-error role="alert"></p>
 
-          <div class="mt-8 flex flex-wrap items-center justify-between gap-3">
-            <button type="button" class="rounded-xl px-4 py-2.5 text-sm font-semibold text-white/70 hover:bg-white/10 hover:text-white invisible" data-back>Zurück</button>
+          <div class="mt-8 flex flex-wrap items-center justify-end gap-3">
+            <button type="button" class="hidden" data-back>Zurück</button>
             <div class="flex gap-3">
-              <button type="button" class="rounded-xl bg-white px-6 py-3 text-sm font-extrabold text-slate-900 transition hover:bg-amber-50" data-next>Weiter</button>
-              <button type="submit" class="${GOLD_BTN} hidden" data-submit>
+              <button type="button" class="hidden" data-next>Weiter</button>
+              <button type="submit" class="${GOLD_BTN} nmg-submit" data-submit>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                 Kampagne starten
               </button>
@@ -308,7 +366,6 @@ export function briefingPage(o: { user: User; lead: AgencyLead }): string {
 
   const script = `
 (function () {
-  var STEPS = ${jsonScript(VIEW_STEPS)};
   /* Unsere Preise für den Bereich dieser Agentur (lib/agency.ts); der Server prüft dasselbe. */
   var NICHE = ${jsonScript(o.lead.niche ?? '')}, RANGE = ${jsonScript(priceRangeFor(o.lead.niche))}, NAMED = ${jsonScript(Boolean(o.lead.niche && PRICE_RANGES[o.lead.niche]))};
   var form = document.querySelector('[data-briefing]');
@@ -321,7 +378,7 @@ export function briefingPage(o: { user: User; lead: AgencyLead }): string {
   var short = function (n) {
     return n >= 1000000 ? (n / 1000000).toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' Mio.' : Math.round(n / 1000) + 'K';
   };
-  range.addEventListener('input', function () { out.textContent = short(STEPS[Number(range.value)]); });
+  range.addEventListener('input', onViews);
 
   function budgetEuro() {
     var raw = String(form.budget.value || '').replace(/[€\\s]/g, '');
@@ -342,11 +399,11 @@ export function briefingPage(o: { user: User; lead: AgencyLead }): string {
     return n.toLocaleString('de-DE', { minimumFractionDigits: cents ? 2 : 0, maximumFractionDigits: cents ? 2 : 0 }) + ' €';
   };
   function bounds() {
-    var v = STEPS[Number(range.value)];
+    var v = Number(range.value);
     return { min: Math.round(v * RANGE.min / 1000), max: RANGE.max == null ? null : Math.round(v * RANGE.max / 1000) };
   }
   function ruleText() {
-    var b = bounds(), v = short(STEPS[Number(range.value)]) + ' Views', who = NAMED ? 'Für ' + NICHE : 'Unser Preis';
+    var b = bounds(), v = Number(range.value).toLocaleString('de-DE') + ' Views', who = NAMED ? 'Für ' + NICHE : 'Unser Preis';
     if (RANGE.max === RANGE.min) return who + ': ' + euro(RANGE.min / 100, true) + ' pro 1.000 Views. Für ' + v + ' sind das ' + euro(b.min / 100, false) + '.';
     if (RANGE.max == null) return who + ': ab ' + euro(RANGE.min / 100, true) + ' pro 1.000 Views. Für ' + v + ' also ab ' + euro(b.min / 100, false) + '.';
     return who + ': ' + euro(RANGE.min / 100, true) + ' bis ' + euro(RANGE.max / 100, true) + ' pro 1.000 Views. Für ' + v + ' also ' + euro(b.min / 100, false) + ' bis ' + euro(b.max / 100, false) + '.';
@@ -359,15 +416,11 @@ export function briefingPage(o: { user: User; lead: AgencyLead }): string {
   }
   function show(message) { err.textContent = message || ''; err.classList.toggle('hidden', !message); }
   function render() {
-    form.querySelectorAll('[data-step]').forEach(function (f) { f.classList.toggle('hidden', Number(f.getAttribute('data-step')) !== step); });
     form.querySelectorAll('[data-dot]').forEach(function (d) {
       var on = Number(d.getAttribute('data-dot')) <= step;
       d.classList.toggle('bg-brand', on); d.classList.toggle('bg-white/15', !on);
     });
     form.querySelector('[data-step-label]').textContent = 'Schritt ' + step + ' von ' + TOTAL + ' · ' + titles[step - 1];
-    form.querySelector('[data-back]').classList.toggle('invisible', step === 1);
-    form.querySelector('[data-next]').classList.toggle('hidden', step === TOTAL);
-    form.querySelector('[data-submit]').classList.toggle('hidden', step !== TOTAL);
     form.querySelector('[data-submit]').disabled = sending;
   }
   form.querySelector('[data-next]').addEventListener('click', function () {
@@ -376,9 +429,7 @@ export function briefingPage(o: { user: User; lead: AgencyLead }): string {
     if (step === 2) { prepareBudget(); if (!form.budget.readOnly) form.budget.focus(); }
   });
   form.querySelector('[data-back]').addEventListener('click', function () { show(''); step = Math.max(step - 1, 1); render(); });
-  form.budget.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') { e.preventDefault(); form.querySelector('[data-next]').click(); }
-  });
+  form.budget.addEventListener('keydown', function (e) { if (e.key === 'Enter') e.preventDefault(); });
 
   // Schon beim Tippen, nicht erst bei \`change\` (feuert beim Klick auf „Weiter“
   // und ließe den Knopf zwischen Drücken und Loslassen nach oben rutschen).
@@ -387,9 +438,9 @@ export function briefingPage(o: { user: User; lead: AgencyLead }): string {
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     if (sending) return;
-    for (var n = 1; n <= TOTAL; n++) { var p = problem(n); if (p) { step = n; render(); show(p); return; } }
+    for (var n = 1; n <= TOTAL; n++) { var p = problem(n); if (p) { show(p); jumpTo(n); return; } }
     sending = true; render();
-    var data = { views: STEPS[Number(range.value)], budget: budgetEuro(), package: picked() };
+    var data = { views: Number(range.value), budget: budgetEuro(), package: picked() };
     fetch(ENDPOINT, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -401,6 +452,7 @@ export function briefingPage(o: { user: User; lead: AgencyLead }): string {
       })
       .catch(function (e2) { sending = false; render(); show(e2.message); });
   });
+${ONE_PAGE_JS}
   render();
 })();`
 
@@ -418,7 +470,6 @@ export function briefingPage(o: { user: User; lead: AgencyLead }): string {
  */
 export function newCampaignPage(o: { user: User }): string {
   const titles = ['Name', 'Bereich', 'Plattformen', 'Views', 'Budget', 'Übersicht']
-  const ticks = VIEW_STEPS.map((v) => `<span>${esc(viewsShort(v))}</span>`).join('')
   const legend = (text: string) => `<legend class="font-display text-2xl font-extrabold leading-tight sm:text-3xl">${esc(text)}</legend>`
   const niches = INDUSTRIES.map(
     (n) => `
@@ -451,34 +502,29 @@ export function newCampaignPage(o: { user: User }): string {
       <a href="${esc(AGENCY_CAMPAIGN_AREA.home)}" class="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-brand">← Meine Kampagnen</a>
       ${pageTitle('Neue Kampagne erstellen', 'Name, Bereich, Plattformen, Views und Budget. Danach siehst du, was 1.000 Views für deine Kampagne kosten.')}
 
-      <section class="overflow-hidden rounded-3xl bg-gradient-to-br from-[#010302] via-[#041a0f] to-[#0a4527] ring-1 ring-inset ring-[#2fe08c]/25 text-white shadow-xl" id="neue-kampagne">
+      <section class="nmg text-white" id="neue-kampagne">
         <form class="p-6 sm:p-10" data-new-campaign novalidate>
-          <div class="flex flex-wrap items-center justify-between gap-3">
-            <span class="text-xs font-bold uppercase tracking-[.16em] text-brand-2" data-step-label>Schritt 1 von ${titles.length} · Name</span>
-            <span class="flex gap-1.5" aria-hidden="true">${titles
-              .map((_, i) => `<i class="h-1.5 w-6 rounded-full sm:w-8 ${i === 0 ? 'bg-brand' : 'bg-white/15'}" data-dot="${i + 1}"></i>`)
-              .join('')}</span>
-          </div>
+          ${stationsBar(titles)}
 
           <!-- Schritt 1: Name -->
-          <fieldset class="mt-8" data-step="1">
+          <fieldset class="nmg-sec" data-step="1" id="abschnitt-1">
             ${legend('Wie soll die Kampagne heißen?')}
-            <label class="mx-auto mt-8 flex max-w-xl items-center rounded-2xl bg-white px-5 py-4 text-slate-900 shadow-inner ring-4 ring-transparent focus-within:ring-brand/50">
+            <label class="nmg-field mx-auto mt-8 flex max-w-xl items-center">
               <input type="text" name="campaignName" autocomplete="off" maxlength="80" placeholder="${esc(AGENCY_CAMPAIGN_AREA.text.namePlaceholder)}"
-                     class="min-w-0 flex-1 bg-transparent font-display text-2xl font-extrabold outline-none placeholder:text-slate-300">
+                     class="min-w-0 flex-1 bg-transparent font-display text-2xl font-extrabold outline-none">
             </label>
             <p class="mt-3 text-center text-sm text-white/60">Ein Name, an dem du die Kampagne wiedererkennst, zum Beispiel der Name deines Kunden.</p>
           </fieldset>
 
           <!-- Schritt 2: Bereich -->
-          <fieldset class="mt-8 hidden" data-step="2">
+          <fieldset class="nmg-sec" data-step="2" id="abschnitt-2">
             ${legend('In welchem Bereich ist die Kampagne?')}
             <div class="mt-6 flex flex-wrap gap-2.5">${niches}
             </div>
           </fieldset>
 
           <!-- Schritt 3: Plattformen -->
-          <fieldset class="mt-8 hidden" data-step="3">
+          <fieldset class="nmg-sec" data-step="3" id="abschnitt-3">
             ${legend('Auf welchen Plattformen soll die Kampagne laufen?')}
             <p class="mt-2 text-sm text-white/60">Mehrfachauswahl möglich, mindestens eine.</p>
             <div class="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">${platforms}
@@ -486,29 +532,24 @@ export function newCampaignPage(o: { user: User }): string {
           </fieldset>
 
           <!-- Schritt 4: Views -->
-          <fieldset class="mt-8 hidden" data-step="4">
+          <fieldset class="nmg-sec" data-step="4" id="abschnitt-4">
             ${legend('Wie viele Views möchtest du in Auftrag geben?')}
-            <p class="mt-6 text-center font-display text-5xl font-extrabold tracking-tight text-brand-2 sm:text-6xl"><span data-views-out>${esc(
-              viewsShort(VIEW_STEPS[3]),
-            )}</span><small class="ml-2 text-xl font-bold text-white/70">Views</small></p>
-            <input type="range" name="viewsStep" min="0" max="${VIEW_STEPS.length - 1}" step="1" value="3"
-                   class="mt-8 w-full cursor-pointer accent-brand" aria-label="Gewünschte Views">
-            <div class="mt-2 flex justify-between text-[11px] font-semibold text-white/50 sm:text-xs">${ticks}</div>
+            ${viewsControl()}
           </fieldset>
 
           <!-- Schritt 5: Budget -->
-          <fieldset class="mt-8 hidden" data-step="5">
+          <fieldset class="nmg-sec" data-step="5" id="abschnitt-5">
             ${legend('Wie viel Budget möchtest du für diese Kampagne in Auftrag geben?')}
-            <label class="mx-auto mt-8 flex max-w-md items-center gap-3 rounded-2xl bg-white px-5 py-4 text-slate-900 shadow-inner ring-4 ring-transparent focus-within:ring-brand/50">
+            <label class="nmg-field mx-auto mt-8 flex max-w-md items-center gap-3">
               <input type="text" name="budget" inputmode="decimal" autocomplete="off" maxlength="16" placeholder="z. B. 5.000"
-                     class="min-w-0 flex-1 bg-transparent font-display text-3xl font-extrabold outline-none placeholder:text-slate-300">
-              <span class="font-display text-3xl font-extrabold text-slate-400">€</span>
+                     class="min-w-0 flex-1 bg-transparent font-display text-3xl font-extrabold outline-none">
+              <span class="nmg-field__unit font-display text-3xl font-extrabold">€</span>
             </label>
             <p class="mx-auto mt-4 max-w-md text-center text-sm text-white/70" data-budget-hint></p>
           </fieldset>
 
           <!-- Schritt 6: Übersicht, Preis pro 1.000 Views, verbindlicher Auftrag -->
-          <fieldset class="mt-8 hidden" data-step="6">
+          <fieldset class="nmg-sec" data-step="6" id="abschnitt-6">
             ${legend('Deine Kampagne im Überblick')}
             <div class="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
               <dl class="divide-y divide-white/10 rounded-2xl bg-white/5 px-5 ring-1 ring-inset ring-white/10">
@@ -538,11 +579,11 @@ export function newCampaignPage(o: { user: User }): string {
 
           <p class="mt-6 hidden rounded-xl bg-red-500/15 px-4 py-3 text-sm font-semibold text-red-200 ring-1 ring-inset ring-red-400/30" data-error role="alert"></p>
 
-          <div class="mt-8 flex flex-wrap items-center justify-between gap-3">
-            <button type="button" class="invisible rounded-xl px-4 py-2.5 text-sm font-semibold text-white/70 hover:bg-white/10 hover:text-white" data-back>Zurück</button>
+          <div class="mt-8 flex flex-wrap items-center justify-end gap-3">
+            <button type="button" class="hidden" data-back>Zurück</button>
             <div class="flex gap-3">
-              <button type="button" class="rounded-xl bg-white px-6 py-3 text-sm font-extrabold text-slate-900 transition hover:bg-amber-50" data-next>Weiter</button>
-              <button type="submit" class="${GOLD_BTN} hidden" data-submit>
+              <button type="button" class="hidden" data-next>Weiter</button>
+              <button type="submit" class="${GOLD_BTN} nmg-submit" data-submit>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                 Kampagne starten
               </button>
@@ -553,7 +594,6 @@ export function newCampaignPage(o: { user: User }): string {
 
   const script = `
 (function () {
-  var STEPS = ${jsonScript(VIEW_STEPS)};
   /* Unsere Preise je Bereich (lib/agency.ts, PRICE_RANGES); der Server prüft dasselbe. */
   var RANGES = ${jsonScript(PRICE_RANGES)}, DEFAULT_RANGE = ${jsonScript(DEFAULT_PRICE_RANGE)};
   var LABELS = ${jsonScript(Object.fromEntries(AGENCY_PLATFORMS.map((p) => [p.value, p.label])))};
@@ -568,7 +608,7 @@ export function newCampaignPage(o: { user: User }): string {
   var euro = function (n, cents) {
     return n.toLocaleString('de-DE', { minimumFractionDigits: cents ? 2 : 0, maximumFractionDigits: cents ? 2 : 0 }) + ' €';
   };
-  range.addEventListener('input', function () { form.querySelector('[data-views-out]').textContent = short(STEPS[Number(range.value)]); });
+  range.addEventListener('input', onViews);
 
   function budgetEuro() {
     var raw = String(form.budget.value || '').replace(/[€\\s]/g, '');
@@ -592,23 +632,23 @@ export function newCampaignPage(o: { user: User }): string {
     return '';
   }
   function summary() {
-    var views = STEPS[Number(range.value)], budget = budgetEuro();
+    var views = Number(range.value), budget = budgetEuro();
     var set = function (key, text) { form.querySelector('[data-sum="' + key + '"]').textContent = text; };
     set('name', form.campaignName.value.trim());
     set('niche', niche());
     set('platforms', platforms().map(function (p) { return LABELS[p] || p; }).join(', '));
-    set('views', short(views) + ' Views');
+    set('views', views.toLocaleString('de-DE') + ' Views');
     set('budget', euro(budget, false));
     set('perThousand', euro(Math.round(budget * 100000 / views) / 100, true));
-    set('sentence', short(views) + ' Views für ' + euro(budget, false));
+    set('sentence', views.toLocaleString('de-DE') + ' Views für ' + euro(budget, false));
   }
   function rangeFor() { return RANGES[niche()] || DEFAULT_RANGE; }
   function bounds() {
-    var r = rangeFor(), v = STEPS[Number(range.value)];
+    var r = rangeFor(), v = Number(range.value);
     return { min: Math.round(v * r.min / 1000), max: r.max == null ? null : Math.round(v * r.max / 1000) };
   }
   function ruleText() {
-    var r = rangeFor(), b = bounds(), v = short(STEPS[Number(range.value)]) + ' Views';
+    var r = rangeFor(), b = bounds(), v = Number(range.value).toLocaleString('de-DE') + ' Views';
     var who = RANGES[niche()] ? 'Für ' + niche() : 'Unser Preis';
     if (r.max === r.min) return who + ': ' + euro(r.min / 100, true) + ' pro 1.000 Views. Für ' + v + ' sind das ' + euro(b.min / 100, false) + '.';
     if (r.max == null) return who + ': ab ' + euro(r.min / 100, true) + ' pro 1.000 Views. Für ' + v + ' also ab ' + euro(b.min / 100, false) + '.';
@@ -623,17 +663,13 @@ export function newCampaignPage(o: { user: User }): string {
   }
   function show(message) { err.textContent = message || ''; err.classList.toggle('hidden', !message); }
   function render() {
-    form.querySelectorAll('[data-step]').forEach(function (f) { f.classList.toggle('hidden', Number(f.getAttribute('data-step')) !== step); });
     form.querySelectorAll('[data-dot]').forEach(function (d) {
       var on = Number(d.getAttribute('data-dot')) <= step;
       d.classList.toggle('bg-brand', on); d.classList.toggle('bg-white/15', !on);
     });
     form.querySelector('[data-step-label]').textContent = 'Schritt ' + step + ' von ' + TOTAL + ' · ' + titles[step - 1];
-    form.querySelector('[data-back]').classList.toggle('invisible', step === 1);
-    form.querySelector('[data-next]').classList.toggle('hidden', step === TOTAL);
-    form.querySelector('[data-submit]').classList.toggle('hidden', step !== TOTAL);
     form.querySelector('[data-submit]').disabled = sending;
-    if (step === TOTAL) summary();
+    summary();
   }
   function next() {
     var p = problem(step); if (p) { show(p); return; }
@@ -642,16 +678,17 @@ export function newCampaignPage(o: { user: User }): string {
   }
   form.querySelector('[data-next]').addEventListener('click', next);
   form.querySelector('[data-back]').addEventListener('click', function () { show(''); step = Math.max(step - 1, 1); render(); });
-  // Der Bereich ist eine einzige Wahl: nach dem Klick geht es von selbst weiter.
-  form.querySelectorAll('input[name="niche"]').forEach(function (el) { el.addEventListener('change', function () { if (step === 2) next(); }); });
+  // Der Preis hängt am Bereich: Budget und Übersicht rechnen sofort mit.
+  form.querySelectorAll('input[name="niche"]').forEach(function (el) { el.addEventListener('change', onViews); });
   [form.campaignName, form.budget].forEach(function (el) {
-    el.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); next(); } });
+    el.addEventListener('keydown', function (e) { if (e.key === 'Enter') e.preventDefault(); });
   });
-  form.addEventListener('input', function () { show(''); });
+  form.addEventListener('input', function () { show(''); summary(); });
+  form.addEventListener('change', summary);
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     if (sending) return;
-    for (var n = 1; n <= TOTAL; n++) { var p = problem(n); if (p) { step = n; render(); show(p); return; } }
+    for (var n = 1; n <= TOTAL; n++) { var p = problem(n); if (p) { show(p); jumpTo(n); return; } }
     sending = true; render();
     fetch('/api/collaboration/campaigns', {
       method: 'POST',
@@ -660,7 +697,7 @@ export function newCampaignPage(o: { user: User }): string {
         name: form.campaignName.value.trim(),
         niche: niche(),
         platforms: platforms(),
-        views: STEPS[Number(range.value)],
+        views: Number(range.value),
         budget: budgetEuro(),
         binding: form.binding.checked
       })
@@ -671,6 +708,7 @@ export function newCampaignPage(o: { user: User }): string {
       })
       .catch(function (e2) { sending = false; render(); show(e2.message); });
   });
+${ONE_PAGE_JS}
   render();
   form.campaignName.focus();
 })();`

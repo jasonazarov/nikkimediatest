@@ -57,6 +57,17 @@
     base.appendChild(document.createTextNode(' ' + SOURCE[c.baseSource] + ' · ' + euro(c.perThousandCents) + ' pro 1.000 Views'));
     body.appendChild(base);
 
+    /* Bedingungen (Vorgabe des Auftraggebers): nur im Kampagnenzeitraum, Rabatt, spätestens 5 Werktage. */
+    var terms = el('div', 'nmu__terms');
+    terms.appendChild(el('strong', 'nmu__only', 'Kampagnen-Push-Angebote sind nur innerhalb des vereinbarten Kampagnenzeitraums möglich.'));
+    if (c.offers.some(function (o) { return o.discountPct > 0; })) {
+      terms.appendChild(el('span', 'nmu__disc', 'Push-Rabatt: ' + c.offers.map(function (o) {
+        return o.discountPct.toLocaleString('de-DE') + ' % auf +' + o.percent + ' %';
+      }).join(', ') + '.'));
+    }
+    terms.appendChild(el('span', 'nmu__time', 'Das zusätzliche Budget wird spätestens 5 Werktage nach Bestätigung ' + (area === 'agency' ? 'eurer' : 'deiner') + ' Anfrage in der Kampagne hinterlegt.'));
+    body.appendChild(terms);
+
     var grid = el('div', 'nmu__grid');
     c.offers.forEach(function (o) {
       var card = el('div', 'nmu__offer' + (o.percent === 35 ? ' is-pick' : ''));
@@ -64,14 +75,14 @@
       card.appendChild(el('span', 'nmu__pct', '+' + o.percent + ' %'));
       card.appendChild(el('span', 'nmu__unit', 'mehr Budget · ' + (PITCH[o.percent] || '')));
       card.appendChild(el('span', 'nmu__views', '≈ +' + num(o.extraViews) + ' Views'));
-      if (area === 'agency' && o.clientPriceCents != null) {
-        var p = el('span', 'nmu__price', euro(o.clientPriceCents));
-        card.appendChild(p);
-        card.appendChild(el('span', 'nmu__note', 'Euer Kundenpreis · unser Preis ' + euro(o.priceCents) + (state.marginPct ? ' · ' + state.marginPct + ' % Marge' : '')));
-      } else {
-        card.appendChild(el('span', 'nmu__price', '+' + euro(o.priceCents)));
-        card.appendChild(el('span', 'nmu__note', 'zusätzliches Budget, abgerechnet nach erreichten Views'));
-      }
+      var agencyPrice = area === 'agency' && o.clientPriceCents != null;
+      var plus = agencyPrice ? '' : '+';
+      if (o.discountPct > 0) card.appendChild(el('span', 'nmu__was', plus + euro(agencyPrice ? o.clientListPriceCents : o.listPriceCents)));
+      card.appendChild(el('span', 'nmu__price', plus + euro(agencyPrice ? o.clientPriceCents : o.priceCents)));
+      if (o.discountPct > 0) card.appendChild(el('span', 'nmu__save', '−' + o.discountPct.toLocaleString('de-DE') + ' % Push-Rabatt'));
+      card.appendChild(el('span', 'nmu__note', agencyPrice
+        ? 'Euer Kundenpreis · unser Preis ' + euro(o.priceCents) + (state.marginPct ? ' · ' + state.marginPct + ' % Marge' : '')
+        : 'Wird spätestens 5 Werktage nach Bestätigung in deiner Kampagne freigeschaltet.'));
       var btn = el('button', 'nmu__btn', o.pending ? 'Angefragt' : 'Kampagne pushen');
       btn.type = 'button';
       btn.disabled = !!o.pending;

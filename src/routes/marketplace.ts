@@ -164,7 +164,7 @@ marketplaceApi.post('/upsell', async (c) => {
     action: 'upsell.request',
     entity: 'project',
     entityId: r.campaign.id,
-    payload: { percent: r.offer.percent, extraViews: r.offer.extraViews, priceCents: r.offer.priceCents },
+    payload: { percent: r.offer.percent, extraViews: r.offer.extraViews, priceCents: r.offer.priceCents, discountPct: r.offer.discountPct },
   })
   await mailUpsellAdmin(c.env, {
     fullName: user.fullName,
@@ -174,6 +174,8 @@ marketplaceApi.post('/upsell', async (c) => {
     percent: r.offer.percent,
     extraViews: r.offer.extraViews,
     price: formatEuro(r.offer.priceCents),
+    listPrice: r.offer.discountPct ? formatEuro(r.offer.listPriceCents) : null,
+    discountPct: r.offer.discountPct,
     clientPrice: r.offer.clientPriceCents == null ? null : formatEuro(r.offer.clientPriceCents),
   })
   return c.json({ ok: true, offer: r.offer })

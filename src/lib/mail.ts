@@ -993,6 +993,9 @@ export function mailUpsellAdmin(
     percent: number
     extraViews: number
     price: string
+    /** Preis vor Push-Rabatt, nur wenn es einen gab. */
+    listPrice?: string | null
+    discountPct?: number
     clientPrice: string | null
   },
 ) {
@@ -1009,7 +1012,7 @@ export function mailUpsellAdmin(
           ['E-Mail', o.email],
           ['Kampagne', o.campaign],
           ['Zusätzliche Views', o.extraViews.toLocaleString('de-DE')],
-          ['Zusätzliches Budget', o.price],
+          ['Zusätzliches Budget', o.discountPct ? `${o.price} (nach ${o.discountPct.toLocaleString('de-DE')} % Push-Rabatt, vorher ${o.listPrice})` : o.price],
           ...(o.clientPrice ? ([['Kundenpreis der Agentur', o.clientPrice]] as [string, string][]) : []),
         ]) +
         button(`${env.APP_URL}/admin/upsells`, 'Im Admin-Bereich öffnen'),

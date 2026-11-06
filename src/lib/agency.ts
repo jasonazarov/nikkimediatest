@@ -119,6 +119,16 @@ export const AGENCY_PACKAGES = [
  */
 export const VIEW_STEPS = [100_000, 250_000, 500_000, 1_000_000, 2_500_000, 5_000_000, 10_000_000] as const
 
+/**
+ * Views im Briefing und bei „Neue Kampagne“ (Vorgabe des Auftraggebers, November 2026):
+ * Regler von 100.000 bis 10 Mio. in 50.000er-Schritten. Der Server nimmt genau diese Werte an.
+ */
+export const VIEWS_MIN = 100_000
+export const VIEWS_MAX = 10_000_000
+export const VIEWS_STEP = 50_000
+export const VIEWS_DEFAULT = 1_000_000
+export const isValidViews = (v: number) => Number.isInteger(v) && v >= VIEWS_MIN && v <= VIEWS_MAX && v % VIEWS_STEP === 0
+
 const labelIn = (list: readonly { value: string; label: string }[], value: string | null | undefined) =>
   list.find((o) => o.value === value)?.label ?? value ?? '–'
 
@@ -178,7 +188,7 @@ export interface Briefing {
 function parseViewsBudget(body: Record<string, unknown>): { views: number; budgetCents: number } | { error: string } {
   const views = Number(body.views)
   const budgetCents = Math.round(Number(body.budget) * 100)
-  if (!(VIEW_STEPS as readonly number[]).includes(views)) return { error: 'Bitte wähle die gewünschten Views.' }
+  if (!isValidViews(views)) return { error: 'Bitte wähle die gewünschten Views.' }
   if (!Number.isFinite(budgetCents) || budgetCents < 100 || budgetCents > BUDGET_MAX_CENTS) {
     return { error: 'Bitte gib dein Budget in Euro ein.' }
   }

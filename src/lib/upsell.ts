@@ -37,12 +37,32 @@ export const MARGIN_MAX_PCT = 300
 
 export type UpsellArea = 'customer' | 'agency' | 'creator'
 
+/**
+ * Push-Rabatt (Vorgabe des Auftraggebers, November 2026): während der laufenden
+ * Kampagne +20 % → 5 %, +35 % → 7,5 %, +50 % → 11 % auf unseren Preis. Nur für
+ * Agenturen und Kunden, nicht für Creator. Beendete Kampagnen bekommen ohnehin
+ * kein Angebot (`upsellCampaigns`). Der Kundenpreis einer Agentur rechnet ihre
+ * Marge auf den rabattierten Preis.
+ */
+export const PUSH_DISCOUNT_PCT: Record<UpsellPercent, number> = { 20: 5, 35: 7.5, 50: 11 }
+export const discountFor = (role: string, percent: UpsellPercent): number =>
+  role === 'agency' || role === 'customer' ? PUSH_DISCOUNT_PCT[percent] : 0
+/** Preis nach Rabatt, auf volle Cent gerundet. */
+export const discounted = (cents: number, pct: number) => Math.round(cents * (1 - pct / 100))
+
 export interface UpsellOffer {
   percent: UpsellPercent
   extraViews: number
+  /** Unser Preis, nach Push-Rabatt. */
   priceCents: number
-  /** Nur Agenturen: Preis inkl. ihrer Marge. */
+  /** Unser Preis ohne Rabatt (gleich `priceCents`, wenn es keinen Rabatt gibt). */
+  listPriceCents: number
+  /** Push-Rabatt in Prozent, 0 = keiner. */
+  discountPct: number
+  /** Nur Agenturen: Preis inkl. ihrer Marge (nach Rabatt). */
   clientPriceCents: number | null
+  /** Nur Agenturen: Kundenpreis ohne Rabatt. */
+  clientListPriceCents: number | null
   /** Offene Anfrage für genau dieses Angebot? */
   pending: boolean
 }
@@ -156,12 +176,17 @@ export async function upsellCampaigns(env: Env, user: User): Promise<{ marginPct
       perThousandCents,
       offers: UPSELL_PERCENTS.map((percent) => {
         const extraViews = extraViewsFor(baseViews, percent)
-        const priceCents = priceFor(extraViews, perThousandCents)
+        const listPriceCents = priceFor(extraViews, perThousandCents)
+        const discountPct = discountFor(user.role, percent)
+        const priceCents = discounted(listPriceCents, discountPct)
         return {
           percent,
           extraViews,
           priceCents,
+          listPriceCents,
+          discountPct,
           clientPriceCents: user.role === 'agency' ? withMargin(priceCents, marginPct) : null,
+          clientListPriceCents: user.role === 'agency' ? withMargin(listPriceCents, marginPct) : null,
           pending: open.has(`${r.id}:${percent}`),
         }
       }),
