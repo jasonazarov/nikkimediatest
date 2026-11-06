@@ -2,6 +2,7 @@ import type { User } from '../db/schema'
 import { r2Ready } from './r2'
 import { signThumb } from './thumbs'
 import type { Env } from './types'
+import { showcaseFor } from './showcase'
 
 /**
  * „Virale Clips“ — die Clips mit den meisten Views, für das Feld oben in
@@ -67,17 +68,29 @@ export interface PostScope {
   showAccounts: boolean
   /** Eingrenzung allein über Kampagnen (Admin, Kunde, Agentur) — dann taugen Tagesstände je Kampagne. */
   projectScoped: boolean
+  /** Angezeigte Namen statt `projects.name` (Use Cases der Demo-Agentur, lib/showcase.ts). */
+  names?: Map<string, string>
 }
 
 export async function postScopeFor(env: Env, user: User): Promise<PostScope | null> {
   switch (user.role) {
     case 'admin':
       return { where: '1 = 1', binds: [], showAccounts: true, projectScoped: true }
-    case 'customer':
-    case 'agency': {
+    case 'customer': {
       const customer = await idOf(env, 'customers', user.id)
       if (!customer) return null
       return { where: 'p.customer_id = ?', binds: [customer.id], showAccounts: true, projectScoped: true }
+    }
+    case 'agency': {
+      const [customer, showcase] = await Promise.all([idOf(env, 'customers', user.id), showcaseFor(env, user)])
+      // Die Demo-Agentur sieht zusätzlich die Use Cases von der Startseite (lib/showcase.ts).
+      const ids = [...showcase.keys()]
+      if (!customer && !ids.length) return null
+      const parts: string[] = []
+      const binds: unknown[] = []
+      if (customer) (parts.push('p.customer_id = ?'), binds.push(customer.id))
+      if (ids.length) (parts.push(`p.id IN (${ids.map(() => '?').join(',')})`), binds.push(...ids))
+      return { where: `(${parts.join(' OR ')})`, binds, showAccounts: true, projectScoped: true, names: showcase }
     }
     case 'clipper': {
       const clipper = await idOf(env, 'clippers', user.id)
@@ -157,7 +170,7 @@ export async function viralClipsFor(env: Env, user: User, limit = 8): Promise<Vi
       if (!thumb) thumb = `/media/kampagne/${encodeURIComponent(r.project_id)}/thumb`
       return {
         id: r.id,
-        campaign: r.campaign,
+        campaign: scope.names?.get(r.project_id) ?? r.campaign,
         views: Number(r.views) || 0,
         likes: Number(r.likes) || 0,
         shares: Number(r.shares) || 0,

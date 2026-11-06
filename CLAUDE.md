@@ -531,3 +531,13 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   „Bewegung reduzieren“ steht es still. Das Formular (`.stepper__card`) bleibt gleichmäßig und etwas
   dunkler, es wird nicht angestrahlt. **Buttons sind nicht animiert:** kein Wippen, Puls oder Glanz
   (früher `ctaBob`/`ctaPulse`/`ctaSheen`/`badgeLift` in `site.css`). Die Dashboards haben das Licht nicht.
+- **Use Cases im Dashboard der Demo-Agentur** (Vorgabe des Auftraggebers, November 2026; `src/lib/showcase.ts`):
+  Die Accounts der Case Studies (dindrop7, caspianbluecaviar, max_tornow_business, levantine_istanbul,
+  panperium; Liste `SHOWCASE_ACCOUNTS`) sind über Zernio angebunden. Die Demo-Agentur
+  (theguardians@demo.nikkimedia.co, `users.demo = 1`) sieht jede Kampagne mit Posts dieser Accounts als
+  Kampagne: in „Kampagnen“, „Neueste Kampagnen“, der Views-Grafik, „Virale Clips“ und auf
+  `/collaboration/kampagne/:id`, mit den echten Zahlen aus dem Viertelstunden-Abgleich. Gefunden über
+  `post_metrics.username`, angezeigt immer unter dem Markennamen, nie dem internen Kampagnennamen. Nur
+  ansehen: kein Rohmaterial, keine Cloud-Links, kein Briefing, kein „Kampagne pushen“. Echte Agenturen
+  sehen davon nichts. Neuer Use Case → Account in `SHOWCASE_ACCOUNTS` ergänzen.
+  Test: `npx tsx tests/gold/showcase.test.ts`.

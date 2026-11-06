@@ -126,7 +126,7 @@ export async function viewsAnalyticsFor(env: Env, user: User, now = Math.floor(D
 
   out.top = ((byCampaign.results ?? []) as Record<string, unknown>[]).map((r) => ({
     id: String(r.id),
-    name: String(r.name ?? ''),
+    name: scope.names?.get(String(r.id)) ?? String(r.name ?? ''),
     views: Number(r.views) || 0,
     posts: Number(r.posts) || 0,
     clips: Number(r.clips) || 0,

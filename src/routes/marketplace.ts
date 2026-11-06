@@ -77,6 +77,7 @@ marketplaceApi.get('/views-analytics', async (c) => {
     admin: (id) => `/admin/projekte/${encodeURIComponent(id)}`,
     customer: (id) => `/app/projekt/${encodeURIComponent(id)}`,
     clipper: (id) => `/work/projekt/${encodeURIComponent(id)}`,
+    agency: (id) => `/collaboration/kampagne/${encodeURIComponent(id)}`,
   }
   const link = href[user.role]
   c.header('Cache-Control', 'private, max-age=60')

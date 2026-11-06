@@ -1,3 +1,4 @@
+import { showcaseFor } from './showcase'
 import { and, eq, inArray, isNotNull, isNull, sql } from 'drizzle-orm'
 import { getDb, schema } from './db'
 import { deleteObject, objectSize, presignGet, presignPut, r2Ready } from './r2'
@@ -193,7 +194,7 @@ export async function campaignThumbKey(env: Env, projectId: string, full: boolea
  */
 export async function thumbAccess(
   env: Env,
-  user: { id: string; role: string },
+  user: { id: string; role: string; demo?: number | null },
   projectId: string,
 ): Promise<'full' | 'limited' | null> {
   if (user.role === 'admin') return 'full'
@@ -226,6 +227,8 @@ export async function thumbAccess(
   // Freigeschaltete Agenturen sehen alle Kampagnen — aber kein Rohmaterial
   // und keine Cloud-Links (siehe lib/agency.ts). Eigene sind oben schon 'full'.
   if (user.role === 'agency') {
+    // Use Cases der Demo-Agentur (lib/showcase.ts): Bild ohne Rohmaterial, wie bei fremden Kampagnen.
+    if ((await showcaseFor(env, user)).has(projectId)) return 'limited'
     const [lead] = await db
       .select({ accessAt: schema.agencyLeads.accessAt, briefedAt: schema.agencyLeads.briefedAt })
       .from(schema.agencyLeads)
