@@ -97,6 +97,9 @@ def main(out: Path) -> None:
                 if not res or res.status != 200 or urlparse(page.url).path != path:
                     continue
                 page.wait_for_timeout(700)
+                # Einmal durchscrollen: Balken und Zähler starten erst, wenn sie ins Bild kommen.
+                page.evaluate("""async () => { for (let y = 0; y < document.body.scrollHeight; y += 500) { window.scrollTo(0, y); await new Promise(r => setTimeout(r, 60)); } window.scrollTo(0, 0); }""")
+                page.wait_for_timeout(1400)
                 page.evaluate("document.querySelectorAll('.nma').forEach(e => e.remove())")
                 pages[(role, path)] = page.content()
                 for href in page.eval_on_selector_all("a[href]", "els => els.map(e => e.getAttribute('href'))"):

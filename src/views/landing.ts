@@ -71,7 +71,7 @@ ${geoHead('/')}
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/site.css">
 <link rel="stylesheet" href="/assets/glass.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%232563eb'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='15' font-weight='bold' fill='white' text-anchor='middle'%3ENM%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23000'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='15' font-weight='bold' fill='%232fe08c' text-anchor='middle'%3ENM%3C/text%3E%3C/svg%3E">
 
 ${ldGraph(
   ORGANIZATION,
@@ -219,11 +219,11 @@ ${ldGraph(
           <div class="phone__screen">
             <span class="phone__notch" aria-hidden="true"></span>
             <div class="feedgrid" aria-hidden="true">
-              <div class="tile" style="background:linear-gradient(160deg,#3a3f4c,#22262f)"><span>@random</span></div>
+              <div class="tile" style="background:linear-gradient(160deg,#38443e,#212a25)"><span>@random</span></div>
               <div class="tile" style="background:linear-gradient(160deg,#4a4048,#26212a)"><span>@fyp</span></div>
-              <div class="tile" style="background:linear-gradient(160deg,#3d4750,#20262c)"><span>@viral</span></div>
+              <div class="tile" style="background:linear-gradient(160deg,#424b47,#232926)"><span>@viral</span></div>
               <div class="tile" style="background:linear-gradient(160deg,#464049,#252029)"><span>@daily</span></div>
-              <div class="tile" style="background:linear-gradient(160deg,#3c444f,#1f242c)"><span>@clips</span></div>
+              <div class="tile" style="background:linear-gradient(160deg,#414a46,#222926)"><span>@clips</span></div>
               <div class="tile" style="background:linear-gradient(160deg,#474149,#26222a)"><span>@feed</span></div>
             </div>
           </div>
@@ -242,12 +242,12 @@ ${ldGraph(
             <!-- Illustration: echte Clip-Cover aus laufenden Kampagnen, in
                  Markenfarbe eingefärbt — hier stehen später deine Videos. -->
             <div class="feedgrid" aria-hidden="true">
-              <div class="tile tile--real" style="background:linear-gradient(160deg,#3f7bff,#12296b)"><img src="/img/cases/levantine_istanbul-DUTFpaeiMZA.jpg" alt="" loading="lazy" decoding="async" width="270" height="480"><span>DEINE MARKE</span></div>
-              <div class="tile tile--real" style="background:linear-gradient(160deg,#2563eb,#0e1f52)"><img src="/img/cases/dindrop7-DM-7GyZIkb0.jpg" alt="" loading="lazy" decoding="async" width="270" height="480"><span>DEINE MARKE</span></div>
-              <div class="tile tile--real" style="background:linear-gradient(160deg,#4a86ff,#16307a)"><img src="/img/cases/caspianbluecaviar-DQ4ga9SDEnj.jpg" alt="" loading="lazy" decoding="async" width="270" height="480"><span>DEINE MARKE</span></div>
-              <div class="tile tile--real" style="background:linear-gradient(160deg,#1f52c9,#0b1a45)"><img src="/img/cases/levantine_istanbul-Da2pgoToIw_.jpg" alt="" loading="lazy" decoding="async" width="270" height="480"><span>DEINE MARKE</span></div>
-              <div class="tile tile--real" style="background:linear-gradient(160deg,#5b93ff,#1a3a8f)"><img src="/img/cases/panperium-DZurxhPjezN.jpg" alt="" loading="lazy" decoding="async" width="270" height="480"><span>DEINE MARKE</span></div>
-              <div class="tile tile--real" style="background:linear-gradient(160deg,#2a68e0,#0d2159)"><img src="/img/cases/max_tornow_business-C1xEPryiQ4t.jpg" alt="" loading="lazy" decoding="async" width="270" height="480"><span>DEINE MARKE</span></div>
+              <div class="tile tile--real" style="background:linear-gradient(160deg,#47f7a2,#166740)"><img src="/img/cases/levantine_istanbul-DUTFpaeiMZA.jpg" alt="" loading="lazy" decoding="async" width="270" height="480"><span>DEINE MARKE</span></div>
+              <div class="tile tile--real" style="background:linear-gradient(160deg,#2de38b,#223e30)"><img src="/img/cases/dindrop7-DM-7GyZIkb0.jpg" alt="" loading="lazy" decoding="async" width="270" height="480"><span>DEINE MARKE</span></div>
+              <div class="tile tile--real" style="background:linear-gradient(160deg,#51f8a7,#1a764a)"><img src="/img/cases/caspianbluecaviar-DQ4ga9SDEnj.jpg" alt="" loading="lazy" decoding="async" width="270" height="480"><span>DEINE MARKE</span></div>
+              <div class="tile tile--real" style="background:linear-gradient(160deg,#26c277,#1c3428)"><img src="/img/cases/levantine_istanbul-Da2pgoToIw_.jpg" alt="" loading="lazy" decoding="async" width="270" height="480"><span>DEINE MARKE</span></div>
+              <div class="tile tile--real" style="background:linear-gradient(160deg,#62f8b0,#1f8a56)"><img src="/img/cases/panperium-DZurxhPjezN.jpg" alt="" loading="lazy" decoding="async" width="270" height="480"><span>DEINE MARKE</span></div>
+              <div class="tile tile--real" style="background:linear-gradient(160deg,#31d988,#234334)"><img src="/img/cases/max_tornow_business-C1xEPryiQ4t.jpg" alt="" loading="lazy" decoding="async" width="270" height="480"><span>DEINE MARKE</span></div>
             </div>
           </div>
         </div>
@@ -483,7 +483,7 @@ ${ldGraph(
               <p class="cpm__legend"><b>CPM</b> = Kosten pro 1.000 Werbeeinblendungen · internationale Benchmarks in US-Dollar</p>
               <div class="cpm__chart">
                 <div class="cpm__axis"><span>12 $</span><span>9 $</span><span>6 $</span><span>3 $</span><span>0 $</span></div>
-                <div class="cpm__bars">
+                <div class="cpm__bars" data-bars>
                   <div class="cpm__bar"><span>8,19 $</span><i data-bar="68.25"></i></div>
                   <div class="cpm__bar"><span>4,82 $</span><i data-bar="40.17"></i></div>
                   <div class="cpm__bar cpm__bar--win"><span>Tonnenweise günstiger*</span><i data-bar="10"></i></div>
@@ -517,13 +517,13 @@ ${ldGraph(
               <svg class="dachmap__svg" viewBox="0 0 1000 1283" role="img" aria-label="Karte von Deutschland, Österreich und der Schweiz mit aktiven Clippern">
 <defs>
 <linearGradient id="dachFill" x1="0" y1="0" x2="0.4" y2="1">
-  <stop offset="0%" stop-color="#4a86ff"/><stop offset="55%" stop-color="#2f6bf0"/><stop offset="100%" stop-color="#1e4fc4"/>
+  <stop offset="0%" stop-color="#8ff3bf" stop-opacity=".95"/><stop offset="55%" stop-color="#2fe08c" stop-opacity=".88"/><stop offset="100%" stop-color="#17a865" stop-opacity=".9"/>
 </linearGradient>
 <linearGradient id="dachFillAt" x1="0" y1="0" x2="0.4" y2="1">
-  <stop offset="0%" stop-color="#3d75f2"/><stop offset="100%" stop-color="#1a45ad"/>
+  <stop offset="0%" stop-color="#7eeeb4" stop-opacity=".93"/><stop offset="100%" stop-color="#14995c" stop-opacity=".9"/>
 </linearGradient>
 <linearGradient id="dachFillCh" x1="0" y1="0" x2="0.4" y2="1">
-  <stop offset="0%" stop-color="#3870ea"/><stop offset="100%" stop-color="#173e9e"/>
+  <stop offset="0%" stop-color="#74ebad" stop-opacity=".93"/><stop offset="100%" stop-color="#128c54" stop-opacity=".9"/>
 </linearGradient>
 </defs>
 <g class="dach-c dach-de">
@@ -726,10 +726,10 @@ ${ldGraph(
               </div>
               <div class="reformat__flow"><span aria-hidden="true"></span> wird zu hunderten 9:16-Clips <span aria-hidden="true"></span></div>
               <div class="reformat__out">
-                <div class="reformat__clip" style="background:linear-gradient(160deg,#2f6bf0,#12296b)"><b>Reels</b><em aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M3 1.5v9l7-4.5-7-4.5Z"/></svg></em></div>
-                <div class="reformat__clip" style="background:linear-gradient(160deg,#1f52c9,#0b1a45)"><b>TikTok</b><em aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M3 1.5v9l7-4.5-7-4.5Z"/></svg></em></div>
-                <div class="reformat__clip" style="background:linear-gradient(160deg,#4a86ff,#16307a)"><b>Shorts</b><em aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M3 1.5v9l7-4.5-7-4.5Z"/></svg></em></div>
-                <div class="reformat__clip" style="background:linear-gradient(160deg,#2a68e0,#0d2159)"><b>Facebook</b><em aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M3 1.5v9l7-4.5-7-4.5Z"/></svg></em></div>
+                <div class="reformat__clip" style="background:linear-gradient(160deg,#37e892,#166740)"><b>Reels</b><em aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M3 1.5v9l7-4.5-7-4.5Z"/></svg></em></div>
+                <div class="reformat__clip" style="background:linear-gradient(160deg,#26c277,#1c3428)"><b>TikTok</b><em aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M3 1.5v9l7-4.5-7-4.5Z"/></svg></em></div>
+                <div class="reformat__clip" style="background:linear-gradient(160deg,#51f8a7,#1a764a)"><b>Shorts</b><em aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M3 1.5v9l7-4.5-7-4.5Z"/></svg></em></div>
+                <div class="reformat__clip" style="background:linear-gradient(160deg,#31d988,#234334)"><b>Facebook</b><em aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M3 1.5v9l7-4.5-7-4.5Z"/></svg></em></div>
               </div>
             </div>
           </div>
