@@ -273,3 +273,57 @@ html.nmd .nmw-stats { width: 100% !important; max-width: 100% !important; flex: 
 .nmu__badge { position: absolute; top: 12px; right: 12px; padding: 3px 9px; border-radius: 99px; font-size: .68rem; font-weight: 700; color: #02160c; background: var(--w-green); }
 .nmu__unit { font-size: .8rem; color: var(--w-mute); }
 #kampagne-pushen { margin-top: 18px; }
+
+/* ==========================================================================
+   Markenfarbe überall im Dashboard (November 2026, Vorgabe des Auftraggebers)
+   Violett (Creator), Indigo („Zugewiesene Kampagne“) und Navy (dunkle Knöpfe,
+   Kacheln) aus der Zeit vor dem Grün werden zu Markengrün im Liquid-Glass-Stil.
+   Unterscheidungen bleiben über Form erhalten, nicht über eine zweite Farbe:
+     eigene Kampagne     = volles Grün (Verlauf wie „Videos hochladen“)
+     zugewiesene Kampagne = Glas mit grüner Kante
+     Creator-Chip        = grün getönt, Clipper-Chip = neutrales Glas
+   ========================================================================== */
+html.nmd .bg-violet-600, html.nmd .bg-violet-500 {
+  background: linear-gradient(160deg, #8ff3bf, #2fe08c 55%, #17a865) !important; color: #02160c !important;
+}
+html.nmd .from-violet-500.to-indigo-700, html.nmd .from-violet-500 {
+  background-image: linear-gradient(160deg, #8ff3bf, #2fe08c 55%, #17a865) !important; color: #02160c !important;
+}
+
+/* Herkunft: eigene = Grün, zugewiesene = Glas mit grüner Kante (Band, Plakette) */
+html.nmd [data-origin="own"].bg-emerald-600 {
+  background: linear-gradient(180deg, #8ff3bf 0%, #2fe08c 55%, #17a865 100%) !important; color: #02160c !important; box-shadow: none !important;
+}
+html.nmd [data-origin="assigned"], html.nmd .bg-indigo-600 {
+  background: rgba(4, 14, 9, .72) !important; color: #c9fbe1 !important;
+  box-shadow: inset 0 0 0 1.5px rgba(47, 224, 140, .7), inset 0 1px 0 rgba(255, 255, 255, .12) !important;
+  backdrop-filter: blur(12px) saturate(160%); -webkit-backdrop-filter: blur(12px) saturate(160%);
+}
+html.nmd div[data-origin="assigned"] { box-shadow: inset 0 -1.5px 0 rgba(47, 224, 140, .7), inset 0 1px 0 rgba(255, 255, 255, .1) !important; }
+html.nmd [data-origin] svg { color: inherit !important; }
+
+/* Dunkle Navy-Knöpfe und -Flächen → Glas */
+html.nmd .bg-slate-900, html.nmd .bg-slate-800, html.nmd .bg-slate-900\/60 {
+  background-color: rgba(255, 255, 255, .07) !important; color: var(--w-text) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12), inset 0 1px 0 rgba(255, 255, 255, .1) !important;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+html.nmd .hover\:bg-slate-700:hover, html.nmd .hover\:bg-slate-800:hover { background-color: rgba(47, 224, 140, .16) !important; }
+html.nmd .ring-slate-900 { --tw-ring-color: rgba(47, 224, 140, .6) !important; }
+html.nmd .from-slate-800, html.nmd .from-slate-900 {
+  --tw-gradient-from: #0d1a13 var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgba(13, 26, 19, 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+html.nmd .via-slate-900 { --tw-gradient-stops: var(--tw-gradient-from), #08110c var(--tw-gradient-via-position), var(--tw-gradient-to) !important; }
+html.nmd .to-slate-950, html.nmd .to-slate-900 { --tw-gradient-to: #040906 var(--tw-gradient-to-position) !important; }
+
+/* Creator (früher Pink/Fuchsia): Glas mit grünem Ring, Clipper: volles Grün. So bleiben beide unterscheidbar. */
+html.nmd .bg-pink-600, html.nmd .from-pink-500 {
+  background: rgba(4, 14, 9, .7) !important; background-image: none !important; color: #9cf6c8 !important;
+  box-shadow: inset 0 0 0 1.5px #2fe08c, inset 0 1px 0 rgba(255, 255, 255, .14) !important;
+}
+html.nmd .bg-pink-50 { background-color: rgba(47, 224, 140, .08) !important; }
+html.nmd .ring-pink-200 { --tw-ring-color: rgba(47, 224, 140, .45) !important; }
+html.nmd .text-pink-600, html.nmd .text-pink-700 { color: #9cf6c8 !important; }
+html.nmd .text-pink-900 { color: #c9fbe1 !important; }

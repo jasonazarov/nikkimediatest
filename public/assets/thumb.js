@@ -35,7 +35,7 @@
         // Mittig auf 16:9 zuschneiden — wie ein Video-Thumbnail.
         var scale = Math.max(W / img.naturalWidth, H / img.naturalHeight);
         var w = img.naturalWidth * scale, h = img.naturalHeight * scale;
-        ctx.fillStyle = '#0a0f1e';
+        ctx.fillStyle = '#101814';
         ctx.fillRect(0, 0, W, H);
         ctx.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
         URL.revokeObjectURL(url);

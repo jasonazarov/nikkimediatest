@@ -685,8 +685,8 @@ const extOf = (name: string) => (/\.([a-z0-9]{2,5})$/i.exec(name)?.[1] ?? '').to
 
 /** Großer, zweifarbiger Ordner für die Kacheln. */
 const FOLDER_ART = `<svg viewBox="0 0 64 52" class="h-16 w-20 drop-shadow-sm transition duration-300 group-hover:scale-105 sm:h-20 sm:w-24" aria-hidden="true">
-      <path d="M4 8a6 6 0 0 1 6-6h13.5a4 4 0 0 1 2.8 1.2L31 8h23a6 6 0 0 1 6 6v30a6 6 0 0 1-6 6H10a6 6 0 0 1-6-6Z" fill="#2563eb"/>
-      <path d="M4 17a4 4 0 0 1 4-4h48a4 4 0 0 1 4 4v27a6 6 0 0 1-6 6H10a6 6 0 0 1-6-6Z" fill="#3f7bff"/>
+      <path d="M4 8a6 6 0 0 1 6-6h13.5a4 4 0 0 1 2.8 1.2L31 8h23a6 6 0 0 1 6 6v30a6 6 0 0 1-6 6H10a6 6 0 0 1-6-6Z" fill="#17a865"/>
+      <path d="M4 17a4 4 0 0 1 4-4h48a4 4 0 0 1 4 4v27a6 6 0 0 1-6 6H10a6 6 0 0 1-6-6Z" fill="#2fe08c"/>
       <path d="M4 17a4 4 0 0 1 4-4h48a4 4 0 0 1 4 4v2H4Z" fill="#fff" opacity=".18"/>
     </svg>`
 

@@ -116,9 +116,9 @@ html.nmd .bg-amber-50\/70 { background-color: rgba(251, 191, 36,.12) !important;
 html.nmd .bg-amber-100 { background-color: rgba(251, 191, 36,.18) !important; }
 html.nmd .bg-red-50 { background-color: rgba(248,113,113,.12) !important; }
 html.nmd .bg-red-50\/60 { background-color: rgba(248,113,113,.1) !important; }
-html.nmd .bg-violet-50 { background-color: rgba(167,139,250,.12) !important; }
+html.nmd .bg-violet-50 { background-color: rgba(47,224,140,.1) !important; }
 html.nmd .bg-pink-50 { background-color: rgba(244,114,182,.12) !important; }
-html.nmd .bg-sky-100 { background-color: rgba(56,189,248,.14) !important; }
+html.nmd .bg-sky-100 { background-color: rgba(47,224,140,.12) !important; }
 html.nmd .bg-brand\/10 { background-color: rgba(47, 224, 140,.12) !important; }
 html.nmd .hover\:bg-slate-50:hover { background-color: #0a130e !important; }
 html.nmd .hover\:bg-slate-100:hover { background-color: #0f1a14 !important; }
@@ -160,13 +160,13 @@ html.nmd .text-red-700 { color: #fca5a5 !important; }
 html.nmd .text-red-700\/80 { color: #fca5a5 !important; }
 html.nmd .text-red-800 { color: #fecaca !important; }
 html.nmd .text-red-900 { color: #fecaca !important; }
-html.nmd .text-violet-600 { color: #c4b5fd !important; }
-html.nmd .text-violet-700 { color: #c4b5fd !important; }
-html.nmd .text-violet-900 { color: #ddd6fe !important; }
+html.nmd .text-violet-600 { color: #9cf6c8 !important; }
+html.nmd .text-violet-700 { color: #9cf6c8 !important; }
+html.nmd .text-violet-900 { color: #c9fbe1 !important; }
 html.nmd .text-pink-600 { color: #f9a8d4 !important; }
 html.nmd .text-pink-700 { color: #f9a8d4 !important; }
 html.nmd .text-pink-900 { color: #fbcfe8 !important; }
-html.nmd .text-sky-800 { color: #7dd3fc !important; }
+html.nmd .text-sky-800 { color: #9cf6c8 !important; }
 html.nmd .hover\:text-slate-700:hover { color: #eef7f1 !important; }
 html.nmd .hover\:text-slate-800:hover { color: #eef7f1 !important; }
 html.nmd .hover\:text-red-600:hover { color: #fca5a5 !important; }
@@ -193,9 +193,9 @@ html.nmd .ring-emerald-200 { --tw-ring-color: rgba(52,211,153,.3) !important; }
 html.nmd .ring-amber-200 { --tw-ring-color: rgba(251, 191, 36,.35) !important; }
 html.nmd .ring-amber-300 { --tw-ring-color: rgba(251, 191, 36,.45) !important; }
 html.nmd .ring-red-200 { --tw-ring-color: rgba(248,113,113,.3) !important; }
-html.nmd .ring-violet-200 { --tw-ring-color: rgba(167,139,250,.3) !important; }
+html.nmd .ring-violet-200 { --tw-ring-color: rgba(47,224,140,.3) !important; }
 html.nmd .ring-pink-200 { --tw-ring-color: rgba(244,114,182,.3) !important; }
-html.nmd .ring-sky-200 { --tw-ring-color: rgba(56,189,248,.3) !important; }
+html.nmd .ring-sky-200 { --tw-ring-color: rgba(47,224,140,.3) !important; }
 html.nmd .hover\:ring-slate-300:hover { --tw-ring-color: rgba(238, 247, 241,.2) !important; }
 html.nmd .hover\:ring-slate-400:hover { --tw-ring-color: rgba(238, 247, 241,.28) !important; }
 html.nmd .from-white { --tw-gradient-from: #0a130e var(--tw-gradient-from-position) !important; --tw-gradient-to: #0a130e var(--tw-gradient-to-position) !important; }

@@ -505,3 +505,9 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
 
 - **Kampagne ohne Team anlegen:** Im Admin führt „New campaign“ nicht mehr in den Team-Bereich, und „No
   team yet“ ist ein neutraler Hinweis statt einer Warnung. Ein Team ist nie Pflicht; zuweisen, wann es passt.
+- **Markenfarbe in allen Dashboards** (Vorgabe des Auftraggebers, November 2026): kein Blau, Violett
+  oder Pink mehr, alles Markengrün im Liquid-Glass-Stil (`dash-whop.css`, Abschnitt „Markenfarbe
+  überall“). Die Unterscheidungen bleiben über die FORM: **eigene Kampagne = volles Grün**,
+  **zugewiesene Kampagne = Glas mit grüner Kante** (ersetzt das frühere Blau); Clipper-Chip = volles
+  Grün, Creator-Chip = Glas mit grünem Ring. Ausnahmen mit Absicht: Plattform-Logos (TikTok,
+  Facebook, LinkedIn, Instagram-Ring), Amber als Warnfarbe, Google-Blau in der Snippet-Vorschau.
