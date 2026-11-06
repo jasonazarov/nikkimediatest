@@ -362,7 +362,7 @@ ${ldGraph(
          liegen hinter der Karte und heben sie vom Hintergrund ab. -->
     <div class="hero__stage rv" data-rv-delay="90">
       <span class="hero__stage-halo" aria-hidden="true"></span>
-      <span class="hero__stage-badge"><span class="hero__stage-badge-ic" aria-hidden="true">🎬</span>Kampagnen-Zugang für Creator</span>
+      <span class="hero__stage-badge"><span class="hero__stage-badge-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="m3 8 3.5-4.5M10 8l3.5-4.5M17 8l3.5-4.5M3 8h18"/></svg></span>Kampagnen-Zugang für Creator</span>
 
       <div class="stepper" id="stepper">
         <form class="stepper__card" id="creatorform" novalidate autocomplete="on">

@@ -311,7 +311,7 @@ ${ldGraph(
          liegen hinter der Karte und heben sie vom Hintergrund ab. -->
     <div class="hero__stage rv" data-rv-delay="90">
       <span class="hero__stage-halo" aria-hidden="true"></span>
-      <span class="hero__stage-badge"><span class="hero__stage-badge-ic" aria-hidden="true">📤</span>Als Clipper Geld verdienen</span>
+      <span class="hero__stage-badge"><span class="hero__stage-badge-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6.5 9.5 12 4l5.5 5.5M4 20h16"/></svg></span>Als Clipper Geld verdienen</span>
 
       <div class="stepper" id="stepper">
         <form class="stepper__card" id="clipperform" novalidate autocomplete="on">

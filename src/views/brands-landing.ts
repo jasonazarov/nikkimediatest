@@ -326,7 +326,7 @@ ${ldGraph(
 
     <div class="hero__stage rv" data-rv-delay="90">
       <span class="hero__stage-halo" aria-hidden="true"></span>
-      <span class="hero__stage-badge"><span class="hero__stage-badge-ic" aria-hidden="true">🤝</span>Kooperation für Agenturen</span>
+      <span class="hero__stage-badge"><span class="hero__stage-badge-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 17l2 2a1.4 1.4 0 0 0 2-2"/><path d="m14 14 2.5 2.5a1.4 1.4 0 0 0 2-2l-3.9-3.9a2 2 0 0 0-2.8 0l-.9.9a1.4 1.4 0 0 1-2-2l2.8-2.8a3.5 3.5 0 0 1 4.3-.5l.6.4a3 3 0 0 0 2 .4H21"/><path d="M21 4v9h-2M3 4h8M3 4v9h2l4 4"/></svg></span>Kooperation für Agenturen</span>
 
       ${agencyStepper()}
 
