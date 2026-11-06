@@ -662,7 +662,17 @@ try {
   )
   const ohneBriefing = await agenturHole('/api/app/projects', warmCookie, { name: 'Ohne Briefing' })
   pruefe('Agentur legt keine Kampagne ohne Briefing an', ohneBriefing.status === 403, `HTTP ${ohneBriefing.status}`)
-  const neueKampagne = { name: 'Kunde Sommer', niche: 'Gastronomie', platforms: ['tiktok', 'instagram'], views: 500000, budget: '2000', binding: true }
+  const neueKampagne = { name: 'Kunde Sommer', niche: 'Gastronomie', platforms: ['tiktok', 'instagram'], views: 500000, budget: '3000', binding: true }
+  // Unsere Preise (lib/agency.ts): Gastronomie 5–7 € je 1.000 Views, Personal Brands genau 5 €, sonst ab 5 €.
+  const zuBillig = await agenturHole('/api/collaboration/campaigns', warmCookie, { ...neueKampagne, budget: '2000' })
+  const zuTeuer = await agenturHole('/api/collaboration/campaigns', warmCookie, { ...neueKampagne, budget: '4000' })
+  const pbFalsch = await agenturHole('/api/collaboration/campaigns', warmCookie, { ...neueKampagne, niche: 'Personal Brands', views: 1000000, budget: '6000' })
+  const sonstZuBillig = await agenturHole('/api/collaboration/campaigns', warmCookie, { ...neueKampagne, niche: 'Fitness & Sport', budget: '2000' })
+  pruefe(
+    'Budget außerhalb unserer Preise wird abgewiesen (Gastro 5–7 €, Personal Brands 5 €, sonst ab 5 €)',
+    zuBillig.status === 400 && zuTeuer.status === 400 && pbFalsch.status === 400 && sonstZuBillig.status === 400,
+    `HTTP ${zuBillig.status}/${zuTeuer.status}/${pbFalsch.status}/${sonstZuBillig.status}`,
+  )
   const ohneName = await agenturHole('/api/collaboration/campaigns', warmCookie, { ...neueKampagne, name: '' })
   const unverbindlich = await agenturHole('/api/collaboration/campaigns', warmCookie, { ...neueKampagne, binding: false })
   const ohnePlattform = await agenturHole('/api/collaboration/campaigns', warmCookie, { ...neueKampagne, platforms: [] })
@@ -677,11 +687,11 @@ try {
     'Weitere Kampagne entsteht mit ihrem Briefing',
     zweite.status === 200 &&
       String(zweiteBody.redirect) === `/collaboration/meine/${zweiteBody.id}` &&
-      zaehle(`SELECT count(*) AS n FROM projects WHERE id='${String(zweiteBody.id).replace(/'/g, '')}' AND name='Kunde Sommer' AND briefing_views=500000 AND briefing_budget_cents=200000 AND briefing_niche='Gastronomie' AND briefing_platforms='["tiktok","instagram"]';`) === 1,
+      zaehle(`SELECT count(*) AS n FROM projects WHERE id='${String(zweiteBody.id).replace(/'/g, '')}' AND name='Kunde Sommer' AND briefing_views=500000 AND briefing_budget_cents=300000 AND briefing_niche='Gastronomie' AND briefing_platforms='["tiktok","instagram"]';`) === 1,
     `HTTP ${zweite.status} → ${JSON.stringify(zweiteBody)}`,
   )
   const zweiteSeite = await (await agenturHole(`/collaboration/meine/${zweiteBody.id}`, warmCookie)).text()
-  pruefe('Die Kampagnenseite zeigt das Briefing samt Preis pro 1.000 Views', zweiteSeite.includes('data-briefing-info') && zweiteSeite.includes('500K Views') && zweiteSeite.includes('4 €'))
+  pruefe('Die Kampagnenseite zeigt das Briefing samt Preis pro 1.000 Views', zweiteSeite.includes('data-briefing-info') && zweiteSeite.includes('500K Views') && zweiteSeite.includes('6 €'))
 
   const agenturImKundenbereich = await agenturHole('/app', warmCookie)
   pruefe('Agentur-Sitzung öffnet nicht den Kundenbereich', agenturImKundenbereich.status === 302, `HTTP ${agenturImKundenbereich.status}`)

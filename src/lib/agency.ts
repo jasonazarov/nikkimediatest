@@ -210,8 +210,64 @@ export function parseNewCampaign(body: Record<string, unknown>): (Briefing & { n
   if (!platforms.length) return { error: 'Bitte wähle mindestens eine Plattform.' }
   const vb = parseViewsBudget(body)
   if ('error' in vb) return vb
+  const rule = budgetRuleError(niche, vb.views, vb.budgetCents)
+  if (rule) return { error: rule }
   if (body.binding !== true) return { error: 'Bitte bestätige, dass du die Kampagne verbindlich beauftragst.' }
   return { name, niche, platforms, pkg: null, ...vb }
+}
+
+/* ---------------------------------------------------------------- Preise
+
+   Unsere Preise je 1.000 Views (Vorgabe des Auftraggebers, November 2026).
+   Ein Budget wird nur angenommen, wenn es zu diesen Preisen passt. Das
+   Formular füllt es passend vor, der Server prüft es noch einmal.
+
+     Personal Brands   genau 5 € je 1.000 Views (1 Mio. Views = 5.000 €)
+     Gastronomie       5 bis 7 € je 1.000 Views (1 Mio. Views = 5.000 bis 7.000 €)
+     alle anderen      ab 5 € je 1.000 Views (Richtwert 1 Mio. = 5.000 €, nie darunter)
+   ------------------------------------------------------------------------ */
+
+export interface PriceRange {
+  /** Cent je 1.000 Views. */
+  min: number
+  /** Cent je 1.000 Views; null = nach oben offen. */
+  max: number | null
+}
+
+export const PRICE_RANGES: Record<string, PriceRange> = {
+  'Personal Brands': { min: 500, max: 500 },
+  Gastronomie: { min: 500, max: 700 },
+}
+export const DEFAULT_PRICE_RANGE: PriceRange = { min: 500, max: null }
+
+export const priceRangeFor = (niche: string | null | undefined): PriceRange =>
+  (niche && PRICE_RANGES[niche]) || DEFAULT_PRICE_RANGE
+
+/** Erlaubtes Budget in Cent für einen Bereich und eine Anzahl Views. */
+export function budgetRange(niche: string | null | undefined, views: number): { min: number; max: number | null } {
+  const r = priceRangeFor(niche)
+  return { min: Math.round((views * r.min) / 1000), max: r.max == null ? null : Math.round((views * r.max) / 1000) }
+}
+
+const euroText = (cents: number) =>
+  `${(cents / 100).toLocaleString('de-DE', { minimumFractionDigits: cents % 100 ? 2 : 0, maximumFractionDigits: 2 })} €`
+
+/** Satz für Formular und Fehlermeldung: was der Bereich kostet und welches Budget dazu passt. */
+export function priceRule(niche: string | null | undefined, views: number): string {
+  const r = priceRangeFor(niche)
+  const b = budgetRange(niche, views)
+  const who = niche && PRICE_RANGES[niche] ? `Für ${niche}` : 'Unser Preis'
+  const amount = `${viewsShort(views)} Views`
+  if (r.max === r.min) return `${who}: ${euroText(r.min)} pro 1.000 Views. Für ${amount} sind das ${euroText(b.min)}.`
+  if (r.max == null) return `${who}: ab ${euroText(r.min)} pro 1.000 Views. Für ${amount} also ab ${euroText(b.min)}.`
+  return `${who}: ${euroText(r.min)} bis ${euroText(r.max)} pro 1.000 Views. Für ${amount} also ${euroText(b.min)} bis ${euroText(b.max!)}.`
+}
+
+/** null, wenn das Budget zu unseren Preisen passt; sonst die Erklärung. */
+export function budgetRuleError(niche: string | null | undefined, views: number, budgetCents: number): string | null {
+  const b = budgetRange(niche, views)
+  if (budgetCents < b.min || (b.max != null && budgetCents > b.max)) return `Bitte passe dein Budget an. ${priceRule(niche, views)}`
+  return null
 }
 
 /** Preis pro 1.000 Views in Cent — Budget geteilt durch die gewünschten Views. */

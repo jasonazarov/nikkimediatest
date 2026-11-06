@@ -310,10 +310,10 @@ const BTN_GHOST =
 export function briefingStrip(b: Briefing): string {
   const cell = (label: string, value: string) => `
         <div class="min-w-0 px-4 py-2.5">
-          <dt class="text-[10px] font-semibold uppercase tracking-wider text-amber-700/80">${esc(label)}</dt>
+          <dt class="text-[10px] font-semibold uppercase tracking-wider text-brand-2">${esc(label)}</dt>
           <dd class="mt-0.5 font-display text-sm font-extrabold text-slate-900">${esc(value)}</dd>
         </div>`
-  return `<dl class="flex flex-wrap divide-x divide-amber-200/70 overflow-hidden rounded-2xl bg-gradient-to-r from-amber-50 to-white ring-1 ring-inset ring-amber-200" data-briefing-info>
+  return `<dl class="nmw-brand-glass nmw-brand-glass--soft flex flex-wrap divide-x divide-white/10 overflow-hidden rounded-2xl" data-briefing-info>
         ${cell('Views', `${viewsShort(b.views)} Views`)}
         ${cell('Budget', formatEuro(b.budgetCents))}
         ${cell('Pro 1.000 Views', formatEuro(pricePerThousandCents(b)))}

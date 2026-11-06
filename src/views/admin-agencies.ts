@@ -256,7 +256,7 @@ export function agenciesPage(o: {
         'mb-6',
       )}
 
-      <section class="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-white p-5 shadow-sm" id="codes">
+      <section class="rounded-2xl p-5 nmw-brand-glass nmw-brand-glass--soft" id="codes">
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div class="min-w-0">
             <h2 class="font-display text-xl font-extrabold">Cooperation-Codes</h2>
@@ -264,7 +264,7 @@ export function agenciesPage(o: {
           </div>
           <form class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row" data-code-create>
             <input name="note" maxlength="120" placeholder="For whom? (optional)" class="min-w-0 rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-brand sm:w-56">
-            <button class="whitespace-nowrap rounded-xl bg-gradient-to-br from-[#f6dc8f] via-[#d9a63c] to-[#b9831c] px-5 py-2.5 text-sm font-extrabold text-[#1d1404] shadow-sm transition hover:brightness-105">+ Cooperation-Code erstellen</button>
+            <button class="whitespace-nowrap rounded-xl bg-brand px-5 py-2.5 text-sm font-extrabold text-white shadow-sm transition hover:bg-brand-2">+ Cooperation-Code erstellen</button>
           </form>
         </div>
         <div class="mt-4 hidden rounded-2xl bg-[#0b0a07] px-5 py-5 text-center text-white" data-code-new>

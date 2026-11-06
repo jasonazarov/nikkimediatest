@@ -342,3 +342,19 @@ html.nmd .nm-brand-ico path[fill="#FFFFFF"], html.nmd .nm-brand-ico path[fill="#
 html.nmd .nm-brand-ico { filter: drop-shadow(0 0 5px rgba(47, 224, 140, .35)); }
 /* Kleine Logos in „Virale Clips“: Glaskachel statt weißem Hintergrund */
 html.nmd .nmv__plat img { background: rgba(4, 14, 9, .6) !important; box-shadow: inset 0 0 0 1px rgba(47, 224, 140, .45); padding: 2px; }
+
+/* Ehemals goldene Kästen (Preis pro 1.000 Views, Briefing, Code einlösen …): Markengrün in Liquid Glass */
+html.nmd .nmw-brand-glass {
+  color: var(--w-text) !important;
+  background: radial-gradient(120% 140% at 100% 0%, rgba(47, 224, 140, .32), transparent 55%),
+              linear-gradient(160deg, rgba(47, 224, 140, .22), rgba(23, 168, 101, .08) 60%, rgba(255, 255, 255, .03)) !important;
+  box-shadow: inset 0 0 0 1px rgba(47, 224, 140, .5), inset 0 1px 0 rgba(255, 255, 255, .22), 0 18px 40px rgba(47, 224, 140, .12) !important;
+  backdrop-filter: blur(18px) saturate(170%); -webkit-backdrop-filter: blur(18px) saturate(170%);
+}
+html.nmd .nmw-brand-glass--soft {
+  background: linear-gradient(160deg, rgba(47, 224, 140, .12), rgba(255, 255, 255, .03)) !important;
+  box-shadow: inset 0 0 0 1px rgba(47, 224, 140, .32), inset 0 1px 0 rgba(255, 255, 255, .14) !important;
+}
+html.nmd .nmw-brand-glass .text-\[\#1d1404\], html.nmd .nmw-brand-glass [class*="text-[#1d1404]"] { color: var(--w-text) !important; }
+html.nmd .nmw-brand-glass .text-amber-900, html.nmd .nmw-brand-glass .text-amber-800 { color: #9cf6c8 !important; }
+html.nmd .nmw-brand-glass .border-amber-300 { border-color: rgba(47, 224, 140, .45) !important; }

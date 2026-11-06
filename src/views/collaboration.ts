@@ -28,6 +28,10 @@ import {
   agencyPackageLabel,
   viewsShort,
   type Briefing,
+  PRICE_RANGES,
+  DEFAULT_PRICE_RANGE,
+  priceRule,
+  priceRangeFor,
 } from '../lib/agency'
 import { INDUSTRIES, creatorPlatformLabel } from '../lib/domain'
 import { formatCompact } from './metrics'
@@ -168,9 +172,9 @@ function lockedPreview(): string {
 
 /** Cooperation-Code nachträglich einlösen — für kalte Leads nach dem Erstgespräch. */
 function codeRedeemBox(): string {
-  return `<section class="mx-auto mt-8 max-w-xl rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-5 shadow-sm" id="code-einloesen">
+  return `<section class="mx-auto mt-8 max-w-xl rounded-2xl p-5 nmw-brand-glass nmw-brand-glass--soft" id="code-einloesen">
       <div class="flex items-start gap-3">
-        <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[#f6dc8f] to-[#b9831c] text-[#1d1404]">
+        <span class="nmw-brand-glass grid h-10 w-10 shrink-0 place-items-center rounded-xl">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3M15 8l2 2"/></svg>
         </span>
         <div class="min-w-0 flex-1">
@@ -271,7 +275,7 @@ export function briefingPage(o: { user: User; lead: AgencyLead }): string {
                      class="min-w-0 flex-1 bg-transparent font-display text-3xl font-extrabold outline-none placeholder:text-slate-300">
               <span class="font-display text-3xl font-extrabold text-slate-400">€</span>
             </label>
-            <p class="mt-3 text-center text-sm text-white/60">Dein Budget für die gewählten Views, wir stimmen das Angebot darauf ab.</p>
+            <p class="mx-auto mt-4 max-w-md text-center text-sm text-white/70" data-budget-hint>Dein Budget für die gewählten Views.</p>
           </fieldset>
 
           <!-- Schritt 3 — Auftrag -->
@@ -305,6 +309,8 @@ export function briefingPage(o: { user: User; lead: AgencyLead }): string {
   const script = `
 (function () {
   var STEPS = ${jsonScript(VIEW_STEPS)};
+  /* Unsere Preise für den Bereich dieser Agentur (lib/agency.ts); der Server prüft dasselbe. */
+  var NICHE = ${jsonScript(o.lead.niche ?? '')}, RANGE = ${jsonScript(priceRangeFor(o.lead.niche))}, NAMED = ${jsonScript(Boolean(o.lead.niche && PRICE_RANGES[o.lead.niche]))};
   var form = document.querySelector('[data-briefing]');
   var titles = ${jsonScript(titles)};
   var step = 1, TOTAL = titles.length, sending = false;
@@ -328,8 +334,28 @@ export function briefingPage(o: { user: User; lead: AgencyLead }): string {
   function picked() { var el = form.querySelector('input[name="package"]:checked'); return el ? el.value : ''; }
   function problem(n) {
     if (n === 2 && !(budgetEuro() >= 1)) return 'Bitte gib dein Budget in Euro ein.';
+    if (n === 2) { var b = bounds(), c = Math.round(budgetEuro() * 100); if (c < b.min || (b.max != null && c > b.max)) return 'Bitte passe dein Budget an. ' + ruleText(); }
     if (n === 3 && !picked()) return 'Bitte wähle, was du beauftragen möchtest.';
     return '';
+  }
+  var euro = function (n, cents) {
+    return n.toLocaleString('de-DE', { minimumFractionDigits: cents ? 2 : 0, maximumFractionDigits: cents ? 2 : 0 }) + ' €';
+  };
+  function bounds() {
+    var v = STEPS[Number(range.value)];
+    return { min: Math.round(v * RANGE.min / 1000), max: RANGE.max == null ? null : Math.round(v * RANGE.max / 1000) };
+  }
+  function ruleText() {
+    var b = bounds(), v = short(STEPS[Number(range.value)]) + ' Views', who = NAMED ? 'Für ' + NICHE : 'Unser Preis';
+    if (RANGE.max === RANGE.min) return who + ': ' + euro(RANGE.min / 100, true) + ' pro 1.000 Views. Für ' + v + ' sind das ' + euro(b.min / 100, false) + '.';
+    if (RANGE.max == null) return who + ': ab ' + euro(RANGE.min / 100, true) + ' pro 1.000 Views. Für ' + v + ' also ab ' + euro(b.min / 100, false) + '.';
+    return who + ': ' + euro(RANGE.min / 100, true) + ' bis ' + euro(RANGE.max / 100, true) + ' pro 1.000 Views. Für ' + v + ' also ' + euro(b.min / 100, false) + ' bis ' + euro(b.max / 100, false) + '.';
+  }
+  function prepareBudget() {
+    var b = bounds(), c = Math.round(budgetEuro() * 100), fixed = b.max === b.min;
+    if (!c || c < b.min || (b.max != null && c > b.max)) form.budget.value = (b.min / 100).toLocaleString('de-DE');
+    form.budget.readOnly = fixed;
+    form.querySelector('[data-budget-hint]').textContent = ruleText() + (fixed ? ' Der Preis ist fest.' : '');
   }
   function show(message) { err.textContent = message || ''; err.classList.toggle('hidden', !message); }
   function render() {
@@ -347,7 +373,7 @@ export function briefingPage(o: { user: User; lead: AgencyLead }): string {
   form.querySelector('[data-next]').addEventListener('click', function () {
     var p = problem(step); if (p) { show(p); return; }
     show(''); step = Math.min(step + 1, TOTAL); render();
-    if (step === 2) form.budget.focus();
+    if (step === 2) { prepareBudget(); if (!form.budget.readOnly) form.budget.focus(); }
   });
   form.querySelector('[data-back]').addEventListener('click', function () { show(''); step = Math.max(step - 1, 1); render(); });
   form.budget.addEventListener('keydown', function (e) {
@@ -478,6 +504,7 @@ export function newCampaignPage(o: { user: User }): string {
                      class="min-w-0 flex-1 bg-transparent font-display text-3xl font-extrabold outline-none placeholder:text-slate-300">
               <span class="font-display text-3xl font-extrabold text-slate-400">€</span>
             </label>
+            <p class="mx-auto mt-4 max-w-md text-center text-sm text-white/70" data-budget-hint></p>
           </fieldset>
 
           <!-- Schritt 6: Übersicht, Preis pro 1.000 Views, verbindlicher Auftrag -->
@@ -491,7 +518,7 @@ export function newCampaignPage(o: { user: User }): string {
                 ${sumRow('Views', 'views')}
                 ${sumRow('Budget', 'budget')}
               </dl>
-              <div class="flex flex-col justify-center rounded-2xl bg-gradient-to-br from-[#f6dc8f] via-[#d9a63c] to-[#b9831c] p-6 text-[#1d1404]">
+              <div class="flex flex-col justify-center rounded-2xl p-6 nmw-brand-glass">
                 <p class="text-xs font-bold uppercase tracking-[.16em]">Preis pro 1.000 Views</p>
                 <p class="mt-1 font-display text-4xl font-extrabold tracking-tight" data-sum="perThousand"></p>
                 <p class="mt-2 text-sm font-semibold" data-sum="sentence"></p>
@@ -527,6 +554,8 @@ export function newCampaignPage(o: { user: User }): string {
   const script = `
 (function () {
   var STEPS = ${jsonScript(VIEW_STEPS)};
+  /* Unsere Preise je Bereich (lib/agency.ts, PRICE_RANGES); der Server prüft dasselbe. */
+  var RANGES = ${jsonScript(PRICE_RANGES)}, DEFAULT_RANGE = ${jsonScript(DEFAULT_PRICE_RANGE)};
   var LABELS = ${jsonScript(Object.fromEntries(AGENCY_PLATFORMS.map((p) => [p.value, p.label])))};
   var titles = ${jsonScript(titles)};
   var form = document.querySelector('[data-new-campaign]');
@@ -558,6 +587,7 @@ export function newCampaignPage(o: { user: User }): string {
     if (n === 2 && !niche()) return 'Bitte wähle den Bereich der Kampagne.';
     if (n === 3 && !platforms().length) return 'Bitte wähle mindestens eine Plattform.';
     if (n === 5 && !(budgetEuro() >= 1)) return 'Bitte gib dein Budget in Euro ein.';
+    if (n === 5) { var b = bounds(), c = Math.round(budgetEuro() * 100); if (c < b.min || (b.max != null && c > b.max)) return 'Bitte passe dein Budget an. ' + ruleText(); }
     if (n === 6 && !form.binding.checked) return 'Bitte bestätige, dass du die Kampagne verbindlich beauftragst.';
     return '';
   }
@@ -571,6 +601,25 @@ export function newCampaignPage(o: { user: User }): string {
     set('budget', euro(budget, false));
     set('perThousand', euro(Math.round(budget * 100000 / views) / 100, true));
     set('sentence', short(views) + ' Views für ' + euro(budget, false));
+  }
+  function rangeFor() { return RANGES[niche()] || DEFAULT_RANGE; }
+  function bounds() {
+    var r = rangeFor(), v = STEPS[Number(range.value)];
+    return { min: Math.round(v * r.min / 1000), max: r.max == null ? null : Math.round(v * r.max / 1000) };
+  }
+  function ruleText() {
+    var r = rangeFor(), b = bounds(), v = short(STEPS[Number(range.value)]) + ' Views';
+    var who = RANGES[niche()] ? 'Für ' + niche() : 'Unser Preis';
+    if (r.max === r.min) return who + ': ' + euro(r.min / 100, true) + ' pro 1.000 Views. Für ' + v + ' sind das ' + euro(b.min / 100, false) + '.';
+    if (r.max == null) return who + ': ab ' + euro(r.min / 100, true) + ' pro 1.000 Views. Für ' + v + ' also ab ' + euro(b.min / 100, false) + '.';
+    return who + ': ' + euro(r.min / 100, true) + ' bis ' + euro(r.max / 100, true) + ' pro 1.000 Views. Für ' + v + ' also ' + euro(b.min / 100, false) + ' bis ' + euro(b.max / 100, false) + '.';
+  }
+  /* Beim Budget-Schritt: Hinweis zeigen, Budget passend vorausfüllen, fester Preis = Feld gesperrt. */
+  function prepareBudget() {
+    var b = bounds(), c = Math.round(budgetEuro() * 100), fixed = b.max === b.min;
+    if (!c || c < b.min || (b.max != null && c > b.max)) form.budget.value = (b.min / 100).toLocaleString('de-DE');
+    form.budget.readOnly = fixed;
+    form.querySelector('[data-budget-hint]').textContent = ruleText() + (fixed ? ' Der Preis ist fest.' : '');
   }
   function show(message) { err.textContent = message || ''; err.classList.toggle('hidden', !message); }
   function render() {
@@ -589,7 +638,7 @@ export function newCampaignPage(o: { user: User }): string {
   function next() {
     var p = problem(step); if (p) { show(p); return; }
     show(''); step = Math.min(step + 1, TOTAL); render();
-    if (step === 5) form.budget.focus();
+    if (step === 5) { prepareBudget(); if (!form.budget.readOnly) form.budget.focus(); }
   }
   form.querySelector('[data-next]').addEventListener('click', next);
   form.querySelector('[data-back]').addEventListener('click', function () { show(''); step = Math.max(step - 1, 1); render(); });
@@ -636,7 +685,7 @@ export const CONTACT_HEADLINE = 'NIKKI MEDIA meldet sich bei dir.'
 export function waitingPage(o: { user: User; lead: AgencyLead }): string {
   const body = `
       <section class="overflow-hidden rounded-3xl bg-gradient-to-br from-[#010302] via-[#041a0f] to-[#0a4527] ring-1 ring-inset ring-[#2fe08c]/25 px-6 py-14 text-center text-white shadow-xl sm:px-12 sm:py-20" data-contact-headline>
-        <span class="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-[#f6dc8f] to-[#b9831c] text-[#1d1404] shadow-lg">
+        <span class="nmw-brand-glass mx-auto grid h-16 w-16 place-items-center rounded-2xl">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-8 w-8"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
         </span>
         <h1 class="mx-auto mt-7 max-w-3xl font-display text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl">${esc(CONTACT_HEADLINE)}</h1>
@@ -854,7 +903,7 @@ export function overviewPage(o: {
   const body = `
       ${
         o.justUnlocked
-          ? `<div class="mb-6 flex items-start gap-3 rounded-2xl bg-gradient-to-r from-amber-50 to-white px-5 py-4 ring-1 ring-inset ring-amber-200" data-unlocked>
+          ? `<div class="mb-6 flex items-start gap-3 rounded-2xl px-5 py-4 nmw-brand-glass nmw-brand-glass--soft" data-unlocked>
                <span class="text-2xl" aria-hidden="true">🎉</span>
                <div><p class="font-display text-lg font-extrabold">Dein Zugang ist freigeschaltet.</p>
                <p class="text-sm text-slate-600">Ab sofort siehst du alle Kampagnen, Creator und Clipper von NIKKI MEDIA.</p></div>

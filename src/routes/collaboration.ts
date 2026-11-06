@@ -12,6 +12,7 @@ import {
   decideBooking,
   parseNewCampaign,
   pricePerThousandCents,
+  budgetRuleError,
   agencyUnlocked,
   bookingsOfAgency,
   claimCooperationCode,
@@ -620,6 +621,9 @@ collaborationApi.post('/briefing', async (c) => {
   if ('error' in parsed) return c.json({ error: parsed.error }, 400)
   // Nische und Plattformen kennt das Briefing schon aus dem Eintrag auf /brands.
   const brief: Briefing = { ...parsed, niche: lead.niche, platforms: leadPlatforms(lead) }
+  // Unsere Preise je Bereich (lib/agency.ts): ein Budget darunter oder darüber wird nicht angenommen.
+  const rule = budgetRuleError(lead.niche, parsed.views, parsed.budgetCents)
+  if (rule) return c.json({ error: rule }, 400)
   const { views, budgetCents } = brief
   const pkg = parsed.pkg
 
