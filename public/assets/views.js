@@ -71,6 +71,7 @@
   /* ---------- Kopf: Zahl, Veränderung, Zeitraum ---------- */
   function slice() {
     var s = data.series;
+    if (range === 'live') return { pts: [], base: 0, prevGain: null };
     if (range === 'all' || s.length <= Number(range)) return { pts: s, base: 0, prevGain: null };
     var n = Number(range);
     var pts = s.slice(s.length - n);
@@ -85,19 +86,22 @@
     var left = el('div', 'nmx__lead');
     left.appendChild(el('h2', 'nmx__title', T.title));
     var last = cur.pts.length ? cur.pts[cur.pts.length - 1].views : 0;
-    var gain = range === 'all' ? data.total : last - cur.base;
+    var gain = range === 'all' || range === 'live' ? data.total : last - cur.base;
     var big = el('p', 'nmx__big');
     big.appendChild(document.createTextNode(fmt(gain)));
     left.appendChild(big);
     var sub = el('p', 'nmx__sub');
-    sub.appendChild(el('span', null, T.gained[range]));
-    if (cur.prevGain !== null && cur.prevGain > 0) {
+    if (range === 'live') {
+      sub.appendChild(el('span', 'nmx__delta', '+' + fmt(live ? live.lastMinute() : 0)));
+      sub.appendChild(el('span', null, T.perMinute));
+    } else sub.appendChild(el('span', null, T.gained[range]));
+    if (range !== 'live' && cur.prevGain !== null && cur.prevGain > 0) {
       var pct = Math.round(((gain - cur.prevGain) / cur.prevGain) * 100);
       var chip = el('span', 'nmx__delta' + (pct < 0 ? ' is-down' : ''), (pct >= 0 ? '+' : '') + pct.toLocaleString(loc) + ' %');
       sub.appendChild(chip);
       sub.appendChild(el('span', null, T.prev));
     }
-    if (range !== 'all') sub.appendChild(el('span', 'nmx__muted', T.total + ': ' + short(data.total)));
+    if (range !== 'all' && range !== 'live') sub.appendChild(el('span', 'nmx__muted', T.total + ': ' + short(data.total)));
     left.appendChild(sub);
     head.appendChild(left);
 
@@ -117,6 +121,7 @@
   /* ---------- Kurve ---------- */
   function renderChart(wrap, pts) {
     wrap.innerHTML = '';
+    if (live && range === 'live') return live.chart(wrap);
     if (pts.length < 2) return;
     var W = Math.max(280, wrap.clientWidth || 600);
     var H = full ? 300 : 230;
@@ -167,6 +172,7 @@
     root.appendChild(cross);
     root.appendChild(dot);
     wrap.appendChild(root);
+    if (live) live.decorate(root, x(pts.length - 1), y(pts[pts.length - 1].views));
     var tip = el('div', 'nmx__tip');
     tip.hidden = true;
     wrap.appendChild(tip);
@@ -276,6 +282,114 @@
     renderPlatforms(plat);
   }
 
+  /* ---------- Live (nur Demo-Agentur, siehe lib/showcase.ts) ----------
+     Reiter „Live“: die letzten 15 Sekunden, rollt flüssig nach links, glatt wie
+     die Tageskurve. Views pro Minute je Minute zufällig zwischen min und max
+     (fest aus der Uhrzeit, also bei allen gleich). Die große Zahl zählt ab dem
+     Öffnen der Seite mit; in 7/30/90 Tagen wächst nur die Zahl, die Kurve
+     behält ihre Form (kein plötzlicher Sprung am Ende). Ein Licht fährt alle
+     2,2 Sekunden über die Kurve; bei „Bewegung reduzieren“ ohne Licht. */
+  var live = null;
+  function startLive(cfg) {
+    var WIN = 15, STEP = 0.1, LOOP = 2200, A = 0.42, B = 0.75, C = 0.18, D = 1.9;
+    var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    T.ranges = [['live', 'Live']].concat(T.ranges.filter(function (r) { return r[0] !== 'all'; }));
+    T.perMinute = en ? 'views in the last minute' : 'Views in der letzten Minute';
+    range = 'live';
+    function rnd(n) { var v = Math.sin(n * 12.9898 + 78.233) * 43758.5453; return v - Math.floor(v); }
+    function perMin(m) { return cfg.minPerMinute + Math.floor(rnd(m) * (cfg.maxPerMinute - cfg.minPerMinute + 1)); }
+    // Stammfunktion der Rate innerhalb einer Minute: glatt, nie rückwärts
+    function F(s) { return s - (A / B) * Math.cos(B * s) - (C / D) * Math.cos(D * s + 1); }
+    function inc(t1, t2) {   // Views zwischen zwei Zeitpunkten (Sekunden seit 1970)
+      var v = 0, a = t1;
+      while (a < t2) {
+        var m = Math.floor(a / 60), b = Math.min(t2, (m + 1) * 60);
+        v += (perMin(m) / 60) * (F(b) - F(a));
+        a = b;
+      }
+      return v;
+    }
+    var nowSec = function () { return Date.now() / 1000; };
+    var opened = nowSec(), gained = 0, lastT = opened, svgLive = null, deco = null, lo = null, hi = null;
+    function mk(parent, tag, attrs) { var e = svg(tag, attrs); parent.appendChild(e); return e; }
+    function lightOn(root, d) {
+      var g = mk(root, 'path', { d: d, class: 'nmx__liveglow' });
+      var l = mk(root, 'path', { d: d, class: 'nmx__livelight' });
+      var ring = mk(root, 'circle', { class: 'nmx__ring', r: 4, opacity: 0 });
+      var end = mk(root, 'circle', { class: 'nmx__end', r: 4 });
+      return { glow: g, light: l, ring: ring, end: end };
+    }
+    function moveLight(o, ex, ey, t) {
+      o.end.setAttribute('cx', ex); o.end.setAttribute('cy', ey); o.ring.setAttribute('cx', ex); o.ring.setAttribute('cy', ey);
+      if (still) { o.glow.style.display = o.light.style.display = 'none'; return; }
+      var L = o.light.getTotalLength(), seg = Math.max(40, L * 0.09), p = (t * 1000 % LOOP) / LOOP;
+      var e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+      [o.glow, o.light].forEach(function (q) { q.setAttribute('stroke-dasharray', seg + ' ' + (L + seg)); q.setAttribute('stroke-dashoffset', seg - e * (L + seg)); });
+      var a = Math.max(0, 1 - Math.abs(p - 0.97) / 0.07);   // Ankunft: Punkt leuchtet kurz auf
+      o.end.setAttribute('r', (4 + a * 2).toFixed(1));
+      o.ring.setAttribute('r', (4 + a * 9).toFixed(1)); o.ring.setAttribute('opacity', (0.7 * a).toFixed(2));
+    }
+    live = {
+      lastMinute: function () { var t = nowSec(); return inc(t - 60, t); },
+      chart: function (wrap) {
+        var W = Math.max(280, wrap.clientWidth || 600), H = full ? 300 : 230;
+        var root = svg('svg', { viewBox: '0 0 ' + W + ' ' + H, width: '100%', height: H, class: 'nmx__svg', role: 'img', 'aria-label': T.title + ' live' });
+        var defs = mk(root, 'defs', {});
+        var grad = mk(defs, 'linearGradient', { id: 'nmxFill', x1: '0', y1: '0', x2: '0', y2: '1' });
+        mk(grad, 'stop', { offset: '0', 'stop-color': '#2fe08c', 'stop-opacity': '.32' });
+        mk(grad, 'stop', { offset: '1', 'stop-color': '#2fe08c', 'stop-opacity': '0' });
+        mk(mk(defs, 'filter', { id: 'nmxGlow', x: '-10%', y: '-50%', width: '120%', height: '200%' }), 'feGaussianBlur', { stdDeviation: '6' });
+        for (var g = 0; g <= 3; g++) { var gy = 16 + (g / 3) * (H - 44); mk(root, 'line', { x1: 4, x2: W - 10, y1: gy, y2: gy, class: 'nmx__grid' }); }
+        var area = mk(root, 'path', { fill: 'url(#nmxFill)' }), glowLine = mk(root, 'path', { class: 'nmx__glow', filter: 'url(#nmxGlow)' }), line = mk(root, 'path', { class: 'nmx__line' });
+        var labels = en ? ['15 s ago', '11 s ago', '8 s ago', '4 s ago', 'now'] : ['vor 15 Sek.', 'vor 11 Sek.', 'vor 8 Sek.', 'vor 4 Sek.', 'jetzt'];
+        labels.forEach(function (txt, i) {
+          var t = mk(root, 'text', { x: 4 + (i / 4) * (W - 14), y: H - 8, class: 'nmx__axis', 'text-anchor': i === 0 ? 'start' : i === 4 ? 'end' : 'middle' });
+          t.textContent = txt;
+        });
+        wrap.appendChild(root);
+        lo = hi = null;
+        svgLive = { W: W, H: H, area: area, glowLine: glowLine, line: line, light: lightOn(root, '') };
+        deco = null;
+      },
+      decorate: function (root, ex, ey) {
+        svgLive = null;
+        var line = root.querySelector('.nmx__line');
+        deco = lightOn(root, line.getAttribute('d'));
+        deco.ex = ex; deco.ey = ey;
+      },
+    };
+    function tick() {
+      var t = nowSec();
+      if (t > lastT) { gained += inc(lastT, t); lastT = t; }
+      var big = box.querySelector('.nmx__big');
+      if (big) {
+        var cur = slice(), lastV = cur.pts.length ? cur.pts[cur.pts.length - 1].views : 0;
+        big.textContent = fmt(range === 'live' ? data.total + gained : lastV - cur.base + gained);
+      }
+      if (range === 'live' && svgLive) {
+        var n = Math.round(WIN / STEP), vals = [0], s0 = t - WIN;
+        for (var k = 1; k <= n; k++) vals.push(vals[k - 1] + inc(s0 + (k - 1) * STEP, s0 + k * STEP));
+        var mn = vals[0], mx = vals[n], pad = (mx - mn) * 0.08 || 1;
+        var tlo = mn - pad, thi = mx + pad * 0.6;
+        lo = lo === null ? tlo : Math.min(mn, lo + (tlo - lo) * 0.12);
+        hi = hi === null ? thi : Math.max(mx, hi + (thi - hi) * 0.12);
+        var W = svgLive.W, H = svgLive.H, padL = 4, padR = 10, padT = 16, padB = 28;
+        var X = function (i) { return padL + (i / n) * (W - padL - padR); };
+        var Y = function (v) { return padT + (1 - (v - lo) / (hi - lo)) * (H - padT - padB); };
+        var d = '';
+        for (var j = 0; j <= n; j++) d += (j ? 'L' : 'M') + X(j).toFixed(1) + ' ' + Y(vals[j]).toFixed(1);
+        svgLive.line.setAttribute('d', d); svgLive.glowLine.setAttribute('d', d);
+        svgLive.light.glow.setAttribute('d', d); svgLive.light.light.setAttribute('d', d);
+        svgLive.area.setAttribute('d', d + 'L' + X(n).toFixed(1) + ' ' + (H - padB) + 'L' + X(0).toFixed(1) + ' ' + (H - padB) + 'Z');
+        moveLight(svgLive.light, X(n), Y(vals[n]), t);
+        var chip = box.querySelector('.nmx__sub .nmx__delta');
+        if (chip) chip.textContent = '+' + fmt(inc(t - 60, t));
+      } else if (deco && deco.light.isConnected) moveLight(deco, deco.ex, deco.ey, t);
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
   var resizeTimer;
   window.addEventListener('resize', function () {
     if (!data) return;
@@ -288,5 +402,9 @@
 
   fetch('/api/views-analytics?area=' + encodeURIComponent(area), { credentials: 'same-origin' })
     .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
-    .then(function (d) { data = d; draw(); }).catch(function () { message(T.fail); });
+    .then(function (d) {
+      data = d;
+      if (d.live) startLive(d.live);
+      draw();
+    }).catch(function () { message(T.fail); });
 })();

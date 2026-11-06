@@ -307,6 +307,12 @@ html.nmd [data-pay-tiers] .text-amber-300 { color: #9cf6c8 !important; }
 .nmx__grid { stroke: rgba(255, 255, 255, .06); stroke-dasharray: 3 5; }
 .nmx__line { fill: none; stroke: #2fe08c; stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
 .nmx__glow { fill: none; stroke: #2fe08c; stroke-width: 6; opacity: .45; }
+/* Live (nur Demo-Agentur, assets/views.js): Licht fährt über die Kurve, Endpunkt leuchtet bei Ankunft. */
+.nmx__livelight { fill: none; stroke: #c9ffe4; stroke-width: 3; stroke-linecap: round; pointer-events: none; }
+.nmx__liveglow { fill: none; stroke: #2fe08c; stroke-width: 12; stroke-linecap: round; opacity: .55; filter: blur(5px); pointer-events: none; }
+.nmx__end { fill: #2fe08c; pointer-events: none; }
+.nmx__ring { fill: none; stroke: #2fe08c; stroke-width: 2; pointer-events: none; }
+.nmx__big { font-variant-numeric: tabular-nums; }
 .nmx__axis { fill: var(--d-soft); font: 500 11px Geist, sans-serif; }
 .nmx__cross { stroke: rgba(255, 255, 255, .25); stroke-width: 1; }
 .nmx__dot { fill: #000; stroke: #9cf6c8; stroke-width: 2.5; }

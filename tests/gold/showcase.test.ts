@@ -49,7 +49,16 @@ x(`INSERT INTO post_metrics (post_id,account_id,deliverable_id,project_id,platfo
   assert.deepEqual(a.top.map((t) => t.name), ['DinDrop', 'Max Tornow', 'Caspian Blue', 'Levantine Istanbul', 'Panperium', 'Eigene Demo'])
   assert.equal(a.series.at(-1)?.views, 213_451_000)
   assert.equal(a.platforms[0].platform, 'instagram')
+  // Freigegebener Verlauf: 7 Tage genau 732.431 (+ eigene Kampagne der Demo: 0 in diesem Zeitraum), gleichmäßig steigend
+  const sr = a.series, at = (n: number) => sr[sr.length - 1].views - sr[sr.length - 1 - n].views
+  assert.equal(at(7), 732_431)
+  assert.ok(at(30) > 3_000_000 && at(30) < 3_150_000, 'Views 30 Tage: ' + at(30))
+  assert.ok(at(90) > 8_700_000 && at(90) < 9_000_000, 'Views 90 Tage: ' + at(90))
+  for (let i = sr.length - 360; i < sr.length; i++) assert.ok(sr[i].views - sr[i - 1].views < 150_000, 'kein Sprung am ' + sr[i].day)
+  assert.deepEqual(a.live, { minPerMinute: 15_000, maxPerMinute: 23_000 })
+  console.log('✓ Kurve: 7 Tage 732.431, 30/90 Tage passend, kein Tag mit Sprung, Live-Zähler 15.000–23.000/Min.')
   const r = await viewsAnalyticsFor(env, real)
+  assert.equal(r.live, undefined)
   assert.deepEqual(r.top.map((t) => t.name), ['Echte'])
   console.log('✓ Views-Grafik: Demo-Agentur mit Use Cases + eigenen, echte Agentur ohne')
 

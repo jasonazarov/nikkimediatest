@@ -226,3 +226,35 @@ export const showcaseViral = (): ViralClip[] =>
     handle: c.handle,
     thumb: c.image,
   }))
+
+/* ------------------------------------------------- Verlauf für die Grafik */
+
+const DAY_SEC = 86400
+/** Views der letzten 7 Tage (Vorgabe des Auftraggebers); 30 und 90 Tage ergeben sich aus dem Verlauf. */
+const LAST_7_DAYS = 732_431
+
+/**
+ * Tagesverlauf der Use Cases über ein Jahr (Vorgabe des Auftraggebers, freigegeben per Vorschau):
+ * neue Views je Tag steigen gleichmäßig von rund 60 auf rund 105 Tausend, mit leichtem Auf und Ab,
+ * die letzten 7 Tage ergeben genau LAST_7_DAYS. Alles davor ist der Startwert der Kurve.
+ * Ergebnis: 7 Tage 732.431, 30 Tage rund 3,07 Mio., 90 Tage rund 8,85 Mio., Gesamt = Summe der Use Cases.
+ * Die Kurve wandert mit dem heutigen Tag mit.
+ */
+export function showcaseDailyRows(now: number, days = 365): { at: number; v: number }[] {
+  const total = USE_CASES.reduce((s, u) => s + u.views, 0)
+  const raw: number[] = []
+  for (let k = 1; k <= days; k++) {
+    raw.push((60_000 + (days - k) * (48_000 / days)) * (1 + 0.05 * Math.sin(k * 1.7) + 0.03 * Math.sin(k * 0.53)))
+  }
+  const f = LAST_7_DAYS / raw.slice(0, 7).reduce((s, v) => s + v, 0)
+  const daily = raw.map((v) => Math.round(v * f))
+  // Rundung auf genau LAST_7_DAYS ausgleichen
+  daily[0] += LAST_7_DAYS - daily.slice(0, 7).reduce((s, v) => s + v, 0)
+  const year = daily.reduce((s, v) => s + v, 0)
+  const rows = daily.map((v, i) => ({ at: now - i * DAY_SEC, v }))
+  rows.push({ at: now - (days - 1) * DAY_SEC, v: total - year })
+  return rows
+}
+
+/** Live-Zähler im Dashboard der Demo-Agentur: Views pro Minute, je Minute zufällig in diesem Bereich. */
+export const SHOWCASE_LIVE = { minPerMinute: 15_000, maxPerMinute: 23_000 } as const

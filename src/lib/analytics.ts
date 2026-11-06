@@ -1,7 +1,7 @@
 import type { User } from '../db/schema'
 import { postScopeFor } from './viral'
 import type { Env } from './types'
-import { showcaseClips, showcaseViewsRows, showsShowcase } from './showcase'
+import { SHOWCASE_LIVE, showcaseClips, showcaseDailyRows, showcaseViewsRows, showsShowcase } from './showcase'
 
 /**
  * Views-Analyse für die Grafik oben in jeder Übersicht und auf
@@ -44,6 +44,8 @@ export interface ViewsAnalytics {
   top: AnalyticsCampaign[]
   /** Views je Plattform, absteigend. */
   platforms: { platform: string; views: number }[]
+  /** Nur Demo-Agentur: Live-Zähler und Reiter „Live“ (lib/showcase.ts, assets/views.js). */
+  live?: { minPerMinute: number; maxPerMinute: number }
 }
 
 const VIEWS = `(case when pm.views > 0 then pm.views else pm.impressions end)`
@@ -145,14 +147,15 @@ function build(
     let views = 0
     for (const r of extra) {
       views += r.views
-      // Ohne bekannten Tag: am Anfang des Zeitraums (zählt zu „Gesamt“, nicht zu den letzten Tagen).
-      dayRows.push({ at: r.at ?? now - (MAX_DAYS - 1) * DAY, v: r.views })
       const n = reels.get(r.campaignId) ?? 0
       const k = camps.get(r.campaignId) ?? { id: r.campaignId, name: r.campaign, views: 0, posts: n, clips: n }
       k.views += r.views
       camps.set(r.campaignId, k)
     }
     const nReels = [...camps.values()].reduce((s, k) => s + k.clips, 0)
+    // Kurve: der freigegebene gleichmäßige Tagesverlauf statt einzelner Reel-Tage (lib/showcase.ts).
+    dayRows.push(...showcaseDailyRows(now, MAX_DAYS))
+    out.live = { ...SHOWCASE_LIVE }
     out.total += views
     out.posts += nReels
     out.clips += nReels

@@ -539,3 +539,10 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   Code (`USE_CASES`), nie in der Datenbank: Gesamtviews je Account wie auf der Startseite, je Reel die
   Views aus `reels`. Vorschaubilder aus `/img/cases`, Abspielen öffnet das Reel bei Instagram. Echte
   Agenturen sehen nichts davon. Test: `npx tsx tests/gold/showcase.test.ts`.
+  **Views-Grafik der Demo-Agentur** (Vorgabe des Auftraggebers, per Vorschau freigegeben): Verlauf aus
+  `showcaseDailyRows` (neue Views je Tag steigen über ein Jahr gleichmäßig, 7 Tage genau 732.431, kein
+  Tag mit Sprung). Reiter „Live“ (Standard) statt „Gesamt“: letzte 15 Sekunden, rollt flüssig, glatte
+  Kurve, 15.000 bis 23.000 Views pro Minute (`SHOWCASE_LIVE`, je Minute zufällig, aus der Uhrzeit). In
+  7/30/90 Tagen zählt nur die Zahl live mit, die Kurve behält ihre Form. Ein Licht fährt alle 2,2 Sekunden
+  über die Kurve, der Endpunkt leuchtet bei Ankunft (`views.js`, nur wenn die API `live` liefert; sonst
+  ist die Grafik unverändert).
