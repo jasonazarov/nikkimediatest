@@ -1099,12 +1099,18 @@ export function campaignPage(o: {
   var video = box.querySelector('[data-player-video]');
   function url(id, download) {
     return fetch('/api/collaboration/clips/' + encodeURIComponent(id) + '/url' + (download ? '?download=1' : ''))
-      .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || 'Nicht verfügbar.'); return d.url; }); });
+      .then(function (r) { return r.json().then(function (d) {
+        if (!r.ok) throw new Error(d.error || 'Nicht verfügbar.');
+        // Use Case: das Reel liegt bei Instagram, nicht bei uns.
+        if (d.external) { window.open(d.url, '_blank', 'noopener'); return null; }
+        return d.url;
+      }); });
   }
   function close() { video.pause(); video.removeAttribute('src'); box.classList.add('hidden'); box.classList.remove('flex'); }
   document.querySelectorAll('[data-play]').forEach(function (b) {
     b.addEventListener('click', function () {
       url(b.getAttribute('data-play'), false).then(function (u) {
+        if (!u) return;
         video.src = u; box.classList.remove('hidden'); box.classList.add('flex'); video.play().catch(function () {});
       }).catch(function (e) { window.alert(e.message); });
     });
@@ -1112,7 +1118,7 @@ export function campaignPage(o: {
   document.querySelectorAll('[data-download]').forEach(function (b) {
     b.addEventListener('click', function () {
       b.disabled = true;
-      url(b.getAttribute('data-download'), true).then(function (u) { window.location.href = u; })
+      url(b.getAttribute('data-download'), true).then(function (u) { if (u) window.location.href = u; })
         .catch(function (e) { window.alert(e.message); })
         .then(function () { b.disabled = false; });
     });

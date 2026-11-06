@@ -532,12 +532,10 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   dunkler, es wird nicht angestrahlt. **Buttons sind nicht animiert:** kein Wippen, Puls oder Glanz
   (früher `ctaBob`/`ctaPulse`/`ctaSheen`/`badgeLift` in `site.css`). Die Dashboards haben das Licht nicht.
 - **Use Cases im Dashboard der Demo-Agentur** (Vorgabe des Auftraggebers, November 2026; `src/lib/showcase.ts`):
-  Die Accounts der Case Studies (dindrop7, caspianbluecaviar, max_tornow_business, levantine_istanbul,
-  panperium; Liste `SHOWCASE_ACCOUNTS`) sind über Zernio angebunden. Die Demo-Agentur
-  (theguardians@demo.nikkimedia.co, `users.demo = 1`) sieht jede Kampagne mit Posts dieser Accounts als
-  Kampagne: in „Kampagnen“, „Neueste Kampagnen“, der Views-Grafik, „Virale Clips“ und auf
-  `/collaboration/kampagne/:id`, mit den echten Zahlen aus dem Viertelstunden-Abgleich. Gefunden über
-  `post_metrics.username`, angezeigt immer unter dem Markennamen, nie dem internen Kampagnennamen. Nur
-  ansehen: kein Rohmaterial, keine Cloud-Links, kein Briefing, kein „Kampagne pushen“. Echte Agenturen
-  sehen davon nichts. Neuer Use Case → Account in `SHOWCASE_ACCOUNTS` ergänzen.
-  Test: `npx tsx tests/gold/showcase.test.ts`.
+  DinDrop, Max Tornow, Caspian Blue, Levantine Istanbul und Panperium erscheinen bei theguardians
+  (`users.demo = 1`, Rolle `agency`) als Kampagnen: „Neueste Kampagnen“, „Kampagnen“, Views-Grafik,
+  „Kampagnen nach Views“, „Plattformen“, „Virale Clips“ und `/collaboration/kampagne/usecase-<slug>`.
+  Die Videos liefen NICHT über die Plattform, deshalb stehen die Zahlen wie das übrige Demo-Netzwerk im
+  Code (`USE_CASES`), nie in der Datenbank: Gesamtviews je Account wie auf der Startseite, je Reel die
+  Views aus `reels`. Vorschaubilder aus `/img/cases`, Abspielen öffnet das Reel bei Instagram. Echte
+  Agenturen sehen nichts davon. Test: `npx tsx tests/gold/showcase.test.ts`.

@@ -41,7 +41,7 @@ import { mailAgencyBriefingAdmin, mailAgencyCampaignAdmin, mailCreatorBookingAdm
 import { totalsForDeliverables, totalsForProjects } from '../lib/metrics'
 import { presignGet, r2Ready } from '../lib/r2'
 import { campaignThumbs } from '../lib/thumbs'
-import { showcaseCampaigns } from '../lib/showcase'
+import { isShowcaseId, showcaseCampaign, showcaseCampaigns, showcaseClipUrl } from '../lib/showcase'
 import { formatEuro } from '../views/layout'
 import {
   AGENCY_CAMPAIGN_AREA,
@@ -105,17 +105,13 @@ collaborationApi.use('*', requireRole('agency'))
  *
  * `onlyOwn`: nur die eigenen — so sieht es die Demo-Agentur, deren übriges
  * Netzwerk erfunden ist (lib/demo.ts).
- *
- * `showcase`: genau diese Kampagnen, unter den angegebenen Namen — die Use
- * Cases der Demo-Agentur (lib/showcase.ts). Nie eigene, nie mit Rohmaterial.
  */
 async function allCampaigns(
   env: Env,
   ownCustomerId: string | null,
-  opts: { onlyOwn?: boolean; showcase?: Map<string, string> } = {},
+  opts: { onlyOwn?: boolean } = {},
 ): Promise<AgencyCampaign[]> {
   if (opts.onlyOwn && !ownCustomerId) return []
-  if (opts.showcase && !opts.showcase.size) return []
   const db = getDb(env)
   const others = and(ne(schema.users.role, 'agency'), eq(schema.users.demo, 0))
   const projects = await db
@@ -124,9 +120,7 @@ async function allCampaigns(
     .innerJoin(schema.customers, eq(schema.customers.id, schema.projects.customerId))
     .innerJoin(schema.users, eq(schema.users.id, schema.customers.userId))
     .where(
-      opts.showcase
-        ? inArray(schema.projects.id, [...opts.showcase.keys()])
-        : opts.onlyOwn
+      opts.onlyOwn
         ? eq(schema.projects.customerId, ownCustomerId!)
         : ownCustomerId
           ? or(others, eq(schema.projects.customerId, ownCustomerId))
@@ -156,9 +150,9 @@ async function allCampaigns(
     const team = teams.get(p.id) ?? []
     return {
       id: p.id,
-      name: opts.showcase?.get(p.id) ?? p.name,
+      name: p.name,
       status: p.status,
-      own: !opts.showcase && p.customerId === ownCustomerId,
+      own: p.customerId === ownCustomerId,
       thumb: ownThumbs.get(p.id) ?? otherThumbs.get(p.id),
       clips: clips.get(p.id) ?? 0,
       views: totals.get(p.id)?.views ?? 0,
@@ -268,13 +262,13 @@ async function allClippers(env: Env, demoAccounts = false): Promise<AgencyClippe
  * Demo-Clipper), dahinter das erfundene Netzwerk, zusammen genau DEMO_TOTALS.
  */
 async function demoNetwork(env: Env, ctx: AgencyCtx, userId: string) {
-  const [own, showcase, creators, clippers] = await Promise.all([
+  const [own, creators, clippers] = await Promise.all([
     allCampaigns(env, ctx.customer?.id ?? null, { onlyOwn: true }),
-    // Die Use Cases von der Startseite mit ihren echten Zahlen (lib/showcase.ts).
-    showcaseCampaigns(env).then((names) => allCampaigns(env, null, { showcase: names })).catch(() => []),
     allCreators(env, userId, true),
     allClippers(env, true),
   ])
+  // Die Use Cases von der Startseite stehen direkt hinter den eigenen (lib/showcase.ts).
+  const showcase = showcaseCampaigns()
   return {
     own,
     campaigns: [...own, ...showcase, ...demoCampaigns(DEMO_TOTALS.campaigns - own.length - showcase.length)],
@@ -401,6 +395,21 @@ collaborationRoutes.get('/kampagne/:id', async (c) => {
   if (isResponse(ctx)) return ctx
   const id = c.req.param('id')
 
+  // Use Case von der Startseite (nur für die Demo-Agentur, lib/showcase.ts).
+  const useCase = ctx.lead.demo && isShowcaseId(id) ? showcaseCampaign(id) : null
+  if (useCase) {
+    return c.html(
+      campaignPage({
+        user: c.get('user'),
+        campaign: useCase.campaign,
+        briefing: null,
+        team: [],
+        clips: useCase.clips,
+        manageHref: null,
+      }),
+    )
+  }
+
   // Erfundene Kampagne aus dem Demo-Netzwerk (nur für die Demo-Agentur).
   const demo = ctx.lead.demo ? demoCampaign(id) : null
   if (demo) {
@@ -428,11 +437,9 @@ collaborationRoutes.get('/kampagne/:id', async (c) => {
     .limit(1)
   const project = row?.project
   const own = Boolean(project && project.customerId === ctx.customer?.id)
-  // Use Case der Demo-Agentur (lib/showcase.ts): ansehen ja, verwalten nein.
-  const showcaseName = ctx.lead.demo && project && !own ? (await showcaseCampaigns(c.env).catch(() => new Map())).get(id) : undefined
   // Kampagnen anderer Agenturen gibt es hier nicht (siehe `allCampaigns`), die
-  // der Demo-Konten ebenso wenig. Die Demo-Agentur sieht nur ihre eigenen und die Use Cases.
-  if (!project || (row.ownerRole === 'agency' && !own) || (!own && !showcaseName && (ctx.lead.demo || row.ownerDemo))) return c.notFound()
+  // der Demo-Konten ebenso wenig. Die Demo-Agentur sieht nur ihre eigenen.
+  if (!project || (row.ownerRole === 'agency' && !own) || (!own && (ctx.lead.demo || row.ownerDemo))) return c.notFound()
 
   const clipRows = await db
     .select()
@@ -472,7 +479,7 @@ collaborationRoutes.get('/kampagne/:id', async (c) => {
       user: c.get('user'),
       campaign: {
         id,
-        name: showcaseName ?? project.name,
+        name: project.name,
         status: project.status,
         own,
         thumb: thumbs.get(id),
@@ -800,6 +807,9 @@ collaborationApi.get('/clips/:id/url', async (c) => {
   if (!agencyUnlocked(lead)) {
     return c.json({ error: 'Dein Zugang ist noch nicht freigeschaltet.' }, 403)
   }
+  // Reel eines Use Case: lief direkt bei Instagram, also dorthin (lib/showcase.ts).
+  const reel = lead?.demo ? showcaseClipUrl(c.req.param('id')) : null
+  if (reel) return c.json({ url: reel, external: true })
   if (c.req.param('id').startsWith('demo-clip-')) {
     return c.json({ error: 'Beispiel-Clip aus dem Demo-Netzwerk: Ansehen und Herunterladen gehen hier nicht.' }, 403)
   }
@@ -815,8 +825,7 @@ collaborationApi.get('/clips/:id/url', async (c) => {
   // Clips aus Kampagnen anderer Agenturen bleiben verborgen, wie die Kampagnen selbst; ebenso
   // die der Demo-Konten. Die Demo-Agentur sieht nur Clips ihrer eigenen Kampagnen.
   const own = hit?.ownerId === user.id
-  const showcase = Boolean(hit && !own && lead?.demo && (await showcaseCampaigns(c.env).catch(() => new Map())).has(hit.d.projectId))
-  if (!hit || (!own && !showcase && (hit.ownerRole === 'agency' || hit.ownerDemo || lead?.demo))) {
+  if (!hit || (!own && (hit.ownerRole === 'agency' || hit.ownerDemo || lead?.demo))) {
     return c.json({ error: 'Clip nicht gefunden.' }, 404)
   }
   const d = hit.d

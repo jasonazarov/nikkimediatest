@@ -1,6 +1,7 @@
 import type { User } from '../db/schema'
 import { postScopeFor } from './viral'
 import type { Env } from './types'
+import { showcaseClips, showsShowcase, type ShowcaseClip } from './showcase'
 
 /**
  * Views-Analyse für die Grafik oben in jeder Übersicht und auf
@@ -58,8 +59,11 @@ const empty = (): ViewsAnalytics => ({
 const isoDay = (unix: number) => new Date(unix * 1000).toISOString().slice(0, 10)
 
 export async function viewsAnalyticsFor(env: Env, user: User, now = Math.floor(Date.now() / 1000)): Promise<ViewsAnalytics> {
+  // Demo-Agentur: die Use Cases von der Startseite zählen mit (lib/showcase.ts).
+  const extra = showsShowcase(user) ? showcaseClips(now) : []
   const scope = await postScopeFor(env, user)
-  if (!scope) return empty()
+  if (!scope && !extra.length) return empty()
+  if (!scope) return build(empty(), [], [], [], extra, now)
 
   const from = `FROM post_metrics pm
       JOIN deliverables d ON d.id = pm.deliverable_id
@@ -102,12 +106,69 @@ export async function viewsAnalyticsFor(env: Env, user: User, now = Math.floor(D
     out.campaigns = Number(totals.campaigns) || 0
     out.syncedAt = totals.synced_at ? Number(totals.synced_at) : null
   }
+  return build(
+    out,
+    (byDay.results ?? []) as { at: number; v: number }[],
+    ((byCampaign.results ?? []) as Record<string, unknown>[]).map((r) => ({
+      id: String(r.id),
+      name: String(r.name ?? ''),
+      views: Number(r.views) || 0,
+      posts: Number(r.posts) || 0,
+      clips: Number(r.clips) || 0,
+    })),
+    ((byPlatform.results ?? []) as Record<string, unknown>[]).map((r) => ({
+      platform: String(r.platform ?? ''),
+      views: Number(r.views) || 0,
+    })),
+    extra,
+    now,
+  )
+}
+
+/**
+ * Kurve, Kampagnen und Plattformen aus den Zahlen der Datenbank, dazu die
+ * Use Cases der Demo-Agentur (`extra`, lib/showcase.ts), wie echte Clips gezählt.
+ */
+function build(
+  out: ViewsAnalytics,
+  dayRows: { at: number; v: number }[],
+  top: AnalyticsCampaign[],
+  platforms: { platform: string; views: number }[],
+  extra: ShowcaseClip[],
+  now: number,
+): ViewsAnalytics {
+  if (extra.length) {
+    const camps = new Map<string, AnalyticsCampaign>()
+    let views = 0
+    for (const c of extra) {
+      views += c.views
+      out.likes += c.likes
+      out.comments += c.comments
+      out.shares += c.shares
+      dayRows.push({ at: c.publishedAt, v: c.views })
+      const k = camps.get(c.campaignId) ?? { id: c.campaignId, name: c.campaign, views: 0, posts: 0, clips: 0 }
+      k.views += c.views
+      k.posts += 1
+      k.clips += 1
+      camps.set(c.campaignId, k)
+    }
+    out.total += views
+    out.posts += extra.length
+    out.clips += extra.length
+    out.campaigns += camps.size
+    out.syncedAt = out.syncedAt ?? now
+    top = [...top, ...camps.values()].sort((a, b) => b.views - a.views).slice(0, 12)
+    const ig = platforms.find((p) => p.platform === 'instagram')
+    if (ig) ig.views += views
+    else platforms.push({ platform: 'instagram', views })
+    platforms.sort((a, b) => b.views - a.views)
+  }
 
   // Tagessummen, dann aufsummiert über jeden Tag bis heute (auch Tage ohne Clips).
   const perDay = new Map<string, number>()
   const firstAllowed = now - (MAX_DAYS - 1) * DAY
   let first = now
-  for (const r of (byDay.results ?? []) as { at: number; v: number }[]) {
+  for (const r of dayRows) {
     const at = Math.max(Number(r.at) || now, firstAllowed)
     if (at < first) first = at
     const key = isoDay(Math.min(at, now))
@@ -123,17 +184,7 @@ export async function viewsAnalyticsFor(env: Env, user: User, now = Math.floor(D
       out.series.push({ day: key, views: run })
     }
   }
-
-  out.top = ((byCampaign.results ?? []) as Record<string, unknown>[]).map((r) => ({
-    id: String(r.id),
-    name: scope.names?.get(String(r.id)) ?? String(r.name ?? ''),
-    views: Number(r.views) || 0,
-    posts: Number(r.posts) || 0,
-    clips: Number(r.clips) || 0,
-  }))
-  out.platforms = ((byPlatform.results ?? []) as Record<string, unknown>[]).map((r) => ({
-    platform: String(r.platform ?? ''),
-    views: Number(r.views) || 0,
-  }))
+  out.top = top
+  out.platforms = platforms
   return out
 }

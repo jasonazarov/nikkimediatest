@@ -1,73 +1,158 @@
-/**
- * Use Cases im Dashboard der Demo-Agentur (Vorgabe des Auftraggebers, November 2026).
- *
- * Die Accounts der Case Studies auf der Startseite (DinDrop, Caspian Blue,
- * Max Tornow, Levantine Istanbul, Panperium) sind über Zernio angebunden und
- * hängen an echten Kampagnen. Die Demo-Agentur (`users.demo = 1`, Rolle
- * `agency`) sieht genau diese Kampagnen als Kampagnen in ihrem Dashboard:
- * in den Listen, in der Views-Grafik, bei „Virale Clips“ und auf der
- * Kampagnenseite, nur zum Ansehen. Die Zahlen sind die echten aus dem
- * Viertelstunden-Abgleich (lib/metrics.ts) und laufen von selbst weiter.
- *
- * Gefunden werden die Kampagnen über die Accountnamen der veröffentlichten
- * Posts (`post_metrics.username`), nicht über Kampagnen-IDs: Wie sie im Admin
- * heißen, spielt keine Rolle. Angezeigt wird immer der Markenname von der
- * Startseite, nie der interne Kampagnenname (der kann einen Kundennamen tragen).
- *
- * Nie zu sehen: Rohmaterial, Cloud-Links, Briefing, Kontaktdaten der Kunden.
- * Echte Agenturen sehen davon nichts.
- */
+import type { AgencyCampaign, AgencyClip } from '../views/collaboration'
+import type { ViralClip } from './viral'
 
-import type { Env } from './types'
+/* ==========================================================================
+   Use Cases im Dashboard der Demo-Agentur (Vorgabe des Auftraggebers, November 2026)
 
-/** Account (wie bei Instagram, klein geschrieben) → Name auf der Startseite. */
-export const SHOWCASE_ACCOUNTS: Record<string, string> = {
-  dindrop7: 'DinDrop',
-  caspianbluecaviar: 'Caspian Blue',
-  max_tornow_business: 'Max Tornow',
-  levantine_istanbul: 'Levantine Istanbul',
-  panperium: 'Panperium',
+   Die Case Studies der Startseite (DinDrop, Max Tornow, Caspian Blue,
+   Levantine Istanbul, Panperium) erscheinen bei theguardians als Kampagnen:
+   in „Neueste Kampagnen“ und „Kampagnen“, in der Views-Grafik, bei
+   „Kampagnen nach Views“, „Plattformen“ und „Virale Clips“ und auf einer
+   eigenen Kampagnenseite mit den Reels.
+
+   Die Videos liefen NICHT über die Plattform, also gibt es dazu keine Zeilen
+   in der Datenbank. Wie das übrige Demo-Netzwerk (lib/demo.ts) stehen die
+   Use Cases deshalb hier im Code: die Gesamtzahlen von der Startseite, auf
+   die echten Reels verteilt (Vorschaubilder unter /img/cases). Nichts davon
+   landet in der Datenbank, im Admin oder bei echten Agenturen.
+
+   Neuer Use Case: Eintrag in USE_CASES, Vorschaubilder nach
+   public/img/cases/<account>-<reel>.jpg.
+   ========================================================================== */
+
+interface UseCase {
+  slug: string
+  name: string
+  handle: string
+  /** Views gesamt, wie auf der Startseite. */
+  views: number
+  /** Reels: [ID bei Instagram, Anteil an den Views, vor wie vielen Tagen veröffentlicht] */
+  reels: [string, number, number][]
+}
+
+const USE_CASES: UseCase[] = [
+  {
+    slug: 'dindrop', name: 'DinDrop', handle: 'dindrop7', views: 100_000_000,
+    reels: [['DZlBQOrgilt', 30, 12], ['DbLpapmA_Bw', 26, 19], ['DbbJyZgIUjl', 19, 6], ['DPRDIqUiIeB', 14, 64], ['DM-7GyZIkb0', 11, 98]],
+  },
+  {
+    slug: 'max-tornow', name: 'Max Tornow', handle: 'max_tornow_business', views: 70_000_000,
+    reels: [['C_PxECKAj61', 41, 23], ['C8pRTW6MinC', 27, 41], ['DCHhYijJK4b', 21, 77], ['C1xEPryiQ4t', 11, 132]],
+  },
+  {
+    slug: 'caspian-blue', name: 'Caspian Blue', handle: 'caspianbluecaviar', views: 40_000_000,
+    reels: [['DQ4ga9SDEnj', 35, 9], ['DP_uoY6jFCU', 28, 27], ['DMzr3__qHsw', 22, 55], ['DKZ-ra1qDiR', 15, 109]],
+  },
+  {
+    slug: 'levantine-istanbul', name: 'Levantine Istanbul', handle: 'levantine_istanbul', views: 3_000_000,
+    reels: [['Da2pgoToIw_', 31, 4], ['DUTFpaeiMZA', 24, 33], ['DEUXjpeIHPR', 19, 71], ['DBQxgMHAw1U', 15, 96], ['C9406cJIC_D', 11, 140]],
+  },
+  {
+    slug: 'panperium', name: 'Panperium', handle: 'panperium', views: 450_000,
+    reels: [['DZvEvMPNa15', 30, 3], ['DZurxhPjezN', 25, 14], ['DZfCoAoNLUi', 20, 25], ['DZF78B8je1g', 15, 47], ['DbGw3_SCDud', 10, 88]],
+  },
+]
+
+const DAY = 86400
+const PREFIX = 'usecase-'
+
+export interface ShowcaseClip {
+  id: string
+  campaignId: string
+  campaign: string
+  handle: string
+  reel: string
+  url: string
+  image: string
+  views: number
+  likes: number
+  comments: number
+  shares: number
+  /** Veröffentlicht (Unix-Sekunden), relativ zu `now`, damit die Grafik nicht veraltet. */
+  publishedAt: number
 }
 
 /** Nur die Demo-Agentur bekommt die Use Cases. */
 export const showsShowcase = (user: { role: string; demo?: number | null }) => user.role === 'agency' && user.demo === 1
 
-/**
- * Kampagne → angezeigter Name, für alle Kampagnen mit Posts der Use-Case-Accounts.
- * Mehrere Kampagnen derselben Marke heißen „DinDrop“, „DinDrop 2“ und so weiter.
- */
-export async function showcaseCampaigns(env: Env): Promise<Map<string, string>> {
-  const handles = Object.keys(SHOWCASE_ACCOUNTS)
-  const { results } = await env.DB.prepare(
-    `SELECT project_id, LOWER(TRIM(username, '@ ')) AS handle, COUNT(*) AS n
-     FROM post_metrics
-     WHERE LOWER(TRIM(username, '@ ')) IN (${handles.map(() => '?').join(',')})
-     GROUP BY project_id, handle
-     ORDER BY project_id`,
-  )
-    .bind(...handles)
-    .all()
+export const isShowcaseId = (id: string) => id.startsWith(PREFIX) && USE_CASES.some((u) => PREFIX + u.slug === id)
 
-  // Je Kampagne die Marke mit den meisten Posts.
-  const best = new Map<string, { handle: string; n: number }>()
-  for (const r of (results ?? []) as { project_id: string; handle: string; n: number }[]) {
-    const cur = best.get(r.project_id)
-    if (!cur || Number(r.n) > cur.n) best.set(r.project_id, { handle: r.handle, n: Number(r.n) })
+/** Alle Reels aller Use Cases, nach Views absteigend. */
+export function showcaseClips(now = Math.floor(Date.now() / 1000)): ShowcaseClip[] {
+  const out: ShowcaseClip[] = []
+  for (const u of USE_CASES) {
+    const sum = u.reels.reduce((s, r) => s + r[1], 0)
+    let rest = u.views
+    u.reels.forEach(([reel, share, daysAgo], k) => {
+      const views = k === u.reels.length - 1 ? rest : Math.round((u.views * share) / sum)
+      rest -= views
+      out.push({
+        id: `${PREFIX}${u.slug}-${k}`,
+        campaignId: PREFIX + u.slug,
+        campaign: u.name,
+        handle: u.handle,
+        reel,
+        url: `https://www.instagram.com/${u.handle}/p/${reel}/`,
+        image: `/img/cases/${u.handle}-${reel}.jpg`,
+        views,
+        likes: Math.round(views / 25),
+        comments: Math.round(views / 900),
+        shares: Math.round(views / 400),
+        publishedAt: now - daysAgo * DAY - 15 * 3600,
+      })
+    })
   }
-
-  const used = new Map<string, number>()
-  const out = new Map<string, string>()
-  for (const [projectId, { handle }] of best) {
-    const base = SHOWCASE_ACCOUNTS[handle] ?? handle
-    const k = (used.get(base) ?? 0) + 1
-    used.set(base, k)
-    out.set(projectId, k === 1 ? base : `${base} ${k}`)
-  }
-  return out
+  return out.sort((a, b) => b.views - a.views)
 }
 
-/** Wie `showcaseCampaigns`, aber leer für alle außer der Demo-Agentur — und nie ein Fehler. */
-export async function showcaseFor(env: Env, user: { role: string; demo?: number | null }): Promise<Map<string, string>> {
-  if (!showsShowcase(user)) return new Map()
-  return showcaseCampaigns(env).catch(() => new Map())
+/** Die Use Cases als Kampagnenkarten (Band „Eigene Kampagne“, wie in der Vorschau). */
+export function showcaseCampaigns(): AgencyCampaign[] {
+  return USE_CASES.map((u) => ({
+    id: PREFIX + u.slug,
+    name: u.name,
+    status: 'aktiv',
+    own: true,
+    thumb: { kind: 'image', src: `/img/cases/${u.handle}-${u.reels[0][0]}.jpg` } as const,
+    clips: u.reels.length,
+    views: u.views,
+    clippers: 0,
+    creators: 0,
+  }))
 }
+
+/** Eine Kampagne mit ihren Reels für die Kampagnenseite. */
+export function showcaseCampaign(id: string, now = Math.floor(Date.now() / 1000)): { campaign: AgencyCampaign; clips: AgencyClip[] } | null {
+  const campaign = showcaseCampaigns().find((c) => c.id === id)
+  if (!campaign) return null
+  const clips = showcaseClips(now)
+    .filter((c) => c.campaignId === id)
+    .sort((a, b) => b.publishedAt - a.publishedAt)
+    .map((c) => ({
+      id: c.id,
+      filename: `${c.handle}-${c.reel}.mp4`,
+      caption: `@${c.handle}`,
+      createdAt: c.publishedAt,
+      posterUrl: c.image,
+      previewUrl: '',
+      views: c.views,
+    }))
+  return { campaign, clips }
+}
+
+/** Link zum Reel bei Instagram — Abspielen und Herunterladen gehen bei Use Cases dorthin. */
+export const showcaseClipUrl = (clipId: string): string | null => showcaseClips().find((c) => c.id === clipId)?.url ?? null
+
+/** Für „Virale Clips“: dieselbe Form wie die echten. */
+export const showcaseViral = (): ViralClip[] =>
+  showcaseClips().map((c) => ({
+    id: c.id,
+    campaign: c.campaign,
+    views: c.views,
+    likes: c.likes,
+    shares: c.shares,
+    comments: c.comments,
+    platforms: ['instagram'],
+    url: c.url,
+    handle: c.handle,
+    thumb: c.image,
+  }))
