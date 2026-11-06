@@ -62,18 +62,23 @@ git ls-tree -r -z --name-only HEAD | xargs -0 rm -f
 git -C "$DEMO_DIR" archive --format=tar HEAD | tar -x -C "$LIVE_DIR"
 git add -A
 [ -n "$(git status --porcelain)" ] || { ok "Live-Repo ist schon auf diesem Stand, nichts zu übertragen."; NOTHING=1; }
+# Ein früherer Lauf kann schon committet haben, ohne dass das Hochladen klappte.
+AHEAD="$(git rev-list --count origin/main..HEAD 2>/dev/null || echo 0)"
 grep -q 'name = "nikki-media"' wrangler.toml || fail "Nach dem Übertragen fehlt der Worker-Name in wrangler.toml."
 CHANGED="$(git status --porcelain | wc -l | tr -d ' ')"
 REMOVED="$(git status --porcelain | grep -c '^D' || true)"
 ok "$CHANGED Dateien geändert, davon $REMOVED entfernt"
 
 # ------------------------------------------------------------------ Hochladen
-if [ -z "${NOTHING:-}" ]; then
+# Große Uploads über HTTPS brechen sonst mit „HTTP 400 / RPC failed“ ab.
+git config http.postBuffer 524288000
+git config http.version HTTP/1.1
+if [ -z "${NOTHING:-}" ] || [ "$AHEAD" != "0" ]; then
   step "5/7  Auf GitHub hochladen"
   printf '%sJetzt wird der neue Stand auf github.com/adprimesbrand-gif/nikki-media (main) hochgeladen.%s\n' "$Y" "$O"
   printf 'Weiter? (j/n) '; read -r a
   case "$a" in j|J|y|Y|ja|Ja) ;; *) git reset -q --hard; fail "Abgebrochen, nichts hochgeladen.";; esac
-  git commit -qm "Neues Design: Liquid Glass Grün, Whop-Dashboards, SEO/GEO, Blog, Hintergrundlicht (Stand $NEW)"
+  [ -n "${NOTHING:-}" ] || git commit -qm "Neues Design: Liquid Glass Grün, Whop-Dashboards, SEO/GEO, Blog, Hintergrundlicht (Stand $NEW)"
   git push -q origin main || fail "Hochladen ging nicht (Anmeldung bei GitHub?). Lokal ist alles gespeichert, Skript einfach neu starten."
   ok "Auf GitHub: $(git rev-parse --short HEAD)"
 else
