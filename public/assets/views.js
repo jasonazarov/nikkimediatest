@@ -283,15 +283,15 @@
   }
 
   /* ---------- Live (nur Demo-Agentur, siehe lib/showcase.ts) ----------
-     Reiter „Live“: die letzten 15 Sekunden, rollt flüssig nach links, glatt wie
+     Reiter „Live“: die letzten 22,5 Sekunden, rollt flüssig nach links, glatt wie
      die Tageskurve. Views pro Minute je Minute zufällig zwischen min und max
      (fest aus der Uhrzeit, also bei allen gleich). Die große Zahl zählt ab dem
      Öffnen der Seite mit; in 7/30/90 Tagen wächst nur die Zahl, die Kurve
      behält ihre Form (kein plötzlicher Sprung am Ende). Ein Licht fährt alle
-     2,2 Sekunden über die Kurve; bei „Bewegung reduzieren“ ohne Licht. */
+     3,3 Sekunden über die Kurve; bei „Bewegung reduzieren“ ohne Licht. */
   var live = null;
   function startLive(cfg) {
-    var WIN = 15, STEP = 0.1, LOOP = 2200, A = 0.42, B = 0.75, C = 0.18, D = 1.9;
+    var WIN = 22.5, STEP = 0.15, LOOP = 3300, A = 0.42, B = 0.75, C = 0.18, D = 1.9;
     var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     T.ranges = [['live', 'Live']].concat(T.ranges.filter(function (r) { return r[0] !== 'all'; }));
     T.perMinute = en ? 'views in the last minute' : 'Views in der letzten Minute';
@@ -341,7 +341,7 @@
         mk(mk(defs, 'filter', { id: 'nmxGlow', x: '-10%', y: '-50%', width: '120%', height: '200%' }), 'feGaussianBlur', { stdDeviation: '6' });
         for (var g = 0; g <= 3; g++) { var gy = 16 + (g / 3) * (H - 44); mk(root, 'line', { x1: 4, x2: W - 10, y1: gy, y2: gy, class: 'nmx__grid' }); }
         var area = mk(root, 'path', { fill: 'url(#nmxFill)' }), glowLine = mk(root, 'path', { class: 'nmx__glow', filter: 'url(#nmxGlow)' }), line = mk(root, 'path', { class: 'nmx__line' });
-        var labels = en ? ['15 s ago', '11 s ago', '8 s ago', '4 s ago', 'now'] : ['vor 15 Sek.', 'vor 11 Sek.', 'vor 8 Sek.', 'vor 4 Sek.', 'jetzt'];
+        var labels = en ? ['22 s ago', '17 s ago', '11 s ago', '6 s ago', 'now'] : ['vor 22 Sek.', 'vor 17 Sek.', 'vor 11 Sek.', 'vor 6 Sek.', 'jetzt'];
         labels.forEach(function (txt, i) {
           var t = mk(root, 'text', { x: 4 + (i / 4) * (W - 14), y: H - 8, class: 'nmx__axis', 'text-anchor': i === 0 ? 'start' : i === 4 ? 'end' : 'middle' });
           t.textContent = txt;
