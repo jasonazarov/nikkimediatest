@@ -84,19 +84,17 @@ INSERT INTO folders (id, customer_id, project_id, name, parent_id, created_at)
   WHERE ${project} IS NOT NULL AND NOT EXISTS (SELECT 1 FROM folders WHERE project_id = ${project});`
 }
 
-/** Alle Anweisungen auf einmal: legt nur an, was fehlt, und setzt die Passwörter. */
-export function demoAccountSql(passwords) {
-  const ts = Math.floor(Date.now() / 1000)
-  const pw = typeof passwords === 'string' ? { agency: passwords, creator: passwords, clipper: passwords } : passwords
+/* Je Rolle ein Baustein, damit es beliebig viele Demo-Konten geben kann. */
 
-  // --- Agentur
-  const agency = userOf(DEMO_EMAIL, 'agency')
+/** Agentur: Arbeitsbereich, freigeschalteter Eintrag (demo = 1), zwei echte eigene Kampagnen. */
+function agencyDemoSql(email, name, password, ts) {
+  const agency = userOf(email, 'agency')
   const agencyCustomer = `(SELECT id FROM customers WHERE user_id = ${agency})`
-  let sql = userSql(DEMO_EMAIL, 'agency', 'theguardians', pw.agency, ts) + customerSql(agency, 'theguardians', ts)
+  let sql = userSql(email, 'agency', name, password, ts) + customerSql(agency, name, ts)
   sql += `
 INSERT INTO agency_leads (id, user_id, customer_id, company, kind, has_clients, platforms, source, niche, socials,
                           footage, warm, access_at, views_target, budget_cents, package, briefed_at, demo, created_at)
-  SELECT '${randomUUID()}', ${agency}, ${agencyCustomer}, 'theguardians', 'marketing', 'mehrere',
+  SELECT '${randomUUID()}', ${agency}, ${agencyCustomer}, '${name}', 'marketing', 'mehrere',
          '["tiktok","instagram","youtube","facebook"]', 'empfehlung', 'Entertainment', '{}',
          'viel', 1, ${ts}, 10000000, 5000000, 'armee_influencer_ugc', ${ts}, 1, ${ts}
   WHERE ${agency} IS NOT NULL AND NOT EXISTS (SELECT 1 FROM agency_leads WHERE user_id = ${agency});
@@ -104,31 +102,106 @@ UPDATE agency_leads SET demo = 1, warm = 1, access_at = COALESCE(access_at, ${ts
   WHERE user_id = ${agency};`
   sql += campaignSql(agencyCustomer, 'Fitness-Launch Herbst', { views: 1_000_000, budgetCents: 800_000, niche: 'Fitness & Sport', platforms: ['tiktok', 'instagram'] }, ts)
   sql += campaignSql(agencyCustomer, 'Restaurant-Eröffnung', { views: 500_000, budgetCents: 450_000, niche: 'Gastronomie', platforms: ['instagram', 'tiktok', 'facebook'] }, ts - 86_400)
+  return sql
+}
 
-  // --- Creator: Angaben, Arbeitsbereich für eigene Kampagnen, Bearbeiterprofil
-  const creator = userOf(DEMO_CREATOR_EMAIL, 'creator')
-  sql += userSql(DEMO_CREATOR_EMAIL, 'creator', 'theguardianscreator', pw.creator, ts)
+/** Creator: Angaben, Arbeitsbereich für eigene Kampagnen, Bearbeiterprofil. */
+function creatorDemoSql(email, name, password, ts) {
+  const creator = userOf(email, 'creator')
+  let sql = userSql(email, 'creator', name, password, ts)
   sql += `
 INSERT INTO creators (id, user_id, goal, niche, platforms, open_to_ads, followers, views_total, views_30d, handles, created_at)
   SELECT '${randomUUID()}', ${creator}, 'beides', 'Entertainment', '["instagram","tiktok","youtube"]', 'ja',
          '100k_1m', '1m_10m', '500k_1m', '{}', ${ts}
   WHERE ${creator} IS NOT NULL AND NOT EXISTS (SELECT 1 FROM creators WHERE user_id = ${creator});`
-  sql += customerSql(creator, null, ts) + clipperRowSql(creator, 'theguardianscreator', ts)
+  return sql + customerSql(creator, null, ts) + clipperRowSql(creator, name, ts)
+}
 
-  // --- Clipper: Bearbeiterprofil und Bewerbung (Plattformen, Erfahrung)
-  const clipper = userOf(DEMO_CLIPPER_EMAIL, 'clipper')
+/** Clipper: Bearbeiterprofil und Bewerbung (Plattformen, Erfahrung). */
+function clipperDemoSql(email, name, password, ts) {
+  const clipper = userOf(email, 'clipper')
   const clipperRow = `(SELECT id FROM clippers WHERE user_id = ${clipper})`
-  sql += userSql(DEMO_CLIPPER_EMAIL, 'clipper', 'theguardiansclipper', pw.clipper, ts) + clipperRowSql(clipper, 'theguardiansclipper', ts)
-  sql += `
+  return (
+    userSql(email, 'clipper', name, password, ts) +
+    clipperRowSql(clipper, name, ts) +
+    `
 INSERT INTO clipper_applications (id, clipper_id, platforms, work_status, experience, availability, created_at)
   SELECT '${randomUUID()}', ${clipperRow}, '["tiktok","instagram","youtube"]', 'full_time', 'professional', '20_plus', ${ts}
   WHERE ${clipperRow} IS NOT NULL AND NOT EXISTS (SELECT 1 FROM clipper_applications WHERE clipper_id = ${clipperRow});`
-  return sql
+  )
+}
+
+/** Kunde: Arbeitsbereich, schon zum Kunden erklärt (converted_at), eine laufende Kampagne mit Briefing. */
+function customerDemoSql(email, name, password, ts) {
+  const customer = userOf(email, 'customer')
+  const customerRow = `(SELECT id FROM customers WHERE user_id = ${customer})`
+  return (
+    userSql(email, 'customer', name, password, ts) +
+    customerSql(customer, name, ts) +
+    `
+UPDATE customers SET converted_at = COALESCE(converted_at, ${ts}) WHERE user_id = ${customer};` +
+    campaignSql(customerRow, 'Demo-Kampagne', { views: 2_000_000, budgetCents: 1_000_000, niche: 'Gastronomie', platforms: ['tiktok', 'instagram'] }, ts)
+  )
+}
+
+/** Alle Anweisungen auf einmal: legt nur an, was fehlt, und setzt die Passwörter. */
+export function demoAccountSql(passwords) {
+  const ts = Math.floor(Date.now() / 1000)
+  const pw = typeof passwords === 'string' ? { agency: passwords, creator: passwords, clipper: passwords } : passwords
+  return (
+    agencyDemoSql(DEMO_EMAIL, 'theguardians', pw.agency, ts) +
+    creatorDemoSql(DEMO_CREATOR_EMAIL, 'theguardianscreator', pw.creator, ts) +
+    clipperDemoSql(DEMO_CLIPPER_EMAIL, 'theguardiansclipper', pw.clipper, ts)
+  )
+}
+
+/**
+ * Jasons eigene Demo-Konten (Vorgabe des Auftraggebers, November 2026), je eines
+ * pro Dashboard, alle mit demselben Passwort aus DEMO_PASSWORD_JASON. Sie
+ * verhalten sich wie die übrigen Demo-Konten (users.demo = 1, Passwort-Login
+ * unter /login/demo, keine Mails, siehe isDemoAddress in src/lib/mail.ts).
+ */
+export const JASON_DEMO = {
+  agency: 'jason@nikki-mediademoagentur.com',
+  creator: 'jason@nikki-mediademocreator.com',
+  customer: 'jason@nikki-mediademokunde.com',
+  clipper: 'jason@nikki-mediademoclipper.com',
+}
+
+export function jasonDemoSql(password) {
+  const ts = Math.floor(Date.now() / 1000)
+  return (
+    agencyDemoSql(JASON_DEMO.agency, 'Jason Demo Agentur', password, ts) +
+    creatorDemoSql(JASON_DEMO.creator, 'Jason Demo Creator', password, ts) +
+    customerDemoSql(JASON_DEMO.customer, 'Jason Demo Kunde', password, ts) +
+    clipperDemoSql(JASON_DEMO.clipper, 'Jason Demo Clipper', password, ts)
+  )
 }
 
 function main() {
   const local = process.argv.includes('--local')
   const persistAt = process.argv.indexOf('--persist-to')
+  const targetArgs = local ? ['--local', ...(persistAt > 0 ? ['--persist-to', process.argv[persistAt + 1]] : [])] : ['--remote']
+
+  // Nur Jasons vier Konten; die theguardians-Konten und ihre Passwörter bleiben unberührt.
+  if (process.argv.includes('--jason')) {
+    const password = process.env.DEMO_PASSWORD_JASON
+    if (!password) {
+      console.error('Bitte das Passwort mitgeben: DEMO_PASSWORD_JASON=\'…\' node scripts/demo-account.mjs --jason')
+      process.exit(1)
+    }
+    const run = spawnSync('npx', ['wrangler', 'd1', 'execute', 'nikki-media', ...targetArgs, '--command', jasonDemoSql(password)], { cwd: ROOT, encoding: 'utf8' })
+    if (run.status !== 0) {
+      console.error(run.stdout, run.stderr)
+      process.exit(1)
+    }
+    console.log(`\nJasons Demo-Konten bereit (${local ? 'lokal' : 'live'}), Login: https://nikkimedia.co/login/demo`)
+    console.log('Alle mit dem Passwort aus DEMO_PASSWORD_JASON (es wird nicht gespeichert, nur sein Hash).\n')
+    for (const [role, email] of Object.entries(JASON_DEMO)) console.log(`  ${role.padEnd(9)} ${email}`)
+    console.log('')
+    return
+  }
+
   // DEMO_PASSWORD gilt für alle drei; DEMO_PASSWORD_AGENCY / _CREATOR / _CLIPPER
   // je Konto, z. B. um ein schon weitergegebenes Passwort zu behalten.
   const env = process.env

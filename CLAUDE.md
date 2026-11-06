@@ -366,6 +366,12 @@ Passwort NUR für Demo-Konten unter `/login/demo`, der Code-Login leitet
 dorthin; Mails an `@demo.nikkimedia.co` entfallen. Anlegen bzw. Passwörter
 neu setzen: `node scripts/demo-account.mjs` (gibt sie einmal aus, gespeichert
 wird nur der Hash).
+**Jasons eigene Demo-Konten** (Vorgabe des Auftraggebers, November 2026), je Dashboard eines:
+jason@nikki-mediademoagentur.com, …democreator.com, …demokunde.com, …democlipper.com, alle mit demselben
+Passwort. Anlegen bzw. Passwort setzen: `DEMO_PASSWORD_JASON='…' node scripts/demo-account.mjs --jason`
+(lässt die theguardians-Konten unberührt; das Passwort steht nirgends im Repo). Gleiche Regeln wie oben:
+`users.demo = 1`, Login unter `/login/demo`, keine Mails (`isDemoAddress`). Die Demo-Agentur sieht wie
+theguardians das erfundene Netzwerk und die Use Cases; der Demo-Kunde ist schon freigegeben und hat eine Kampagne.
 
 **Keine langen Gedankenstriche („—“) in sichtbaren Texten** (Vorgabe des
 Auftraggebers, Oktober 2026): stattdessen Komma, Doppelpunkt oder Punkt; in

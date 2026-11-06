@@ -23,7 +23,7 @@ import { existsSync, renameSync, writeFileSync, unlinkSync, rmSync } from 'node:
 import { createServer } from 'node:net'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
-import { DEMO_CLIPPER_EMAIL, DEMO_CREATOR_EMAIL, DEMO_EMAIL, demoAccountSql } from './demo-account.mjs'
+import { DEMO_CLIPPER_EMAIL, DEMO_CREATOR_EMAIL, DEMO_EMAIL, JASON_DEMO, demoAccountSql, jasonDemoSql } from './demo-account.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const STATE = join(ROOT, '.wrangler', 'login-test-state')
@@ -745,6 +745,29 @@ try {
     demoCode.status === 303 && String(demoCode.headers.get('location')).startsWith('/login/demo'),
     `HTTP ${demoCode.status} → ${demoCode.headers.get('location')}`,
   )
+  // Jasons eigene Demo-Konten: je Dashboard eines, festes Passwort, kein Code per Mail
+  const JASON_PW = 'Jason-Test-9899!$$'
+  d1(jasonDemoSql(JASON_PW))
+  pruefe(
+    'Jasons Demo-Konten sind angelegt (4 Rollen, alle demo=1, Kunde freigegeben)',
+    zaehle(`SELECT count(*) AS n FROM users WHERE demo=1 AND email IN ('${Object.values(JASON_DEMO).join("','")}');`) === 4 &&
+      zaehle(`SELECT count(*) AS n FROM customers c JOIN users u ON u.id = c.user_id WHERE u.email='${JASON_DEMO.customer}' AND c.converted_at IS NOT NULL;`) === 1,
+  )
+  const ziele = { agency: '/collaboration', creator: '/kampagnen', customer: '/app', clipper: '/work' }
+  let jasonOk = true, jasonInfo = ''
+  for (const [rolle, mail] of Object.entries(JASON_DEMO)) {
+    const r = await post('/login/demo', { email: mail, password: JASON_PW })
+    const ok = r.status === 302 && r.headers.get('location') === ziele[rolle] && !!sitzungFuer(r, rolle)
+    if (!ok) { jasonOk = false; jasonInfo += `${rolle}: HTTP ${r.status} → ${r.headers.get('location')} ` }
+  }
+  pruefe('Jasons Demo-Konten: E-Mail + Passwort führen ins jeweilige Dashboard', jasonOk, jasonInfo)
+  const jasonCode = await post('/login', { email: JASON_DEMO.customer, next: '/app' })
+  pruefe(
+    'Jasons Demo-Konten: Code-Login schickt keinen Code, sondern zum Passwort-Login',
+    jasonCode.status === 303 && String(jasonCode.headers.get('location')).startsWith('/login/demo'),
+    `HTTP ${jasonCode.status} → ${jasonCode.headers.get('location')}`,
+  )
+
   const demoUebersicht = await (await agenturHole('/collaboration', demoCookie)).text()
   pruefe(
     'Demo: Übersicht mit den Zahlen und „Neue Kampagne erstellen“',

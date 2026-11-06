@@ -14,8 +14,12 @@ interface Mail {
   replyTo?: string
 }
 
-/** Adressen der Demo-Konten (siehe lib/demo.ts). Sie haben kein Postfach. */
-export const isDemoAddress = (email: string) => email.toLowerCase().endsWith('@demo.nikkimedia.co')
+/**
+ * Adressen der Demo-Konten (siehe lib/demo.ts). Sie haben kein Postfach: die
+ * theguardians-Konten (@demo.nikkimedia.co) und Jasons Demo-Konten
+ * (@nikki-mediademo….com, scripts/demo-account.mjs --jason).
+ */
+export const isDemoAddress = (email: string) => /@(demo\.nikkimedia\.co|nikki-mediademo[a-z]+\.com)$/i.test(email.trim())
 
 export async function send(env: Env, mail: Mail): Promise<boolean> {
   // Demo-Konten (@demo.nikkimedia.co) haben kein Postfach: nichts verschicken,
