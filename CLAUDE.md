@@ -583,3 +583,12 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   `layout.ts`, Styles `dash-whop.css`): erscheint bei `?angelegt=1` in jedem Dashboard. Gesetzt nach „Neue
   Kampagne“ von Kunde, Agentur und Creator und nach dem ersten Agentur-Briefing. Der Zusatz verschwindet sofort
   aus der Adresse. Bausteine der Glas-Formulare: `src/views/form-window.ts`.
+- **Abgebrochene Kampagnen-Formulare und CRM-Verlauf** (Vorgabe des Auftraggebers, November 2026;
+  `src/lib/drafts.ts`, `src/lib/crm.ts`, Migration 0025 `campaign_drafts`): „Neue Kampagne“ im
+  Kunden-Dashboard speichert jede Angabe schon beim Ausfüllen (`PUT /api/app/campaign-draft`, nur
+  Kunden) und setzt sie beim nächsten Öffnen von `/app/neu` wieder ein. Nicht abgeschickt: nach
+  2 Stunden Mail an `ADMIN_EMAIL` („Kampagne begonnen, nicht abgeschlossen“), nach 24 Stunden
+  Erinnerung an den Kunden mit Link auf `/app/neu`; beides genau einmal, im Viertelstundentakt
+  (`draftsCatchUp` in `src/index.ts`), Demo-Konten ohne Mail. Abschicken (`POST /api/app/projects`)
+  hakt den Entwurf ab. Im Admin beim Kunden (`/admin/kunden/:id`) steht der „CRM timeline“: Lead,
+  Bestätigung, begonnene und angelegte Kampagnen, Push-Anfragen. Test: `npx tsx tests/gold/drafts.test.ts`.

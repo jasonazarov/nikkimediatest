@@ -51,6 +51,7 @@ import { CONNECTABLE, PLATFORM_LABEL, PUBLISH_STATUS, platformLines, publishStat
 import { formatCompact, metricStrip, metricsPausedNote } from './metrics'
 import type { MetricRow, MetricTotals, MetricTotalsWithCreators, SyncOverview } from '../lib/metrics'
 import type { Lead, Role, User } from '../db/schema'
+import type { CrmEvent } from '../lib/crm'
 import { agencyPackageLabel, agencyPlatformLabel, pricePerThousandCents, viewsShort, type Briefing } from '../lib/agency'
 
 /*
@@ -1620,6 +1621,41 @@ export function customersPage(o: { user: User; customers: CustomerRow[] }): stri
   })
 }
 
+/**
+ * CRM-Verlauf beim Kunden (lib/crm.ts): Lead-Formular, Bestätigung, begonnene
+ * und angelegte Kampagnen, Push-Anfragen. Nicht Abgeschicktes ist markiert.
+ */
+const CRM_DOT: Record<CrmEvent['kind'], string> = {
+  lead: 'bg-slate-400',
+  converted: 'bg-emerald-500',
+  draft: 'bg-amber-500',
+  campaign: 'bg-brand',
+  push: 'bg-emerald-500',
+}
+function crmTimeline(events: CrmEvent[]): string {
+  const items = events
+    .map(
+      (e) => `
+            <li class="relative pb-5 pl-4 last:pb-0">
+              <span class="absolute left-[-10px] top-1.5 h-2.5 w-2.5 rounded-full ${CRM_DOT[e.kind]}"></span>
+              <div class="flex flex-wrap items-baseline justify-between gap-x-3">
+                <p class="text-sm font-bold ${e.attention ? 'text-amber-600' : ''}">${
+                  e.href ? `<a href="${esc(e.href)}" class="hover:underline">${esc(e.title)}</a>` : esc(e.title)
+                }</p>
+                <span class="text-xs text-slate-500">${dateTimeEN(e.at)}</span>
+              </div>
+              ${e.detail ? `<p class="text-sm text-slate-500">${esc(e.detail)}</p>` : ''}
+            </li>`,
+    )
+    .join('')
+  return `
+        <div class="mt-9 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" id="crm">
+          <h2 class="font-display text-lg font-bold">CRM timeline</h2>
+          <p class="mb-4 text-sm text-slate-500">Everything this account did, newest first. Campaigns started but not submitted are flagged: you get an email after 2 hours, the customer a reminder after 24 hours.</p>
+          ${events.length ? `<ol class="border-l border-slate-200 pl-1">${items}</ol>` : '<p class="text-sm text-slate-500">Nothing yet.</p>'}
+        </div>`
+}
+
 export function customerDetailPage(o: {
   user: User
   customer: CustomerRow
@@ -1636,6 +1672,8 @@ export function customerDetailPage(o: {
     projectName: string | null
     files: { id: string; filename: string; bytes: number; createdAt: number; video: boolean }[]
   }[]
+  /** CRM-Verlauf (lib/crm.ts), neueste zuerst. */
+  timeline?: CrmEvent[]
 }): string {
   /*
    * Die personenbezogenen Daten des Kunden — hier änderbar.
@@ -1755,6 +1793,7 @@ export function customerDetailPage(o: {
     (o.campaigns.length
       ? campaignGrid(cards)
       : emptyState('No campaign yet', creator ? 'This creator has not created a campaign yet.' : 'This customer has not created a campaign yet, you can create one for them.')) +
+    crmTimeline(o.timeline ?? []) +
     contactBlock +
     `<div class="mb-3 mt-9">
        <h2 class="font-display text-lg font-bold">Raw footage</h2>

@@ -1,3 +1,4 @@
+import { customerTimeline } from '../lib/crm'
 import { Hono } from 'hono'
 import { and, desc, eq, inArray, isNotNull, isNull, like, or, sql, type SQL } from 'drizzle-orm'
 import { getDb, nowSec, schema } from '../lib/db'
@@ -908,14 +909,16 @@ adminRoutes.get('/kunden/:id', async (c) => {
     })),
   )
 
-  const [campaigns, team] = await Promise.all([
+  const [campaigns, team, timeline] = await Promise.all([
     campaignSummaries(c.env, { customerId: customer.customerId }),
     people(c.env),
+    customerTimeline(c.env, { customerId: customer.customerId, userId: customer.userId }),
   ])
   const links = profileLinksOf(team)
 
   return c.html(
     customerDetailPage({
+      timeline,
       user: c.get('user'),
       customer,
       campaigns,

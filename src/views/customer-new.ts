@@ -8,9 +8,15 @@
  * öffnet sich die Kampagne mit dem Glückwunsch-Popup (?angelegt=1, shell()).
  *
  * Kein fester Preis, nur der Hinweis „CPM ~5 €“ (Vorgabe des Auftraggebers).
+ *
+ * Jede Angabe wird schon beim Ausfüllen als Entwurf gespeichert
+ * (PUT /api/app/campaign-draft, lib/drafts.ts) und beim nächsten Öffnen
+ * wieder eingesetzt. Nicht abgeschickt: nach 2 Stunden Meldung an den Admin,
+ * nach 24 Stunden Erinnerung an den Kunden.
  */
 import type { User } from '../db/schema'
 import { CAMPAIGN_DURATIONS } from '../lib/agency'
+import type { Draft } from '../lib/drafts'
 import { CUSTOMER_AREA } from './app'
 import { stationsBar, viewsControl } from './form-window'
 import { esc, jsonScript, pageTitle, shell } from './layout'
@@ -18,13 +24,14 @@ import { esc, jsonScript, pageTitle, shell } from './layout'
 const SUBMIT_BTN =
   'inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#9cf6c8] via-[#2fe08c] to-[#17a865] px-6 py-3 text-sm font-extrabold text-[#02160c] shadow-lg shadow-emerald-900/30 transition hover:brightness-105 disabled:opacity-40'
 
-export function customerNewCampaignPage(o: { user: User }): string {
+export function customerNewCampaignPage(o: { user: User; draft?: Draft | null }): string {
+  const d = o.draft ?? null
   const titles = ['Name', 'Laufzeit', 'Reichweite', 'Übersicht']
   const legend = (text: string) => `<legend class="font-display text-2xl font-extrabold leading-tight sm:text-3xl">${esc(text)}</legend>`
   const durations = CAMPAIGN_DURATIONS.map(
     (d) => `
               <label class="group relative block cursor-pointer">
-                <input type="radio" name="durationDays" value="${d}" class="peer sr-only">
+                <input type="radio" name="durationDays" value="${d}" class="peer sr-only"${o.draft?.durationDays === d ? ' checked' : ''}>
                 <span class="nmg-choice flex h-full flex-col items-center rounded-2xl px-4 py-6 text-center">
                   <b class="font-display text-4xl font-extrabold">${d}</b>
                   <small class="mt-1 text-sm text-white/60">Tage</small>
@@ -40,6 +47,11 @@ export function customerNewCampaignPage(o: { user: User }): string {
   const body = `
       <a href="${esc(CUSTOMER_AREA.home)}" class="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-brand">← Meine Kampagnen</a>
       ${pageTitle('Neue Kampagne erstellen', 'Name, Laufzeit und Reichweite. Danach legen wir deine Kampagne an.')}
+      ${
+        d
+          ? `<p class="mb-4 rounded-xl bg-white/5 px-4 py-3 text-sm text-white/70 ring-1 ring-inset ring-white/10" data-draft-note>Deine Angaben von zuletzt sind gespeichert. Du musst nur noch abschicken.</p>`
+          : ''
+      }
 
       <section class="nmg text-white" id="neue-kampagne">
         <form class="p-6 sm:p-10" data-customer-campaign novalidate>
@@ -48,7 +60,7 @@ export function customerNewCampaignPage(o: { user: User }): string {
           <fieldset class="nmg-sec" data-step="1" id="abschnitt-1">
             ${legend('Wie soll die Kampagne heißen?')}
             <label class="nmg-field mx-auto mt-8 flex max-w-xl items-center">
-              <input type="text" name="campaignName" autocomplete="off" maxlength="80" placeholder="${esc(CUSTOMER_AREA.text.namePlaceholder)}"
+              <input type="text" name="campaignName" autocomplete="off" maxlength="80" placeholder="${esc(CUSTOMER_AREA.text.namePlaceholder)}" value="${esc(d?.name ?? '')}"
                      class="min-w-0 flex-1 bg-transparent font-display text-2xl font-extrabold outline-none">
             </label>
             <p class="mt-3 text-center text-sm text-white/60">Ein Name, an dem du die Kampagne wiedererkennst.</p>
@@ -92,6 +104,24 @@ export function customerNewCampaignPage(o: { user: User }): string {
   var form = document.querySelector('[data-customer-campaign]');
   var range = form.viewsStep, err = form.querySelector('[data-error]'), sending = false;
   var PROJECT_HREF = ${jsonScript(CUSTOMER_AREA.projectHref('{id}'))};
+  var DRAFT_VIEWS = ${jsonScript(d?.views ?? null)};
+  // Reichweite zählt erst als Angabe, wenn der Regler bewegt wurde (oder schon im Entwurf stand).
+  var viewsTouched = DRAFT_VIEWS !== null;
+  if (viewsTouched) range.value = String(DRAFT_VIEWS);
+  // Entwurf speichern, kurz nach jeder Änderung (lib/drafts.ts). Fehler bleiben still.
+  var saveTimer = 0, lastSaved = '';
+  function saveDraft() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () {
+      if (sending) return;
+      var data = { name: form.campaignName.value.trim(), durationDays: duration() || null, views: viewsTouched ? Number(range.value) : null };
+      var json = JSON.stringify(data);
+      if (json === lastSaved || (!data.name && !data.durationDays && !data.views)) return;
+      lastSaved = json;
+      fetch('/api/app/campaign-draft', { method: 'PUT', headers: { 'content-type': 'application/json' }, body: json, keepalive: true }).catch(function () {});
+    }, 900);
+  }
+  range.addEventListener('input', function () { viewsTouched = true; });
   function duration() { var el = form.querySelector('input[name="durationDays"]:checked'); return el ? Number(el.value) : 0; }
   function show(m) { err.textContent = m || ''; err.classList.toggle('hidden', !m); }
   function update() {
@@ -132,8 +162,8 @@ export function customerNewCampaignPage(o: { user: User }): string {
   }
   window.addEventListener('scroll', stations, { passive: true });
   stationLinks.forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); jumpTo(Number(a.getAttribute('data-station')), true); }); });
-  form.addEventListener('input', function () { show(''); update(); });
-  form.addEventListener('change', update);
+  form.addEventListener('input', function () { show(''); update(); saveDraft(); });
+  form.addEventListener('change', function () { update(); saveDraft(); });
   form.campaignName.addEventListener('keydown', function (e) { if (e.key === 'Enter') e.preventDefault(); });
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -153,7 +183,7 @@ export function customerNewCampaignPage(o: { user: User }): string {
       .catch(function (e2) { sending = false; form.querySelector('[data-submit]').disabled = false; show(e2.message); });
   });
   update(); stations();
-  form.campaignName.focus();
+  if (!form.campaignName.value) form.campaignName.focus();
 })();`
 
   return shell({ title: 'Neue Kampagne', user: o.user, nav: CUSTOMER_AREA.nav, active: CUSTOMER_AREA.active, body, script })

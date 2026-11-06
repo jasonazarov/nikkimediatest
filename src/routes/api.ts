@@ -11,6 +11,7 @@ import {
   verifyPasswordLogin,
 } from '../lib/auth'
 import { audit } from '../lib/audit'
+import { saveDraft, submitDraft } from '../lib/drafts'
 import { loginSelfTest } from '../lib/selftest'
 import {
   BUDGETS,
@@ -1228,7 +1229,24 @@ appApi.post('/projects', async (c) => {
       ...(withBrief ? { durationDays, views } : {}),
     },
   })
+  // Der angefangene Entwurf (lib/drafts.ts) ist damit erledigt: keine Meldung, keine Erinnerung.
+  if (user.role === 'customer') await submitDraft(c.env, user.id, project.id).catch(() => undefined)
   return c.json({ ok: true, id: project.id })
+})
+
+/**
+ * Entwurf von „Neue Kampagne“ (/app/neu), gespeichert während des Ausfüllens.
+ * Wer nicht abschickt, taucht nach 2 Stunden beim Admin auf und bekommt nach
+ * 24 Stunden eine Erinnerung (lib/drafts.ts). Nur für Kunden.
+ */
+appApi.put('/campaign-draft', async (c) => {
+  const user = c.get('user')
+  if (user.role !== 'customer') return c.json({ error: 'Nur für Kunden.' }, 403)
+  const customer = await customerForUser(c.env, user.id)
+  if (!customer) return c.json({ error: 'Kein Kundenkonto.' }, 400)
+  const body = await c.req.json().catch(() => ({}))
+  const id = await saveDraft(c.env, user.id, customer.id, body ?? {})
+  return c.json({ ok: true, saved: !!id })
 })
 
 appApi.post('/projects/:id', async (c) => {

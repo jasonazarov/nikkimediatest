@@ -1,3 +1,4 @@
+import { openDraft } from '../lib/drafts'
 import { Hono } from 'hono'
 import { and, desc, eq, isNull, isNotNull, sql } from 'drizzle-orm'
 import { getDb, schema } from '../lib/db'
@@ -179,7 +180,9 @@ appRoutes.get('/', async (c) => {
 appRoutes.get('/neu', async (c) => {
   const customer = await customerForUser(c.env, c.get('user').id)
   if (!customer) return c.redirect('/app/einstellungen', 302)
-  return c.html(customerNewCampaignPage({ user: c.get('user') }))
+  // Angefangener Entwurf steht schon drin (lib/drafts.ts), z. B. nach der Erinnerungsmail.
+  const draft = await openDraft(c.env, c.get('user').id).catch(() => null)
+  return c.html(customerNewCampaignPage({ user: c.get('user'), draft }))
 })
 
 /* ------------------------------------ 2 — Ordner innerhalb einer Kampagne */

@@ -1014,6 +1014,70 @@ export function mailCustomerCampaignAdmin(
   })
 }
 
+/** Angefangene, nicht abgeschickte Kampagne (lib/drafts.ts, nach 2 Stunden) → Jason */
+export function mailDraftAbandonedAdmin(
+  env: Env,
+  o: {
+    customerId: string | null
+    campaign: string
+    fullName: string
+    company: string | null
+    email: string
+    phone: string | null
+    duration: string
+    views: string
+    startedAt: number
+  },
+) {
+  const started = new Date(o.startedAt * 1000).toLocaleString('de-DE', { timeZone: 'Europe/Berlin', dateStyle: 'medium', timeStyle: 'short' })
+  return send(env, {
+    to: env.ADMIN_EMAIL,
+    replyTo: o.email,
+    subject: `Kampagne begonnen, nicht abgeschlossen: ${o.company || o.fullName}`,
+    html: layout(
+      env,
+      'Kampagne nicht abgeschlossen',
+      h1('Eine Kampagne wurde begonnen, aber nicht abgeschickt') +
+        p('Ein Kunde hat „Neue Kampagne“ ausgefüllt und seit 2 Stunden nicht abgeschickt. Das sind seine Angaben bis jetzt. Nach 24 Stunden bekommt er automatisch eine freundliche Erinnerung.') +
+        dl([
+          ['Kampagne', o.campaign],
+          ['Name', o.fullName],
+          ['Firma', o.company || '–'],
+          ['E-Mail', o.email],
+          ['Telefon', o.phone || '–'],
+          ['Laufzeit', o.duration],
+          ['Gewünschte Reichweite', o.views],
+          ['Begonnen', started],
+        ]) +
+        (o.customerId ? button(`${env.APP_URL}/admin/kunden/${o.customerId}`, 'Kunden im Admin öffnen') : ''),
+    ),
+  })
+}
+
+/** Erinnerung an den Kunden: Kampagne angefangen, nicht abgeschickt (lib/drafts.ts, nach 24 Stunden) */
+export function mailDraftReminderCustomer(
+  env: Env,
+  o: { to: string; firstName: string; campaign: string | null; duration: string | null; views: string | null },
+) {
+  const rows: [string, string][] = []
+  if (o.campaign) rows.push(['Kampagne', o.campaign])
+  if (o.duration) rows.push(['Laufzeit', o.duration])
+  if (o.views) rows.push(['Reichweite', o.views])
+  return send(env, {
+    to: o.to,
+    subject: 'Deine Kampagne ist fast fertig',
+    html: layout(
+      env,
+      'Deine Kampagne ist fast fertig',
+      h1(`Hallo ${o.firstName}, deine Kampagne wartet auf dich`) +
+        p('Du hast angefangen, eine neue Kampagne anzulegen. Deine Angaben haben wir gespeichert, du musst nur noch abschicken.') +
+        (rows.length ? dl(rows) : '') +
+        button(`${env.APP_URL}/app/neu`, 'Kampagne fertigstellen') +
+        p('Fragen zu Laufzeit oder Reichweite? Antworte einfach auf diese Mail, wir helfen dir gern.'),
+    ),
+  })
+}
+
 /** 8 — Upsell „Mehr Reichweite“ aus einem Dashboard → Jason */
 export function mailUpsellAdmin(
   env: Env,

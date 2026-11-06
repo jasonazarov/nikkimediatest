@@ -1,3 +1,4 @@
+import { processDrafts } from './lib/drafts'
 import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 import { and, eq, isNotNull, lt, sql } from 'drizzle-orm'
@@ -272,6 +273,19 @@ async function metricsCatchUp(env: AppEnv['Bindings']) {
 }
 
 /**
+ * Angefangene, nicht abgeschickte Kampagnen-Formulare (lib/drafts.ts): nach
+ * 2 Stunden Meldung an den Admin, nach 24 Stunden Erinnerung an den Kunden.
+ */
+async function draftsCatchUp(env: AppEnv['Bindings']) {
+  try {
+    const d = await processDrafts(env)
+    if (d.admin || d.reminded) console.log(`[cron] Entwürfe: ${d.admin} an Admin gemeldet, ${d.reminded} Kunden erinnert`)
+  } catch (err) {
+    console.error('[cron] Entwürfe fehlgeschlagen', err)
+  }
+}
+
+/**
  * Wartet ALLE Aufgaben des Viertelstundentakts ab, auch wenn eine scheitert.
  *
  * Mit `Promise.all` endete das gemeinsame Promise beim ersten Fehler — und
@@ -302,7 +316,7 @@ export default {
     ctx.waitUntil(
       event.cron === DAILY_CRON
         ? scheduledRun(env)
-        : allToEnd([publishCatchUp(env), loginWatch(env, ctx), metricsCatchUp(env)]),
+        : allToEnd([publishCatchUp(env), loginWatch(env, ctx), metricsCatchUp(env), draftsCatchUp(env)]),
     )
   },
 }
