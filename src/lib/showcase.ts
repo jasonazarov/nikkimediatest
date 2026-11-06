@@ -79,7 +79,7 @@ const USE_CASES: UseCase[] = [
 const IMAGES = new Set([
   'dindrop7-DRSI7B3CI1M', 'dindrop7-DNF5zC7o66_', 'dindrop7-DY77rgqAHmj', 'dindrop7-DM-7GyZIkb0', 'dindrop7-DPRDIqUiIeB', 'dindrop7-DZlBQOrgilt', 'dindrop7-DbLpapmA_Bw', 'dindrop7-DbbJyZgIUjl',
   'max_tornow_business-C1xEPryiQ4t', 'max_tornow_business-C0hXUyfixJt', 'max_tornow_business-C8pRTW6MinC', 'max_tornow_business-C_PxECKAj61', 'max_tornow_business-DCHhYijJK4b',
-  'caspianbluecaviar-DKZ-ra1qDiR', 'caspianbluecaviar-DMzr3__qHsw', 'caspianbluecaviar-DP_uoY6jFCU', 'caspianbluecaviar-DQ4ga9SDEnj',
+  'caspianbluecaviar-DKZ-ra1qDiR', 'caspianbluecaviar-DaIZcxnqCPw', 'caspianbluecaviar-DMzr3__qHsw', 'caspianbluecaviar-DP_uoY6jFCU', 'caspianbluecaviar-DQ4ga9SDEnj',
   'levantine_istanbul-C9406cJIC_D', 'levantine_istanbul-DBQxgMHAw1U', 'levantine_istanbul-DEUXjpeIHPR', 'levantine_istanbul-DUTFpaeiMZA',
   'levantine_istanbul-Da2pgoToIw_', 'panperium-DZF78B8je1g', 'panperium-DZfCoAoNLUi', 'panperium-DZurxhPjezN', 'panperium-DZvEvMPNa15',
   'panperium-DbGw3_SCDud',
