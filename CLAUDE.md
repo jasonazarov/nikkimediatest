@@ -598,3 +598,12 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   den Kontaktdaten (Startseite Schritt 5 von 6, Creator Schritt 8 von 10 vor den Handles). Damit auch auf
   `/personal-brands` (gleiches `leadStepper`). Steht in der Admin-Mail („Aufmerksam durch“), beim Lead und
   im Creator-Profil („Found us via“). Server: Pflicht im Formular, ohne Angabe weiter gültig (NULL).
+- **„Kampagne pushen“ als Popup alle 7 Tage, mit Resttagen** (Vorgabe des Auftraggebers, November 2026;
+  `public/assets/upsell.js`, `campaignWindow` in `src/lib/upsell.ts`): auf der Übersicht von Kunde (`/app`) und
+  freigeschalteter Agentur (`/collaboration`) erscheint höchstens alle 7 Tage (Cookie `nm_push_pop_<bereich>`,
+  gesetzt beim Anzeigen) ein Popup mit den drei Angeboten. Nur Kampagnen, deren Zeitraum noch läuft, die mit
+  den wenigsten Resttagen zuerst; nicht gleichzeitig mit dem Glückwunsch-Popup. Über den Angeboten (Popup und
+  Abschnitt): „Noch X Tage: Push-Rabatt verfällt am …“ (ab 7 Tagen Amber). **Kampagnenzeitraum** = Anlage +
+  Laufzeit (`briefing_duration_days`; ohne Angabe, also Agentur-Briefing und ältere Kampagnen,
+  `DEFAULT_CAMPAIGN_DAYS` = 30). Danach bleibt das Angebot, aber OHNE Push-Rabatt (Server). Test:
+  `npx tsx tests/gold/push.test.ts`.

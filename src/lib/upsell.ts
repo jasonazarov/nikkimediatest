@@ -50,6 +50,21 @@ export const discountFor = (role: string, percent: UpsellPercent): number =>
 /** Preis nach Rabatt, auf volle Cent gerundet. */
 export const discounted = (cents: number, pct: number) => Math.round(cents * (1 - pct / 100))
 
+/**
+ * Kampagnenzeitraum (Vorgabe des Auftraggebers, November 2026): Der Push-Rabatt
+ * gilt nur bis zum Ende der Kampagne. Ende = Anlage + Laufzeit. Die Laufzeit
+ * steht bei Kunden-Kampagnen aus /app/neu (`briefing_duration_days`); alle
+ * anderen (Agentur-Briefing, ältere Kampagnen) haben keine, für sie gilt
+ * `DEFAULT_CAMPAIGN_DAYS`. Danach bleibt das Angebot, aber ohne Rabatt.
+ */
+export const DEFAULT_CAMPAIGN_DAYS = 30
+const DAY = 86_400
+export function campaignWindow(createdAt: number, durationDays: number | null | undefined, now = nowSec()) {
+  const days = Number(durationDays) > 0 ? Number(durationDays) : DEFAULT_CAMPAIGN_DAYS
+  const endsAt = createdAt + days * DAY
+  return { durationDays: days, endsAt, daysLeft: Math.max(0, Math.ceil((endsAt - now) / DAY)) }
+}
+
 export interface UpsellOffer {
   percent: UpsellPercent
   extraViews: number
@@ -74,6 +89,12 @@ export interface UpsellCampaign {
   baseViews: number
   baseSource: 'briefing' | 'reached' | 'default'
   perThousandCents: number
+  /** Laufzeit in Tagen (eigene Angabe oder DEFAULT_CAMPAIGN_DAYS). */
+  durationDays: number
+  /** Ende des Kampagnenzeitraums (Unix-Sekunden); bis dahin gilt der Push-Rabatt. */
+  endsAt: number
+  /** Volle Tage bis zum Ende, aufgerundet; 0 = vorbei, kein Rabatt mehr. */
+  daysLeft: number
   offers: UpsellOffer[]
 }
 
@@ -121,6 +142,8 @@ interface ProjectRow {
   status: string
   briefing_views: number | null
   briefing_budget_cents: number | null
+  briefing_duration_days: number | null
+  created_at: number
   reached: number | null
 }
 
@@ -129,7 +152,7 @@ interface ProjectRow {
  * Kunde und Agentur: ihre Kampagnen. Creator: nur die EIGENEN (sein
  * Arbeitsbereich), nie zugewiesene Kampagnen anderer.
  */
-export async function upsellCampaigns(env: Env, user: User): Promise<{ marginPct: number; campaigns: UpsellCampaign[] }> {
+export async function upsellCampaigns(env: Env, user: User, now = nowSec()): Promise<{ marginPct: number; campaigns: UpsellCampaign[] }> {
   if (user.role !== 'customer' && user.role !== 'agency' && user.role !== 'creator') return { marginPct: 0, campaigns: [] }
   const customer = await customerOf(env, user.id)
   if (!customer) return { marginPct: 0, campaigns: [] }
@@ -138,7 +161,7 @@ export async function upsellCampaigns(env: Env, user: User): Promise<{ marginPct
   const marginPct = user.role === 'agency' ? Number(customer.margin_pct) || 0 : 0
 
   const { results } = await env.DB.prepare(
-    `SELECT p.id, p.name, p.status, p.briefing_views, p.briefing_budget_cents,
+    `SELECT p.id, p.name, p.status, p.briefing_views, p.briefing_budget_cents, p.briefing_duration_days, p.created_at,
             (SELECT SUM(CASE WHEN pm.views > 0 THEN pm.views ELSE pm.impressions END)
                FROM post_metrics pm WHERE pm.project_id = p.id) AS reached
        FROM projects p
@@ -167,6 +190,7 @@ export async function upsellCampaigns(env: Env, user: User): Promise<{ marginPct
     const baseViews = baseSource === 'briefing' ? briefViews : baseSource === 'reached' ? reached : DEFAULT_BASE_VIEWS
     const perThousandCents =
       briefViews && briefBudget ? Math.max(1, Math.round((briefBudget * 1000) / briefViews)) : PRICE_PER_THOUSAND_CENTS
+    const window = campaignWindow(Number(r.created_at) || 0, r.briefing_duration_days, now)
     return {
       id: r.id,
       name: r.name,
@@ -174,10 +198,12 @@ export async function upsellCampaigns(env: Env, user: User): Promise<{ marginPct
       baseViews,
       baseSource,
       perThousandCents,
+      ...window,
       offers: UPSELL_PERCENTS.map((percent) => {
         const extraViews = extraViewsFor(baseViews, percent)
         const listPriceCents = priceFor(extraViews, perThousandCents)
-        const discountPct = discountFor(user.role, percent)
+        // Rabatt nur innerhalb des Kampagnenzeitraums.
+        const discountPct = window.daysLeft > 0 ? discountFor(user.role, percent) : 0
         const priceCents = discounted(listPriceCents, discountPct)
         return {
           percent,

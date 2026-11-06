@@ -535,3 +535,23 @@ label:hover .nmg-choice { transform: translateY(-2px); border-color: rgba(47, 22
 input:checked + .nmg-choice { border-color: rgba(47, 224, 140, .85); background: linear-gradient(160deg, rgba(47, 224, 140, .16), rgba(47, 224, 140, .04)); box-shadow: 0 0 0 1px rgba(47, 224, 140, .5), 0 0 26px rgba(47, 224, 140, .3); }
 input:checked + .nmg-choice b { color: #9cf6c8; text-shadow: 0 0 20px rgba(47, 224, 140, .5); }
 input:focus-visible + .nmg-choice { outline: 2px solid #9cf6c8; outline-offset: 2px; }
+
+/* ---------- „Kampagne pushen“ als Popup alle 7 Tage + Countdown (Vorgabe des Auftraggebers, November 2026; upsell.js) ---------- */
+.nmu__left { display: block; margin: 10px 0 0; padding: 10px 14px; border-radius: 12px; font-size: .86rem; color: rgba(255, 255, 255, .78); background: rgba(47, 224, 140, .08); border: 1px solid rgba(47, 224, 140, .28); }
+.nmu__left b { color: var(--w-green, #2fe08c); font-weight: 800; }
+.nmu__left.is-soon { background: rgba(245, 158, 11, .1); border-color: rgba(245, 158, 11, .4); }
+.nmu__left.is-soon b { color: #fbbf24; }
+.nmu-pop { position: fixed; inset: 0; z-index: 210; display: grid; place-items: center; padding: 16px; overflow-y: auto; background: rgba(0, 0, 0, .62); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: nmgFade .25s ease-out; }
+.nmu-pop__card.nmu {
+  position: relative; width: min(880px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; margin: 0; padding: 28px 26px 22px; border-radius: 24px; color: #eef7f1;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .02)), rgba(4, 12, 8, .94);
+  border: 1px solid rgba(47, 224, 140, .35); box-shadow: 0 30px 80px rgba(0, 0, 0, .6), 0 0 60px rgba(47, 224, 140, .16), inset 0 1px 0 rgba(255, 255, 255, .14);
+  animation: nmgPop .4s cubic-bezier(.2, .9, .25, 1.2);
+}
+.nmu-pop__t { margin: 4px 40px 2px 0; font-size: 1.5rem; font-weight: 800; line-height: 1.2; }
+.nmu-pop__x { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border-radius: 50%; font-size: 22px; line-height: 1; color: #fff; cursor: pointer; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .16); }
+.nmu-pop__x:hover { background: rgba(255, 255, 255, .16); }
+.nmu-pop__later { display: block; margin: 14px auto 0; padding: 8px 18px; border-radius: 10px; font-size: .85rem; font-weight: 600; color: rgba(255, 255, 255, .65); cursor: pointer; background: none; border: 0; }
+.nmu-pop__later:hover { color: #fff; }
+@media (max-width: 640px) { .nmu-pop__card.nmu { padding: 22px 16px 16px; } .nmu-pop__t { font-size: 1.25rem; } }
+@media (prefers-reduced-motion: reduce) { .nmu-pop, .nmu-pop__card.nmu { animation: none; } }

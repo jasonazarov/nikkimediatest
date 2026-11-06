@@ -5,6 +5,10 @@
    Übersicht: alle laufenden Kampagnen mit Reitern. Kampagnenseite
    (data-project): nur diese eine. Ohne passende Kampagne verschwindet der
    ganze Bereich.
+   Popup (Vorgabe des Auftraggebers, November 2026): auf der Übersicht von
+   Kunde und Agentur höchstens alle 7 Tage (Cookie nm_push_pop_<bereich>),
+   nur für Kampagnen, deren Zeitraum noch läuft, mit den Tagen bis zum Ende,
+   weil der Push-Rabatt nur bis dahin gilt (daysLeft/endsAt vom Server).
    ========================================================================== */
 (function () {
   'use strict';
@@ -14,8 +18,8 @@
   var only = box.getAttribute('data-project');
   /* Was jede Stufe bringt: kurz und ohne Versprechen, die wir nicht messen. */
   var PITCH = { 20: 'Mehr Clips im Umlauf', 35: 'Mehr Clipper auf deiner Kampagne', 50: 'Maximaler Schub' };
-  var body = box.querySelector('[data-upsell-body]');
-  var state = { campaigns: [], marginPct: 0, current: 0 };
+  var POP_COOKIE = 'nm_push_pop_' + area;
+  var POP_EVERY = 7 * 24 * 3600;
 
   var euro = function (c) {
     return (c / 100).toLocaleString('de-DE', { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 }) + ' €';
@@ -33,6 +37,23 @@
     return e;
   }
 
+  var dateDE = function (unix) { return new Date(unix * 1000).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }); };
+  var discounts = function (c) { return c.offers.some(function (o) { return o.discountPct > 0; }); };
+  /* Wie lange der Rabatt noch gilt. Nur Kunde und Agentur haben einen. */
+  function countdown(c) {
+    if (area === 'creator') return null;
+    var box2 = el('p', 'nmu__left' + (c.daysLeft > 0 && c.daysLeft <= 7 ? ' is-soon' : ''));
+    if (c.daysLeft > 0) {
+      box2.appendChild(el('b', '', 'Noch ' + c.daysLeft + (c.daysLeft === 1 ? ' Tag:' : ' Tage:')));
+      box2.appendChild(document.createTextNode(' Push-Rabatt verfällt am ' + dateDE(c.endsAt) + ', zum Ende des Kampagnenzeitraums.'));
+    } else {
+      box2.appendChild(document.createTextNode('Der Kampagnenzeitraum ist vorbei, deshalb gibt es keinen Push-Rabatt mehr.'));
+    }
+    return box2;
+  }
+
+  /* Ein Push-Bereich: als Abschnitt der Seite oder im Popup, gleiches Verhalten. */
+  function panel(body, state) {
   function render() {
     var c = state.campaigns[state.current];
     body.innerHTML = '';
@@ -58,9 +79,11 @@
     body.appendChild(base);
 
     /* Bedingungen (Vorgabe des Auftraggebers): nur im Kampagnenzeitraum, Rabatt, spätestens 5 Werktage. */
+    var left = countdown(c);
+    if (left) body.appendChild(left);
     var terms = el('div', 'nmu__terms');
     terms.appendChild(el('strong', 'nmu__only', 'Kampagnen-Push-Angebote sind nur innerhalb des vereinbarten Kampagnenzeitraums möglich.'));
-    if (c.offers.some(function (o) { return o.discountPct > 0; })) {
+    if (discounts(c)) {
       terms.appendChild(el('span', 'nmu__disc', 'Push-Rabatt: ' + c.offers.map(function (o) {
         return o.discountPct.toLocaleString('de-DE') + ' % auf +' + o.percent + ' %';
       }).join(', ') + '.'));
@@ -125,15 +148,62 @@
         msg.className = 'nmu__msg is-bad';
       });
   }
+  render();
+  }
+
+  function cookieSet() { return document.cookie.split('; ').some(function (k) { return k.indexOf(POP_COOKIE + '=') === 0; }); }
+
+  /* Popup alle 7 Tage: nur Übersicht, nur Kunde und Agentur, nur mit laufendem Rabatt. */
+  function maybePopup(all, marginPct) {
+    if (only || (area !== 'customer' && area !== 'agency') || cookieSet()) return;
+    var live = all.filter(function (c) { return c.daysLeft > 0 && discounts(c); })
+      .sort(function (a, b) { return a.daysLeft - b.daysLeft; });
+    if (!live.length) return;
+    var congrats = document.getElementById('nmg-pop');
+    if (congrats && !congrats.hidden) return; // Glückwunsch zuerst, Push beim nächsten Mal
+    document.cookie = POP_COOKIE + '=1; Max-Age=' + POP_EVERY + '; Path=/; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+
+    var pop = el('div', 'nmu-pop');
+    var card = el('div', 'nmu-pop__card nmu');
+    card.setAttribute('role', 'dialog');
+    card.setAttribute('aria-modal', 'true');
+    card.setAttribute('aria-labelledby', 'nmu-pop-t');
+    var x = el('button', 'nmu-pop__x', '×');
+    x.type = 'button';
+    x.setAttribute('aria-label', 'Schließen');
+    card.appendChild(x);
+    card.appendChild(el('span', 'nmu__eyebrow', 'Kampagne pushen'));
+    var t = el('h2', 'nmu-pop__t', live.length > 1 ? 'Push-Rabatt für eure laufenden Kampagnen' : 'Push-Rabatt für „' + live[0].name + '“');
+    if (area === 'customer') t.textContent = live.length > 1 ? 'Push-Rabatt für deine laufenden Kampagnen' : 'Push-Rabatt für „' + live[0].name + '“';
+    t.id = 'nmu-pop-t';
+    card.appendChild(t);
+    var inner = el('div', 'nmu-pop__body');
+    card.appendChild(inner);
+    var later = el('button', 'nmu-pop__later', 'Später');
+    later.type = 'button';
+    card.appendChild(later);
+    pop.appendChild(card);
+    document.body.appendChild(pop);
+    panel(inner, { campaigns: live, marginPct: marginPct, current: 0 });
+
+    function close() { pop.remove(); document.removeEventListener('keydown', onKey); }
+    function onKey(e) { if (e.key === 'Escape') close(); }
+    x.addEventListener('click', close);
+    later.addEventListener('click', close);
+    pop.addEventListener('click', function (e) { if (e.target === pop) close(); });
+    document.addEventListener('keydown', onKey);
+    x.focus();
+  }
 
   fetch('/api/upsell?area=' + encodeURIComponent(area), { credentials: 'same-origin' })
     .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
     .then(function (d) {
-      state.campaigns = (d && d.campaigns) || [];
-      if (only) state.campaigns = state.campaigns.filter(function (k) { return k.id === only; });
-      state.marginPct = (d && d.marginPct) || 0;
-      if (!state.campaigns.length) { box.remove(); return; }
-      render();
+      var all = (d && d.campaigns) || [];
+      var marginPct = (d && d.marginPct) || 0;
+      var mine = only ? all.filter(function (k) { return k.id === only; }) : all;
+      if (!mine.length) { box.remove(); return; }
+      panel(box.querySelector('[data-upsell-body]'), { campaigns: mine, marginPct: marginPct, current: 0 });
+      maybePopup(all, marginPct);
     })
     .catch(function () { box.remove(); });
 })();
