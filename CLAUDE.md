@@ -546,3 +546,8 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   7/30/90 Tagen zählt nur die Zahl live mit, die Kurve behält ihre Form. Ein Licht fährt alle 3,3 Sekunden
   über die Kurve, der Endpunkt leuchtet bei Ankunft (`views.js`, nur wenn die API `live` liefert; sonst
   ist die Grafik unverändert).
+- **Profilmenü oben rechts in jedem Dashboard** (Vorgabe des Auftraggebers, November 2026): Klick auf das
+  Kürzel öffnet ein kleines Menü (rund 230 px, Glas-Stil) mit Name, E-Mail (nicht beim Clipper), denselben
+  Punkten und Gruppen wie die Seitenleiste und „Abmelden“. Erzeugt in `shell()` aus derselben Liste wie
+  `#sidenav` (also immer gleich), Styles in `dash-whop.css` („Profilmenü oben rechts“). Schließt per Klick
+  daneben oder Esc.

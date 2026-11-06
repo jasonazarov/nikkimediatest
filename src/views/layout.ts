@@ -276,6 +276,21 @@ export function shell(o: ShellOptions): string {
     .map((g) => `<div class="nmw-group" data-nav-group><p class="nmd-group">${esc(g.label)}</p>${g.items.map(link).join('')}</div>`)
     .join('\n        ')
 
+  // Profilmenü oben rechts (Vorgabe des Auftraggebers): dieselben Punkte und Gruppen wie die Seitenleiste.
+  const accountLabel = lang === 'en' ? 'Account and menu' : 'Konto und Menü'
+  const profileMenu = groups
+    .map(
+      (g) =>
+        `<p class="nmw-menu__grp">${esc(g.label)}</p>` +
+        g.items
+          .map((item) => {
+            const on = item.href === o.active
+            return `<a href="${item.href}" role="menuitem"${on ? ' class="is-on" aria-current="page"' : ''}${item.locked ? ' data-locked' : ''}>${icon(item.icon)}<span>${esc(item.label)}</span>${item.locked ? LOCK_SVG : ''}</a>`
+          })
+          .join(''),
+    )
+    .join('')
+
   return `<!DOCTYPE html>
 <html lang="${lang}" class="h-full nmd">
 <head>
@@ -313,7 +328,20 @@ export function shell(o: ShellOptions): string {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
     </a>
     <span class="nmw-role">${esc(ROLE_LABEL[o.user.role])}</span>
-    <span class="nmd-me__av" title="${esc(o.user.fullName)}" aria-hidden="true">${esc(initials)}</span>
+    <span class="nmw-me">
+      <button type="button" class="nmw-me__btn" aria-haspopup="menu" aria-expanded="false" aria-controls="nmw-menu" aria-label="${esc(accountLabel)}" data-me-toggle>
+        <span class="nmd-me__av" title="${esc(o.user.fullName)}">${esc(initials)}</span>
+      </button>
+      <div class="nmw-menu" id="nmw-menu" role="menu" hidden>
+        <div class="nmw-menu__who"><b>${esc(o.user.fullName)}</b>${o.user.role === 'clipper' ? '' : `<small>${esc(o.user.email)}</small>`}</div>
+        ${profileMenu}
+        <div class="nmw-menu__sep"></div>
+        <form method="post" action="/logout">
+          <input type="hidden" name="area" value="${o.user.role}">
+          <button class="nmw-menu__out" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 17l5-5-5-5M20 12H9M12 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/></svg>${esc(logout)}</button>
+        </form>
+      </div>
+    </span>
   </span>
 </header>
 
@@ -372,6 +400,15 @@ ${viral === 'bottom' ? (upsell ? upsellSection(upsell) : '') + viewsSection(o.us
     el.addEventListener('click', function () { setOpen(!body.classList.contains('nmw-open')); });
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
+
+  // Profilmenü oben rechts: Klick öffnet, Klick daneben oder Esc schließt.
+  var meBtn = document.querySelector('[data-me-toggle]'), meMenu = document.getElementById('nmw-menu');
+  if (meBtn && meMenu) {
+    var meOpen = function (v) { meMenu.hidden = !v; meBtn.setAttribute('aria-expanded', String(v)); };
+    meBtn.addEventListener('click', function (e) { e.stopPropagation(); meOpen(meMenu.hidden); });
+    document.addEventListener('click', function (e) { if (!meMenu.hidden && !meMenu.parentNode.contains(e.target)) meOpen(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !meMenu.hidden) { meOpen(false); meBtn.focus(); } });
+  }
 
   var box = document.querySelector('[data-nav-search]');
   if (!box) return;

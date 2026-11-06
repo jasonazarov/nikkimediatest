@@ -358,3 +358,38 @@ html.nmd .nmw-brand-glass--soft {
 html.nmd .nmw-brand-glass .text-\[\#1d1404\], html.nmd .nmw-brand-glass [class*="text-[#1d1404]"] { color: var(--w-text) !important; }
 html.nmd .nmw-brand-glass .text-amber-900, html.nmd .nmw-brand-glass .text-amber-800 { color: #9cf6c8 !important; }
 html.nmd .nmw-brand-glass .border-amber-300 { border-color: rgba(47, 224, 140, .45) !important; }
+
+/* ---------- Profilmenü oben rechts (Vorgabe des Auftraggebers, November 2026) ----------
+   Dieselben Punkte wie die Seitenleiste, klein und im Glas-Stil (shell() in layout.ts). */
+.nmw-me { position: relative; display: inline-flex; }
+.nmw-me__btn { display: grid; place-items: center; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 999px; outline-offset: 3px; }
+.nmw-me__btn .nmd-me__av { transition: box-shadow .15s ease; }
+.nmw-me__btn:hover .nmd-me__av, .nmw-me__btn[aria-expanded="true"] .nmd-me__av { box-shadow: 0 0 0 2px rgba(47, 224, 140, .55); }
+.nmw-menu {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 90;
+  width: 232px; max-width: calc(100vw - 24px); max-height: min(70vh, 520px); overflow: auto;
+  padding: 6px; border-radius: 14px; text-align: left;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .02)), rgba(6, 12, 9, .92);
+  border: 1px solid rgba(255, 255, 255, .1);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 255, 255, .08);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  transform-origin: top right; animation: nmwMenu .14s ease-out;
+}
+.nmw-menu[hidden] { display: none; }
+@keyframes nmwMenu { from { opacity: 0; transform: translateY(-4px) scale(.98); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .nmw-menu { animation: none; } }
+.nmw-menu__who { padding: 8px 10px 10px; margin-bottom: 4px; border-bottom: 1px solid rgba(255, 255, 255, .08); }
+.nmw-menu__who b { display: block; font-size: 13px; font-weight: 600; color: #eef7f1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nmw-menu__who small { display: block; font-size: 11.5px; color: #8fa79a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nmw-menu__grp { margin: 0; padding: 8px 10px 3px; font-size: 10.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #6f8379; }
+.nmw-menu a, .nmw-menu__out {
+  display: flex; align-items: center; gap: 9px; width: 100%; padding: 6px 10px; border: 0; border-radius: 9px;
+  background: none; font: inherit; font-size: 13px; line-height: 1.35; color: #d9e8df; text-decoration: none; text-align: left; cursor: pointer;
+}
+.nmw-menu a > span { flex: 1; min-width: 0; }
+.nmw-menu svg { width: 15px; height: 15px; flex: none; opacity: .75; }
+.nmw-menu a:hover, .nmw-menu a:focus-visible, .nmw-menu__out:hover, .nmw-menu__out:focus-visible { background: rgba(47, 224, 140, .1); color: #fff; outline: none; }
+.nmw-menu a.is-on { background: rgba(47, 224, 140, .14); color: #9cf6c8; }
+.nmw-menu a[data-locked] { opacity: .7; }
+.nmw-menu__sep { height: 1px; margin: 5px 4px; background: rgba(255, 255, 255, .08); }
+.nmw-menu__out { color: #f3b4b4; }
