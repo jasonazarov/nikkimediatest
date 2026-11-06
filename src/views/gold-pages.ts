@@ -18,6 +18,7 @@
  *
  * Keine langen Gedankenstriche in sichtbaren Texten (Vorgabe, siehe CLAUDE.md).
  */
+import { AURORA } from './aurora'
 import { breadcrumbs, clippingService, faqPage, geoHead, ldGraph, ORGANIZATION } from './seo'
 import { DEFAULT_DIAL, dialOptions } from '../lib/phone'
 import { PRICE_PER_MILLION_EUR, faqFor, type FaqAudience } from '../lib/faq'
@@ -382,6 +383,7 @@ ${ldGraph(
 )}
 </head>
 <body class="gold page-home theme-brands g-${o.variant}">
+${AURORA}
 
 ${goldNav(o.variant, o.cta)}
 

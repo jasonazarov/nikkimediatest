@@ -16,6 +16,7 @@
  *
  * Styles: /assets/site.css · Verhalten: /assets/site.js + /assets/stepper.js
  */
+import { AURORA } from './aurora'
 import { breadcrumbs, clippingService, geoHead, ldGraph, ORGANIZATION } from './seo'
 import { CLIPPER_AVAILABILITY, CLIPPER_EXPERIENCE, CLIPPER_WORK_STATUS, PLATFORMS } from '../lib/domain'
 import { DEFAULT_DIAL, dialOptions } from '../lib/phone'
@@ -248,6 +249,7 @@ ${ldGraph(
 )}
 </head>
 <body class="page-home theme-clipper">
+${AURORA}
 
 <!-- ══════════════════════════════════════════════════════════════════════
      NAV

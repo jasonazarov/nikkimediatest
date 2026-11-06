@@ -321,3 +321,49 @@ img[src*="/img/platforms/"], img[src*="/img/cloud/"], img[src*="icons.duckduckgo
 .cta-float__ic { background: rgba(255, 255, 255, .18) !important; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35); }
 .cta-float__in::before { opacity: .45; }
 .cta-float__in::after { opacity: .55; }
+
+/* ==========================================================================
+   Bewegtes Hintergrundlicht (Vorgabe des Auftraggebers, November 2026)
+   Drei weiche grüne Lichtflecken wandern langsam hinter dem Glas und mischen
+   sich mit dem Schwarz. Markup: AURORA aus src/views/aurora.ts direkt nach
+   <body>. Inhalt liegt darüber (z-index 1), die Buttons bewegen sich nicht.
+   ========================================================================== */
+.nm-aurora {
+  position: fixed; inset: -25%; z-index: 0; pointer-events: none;
+  mix-blend-mode: screen; filter: blur(70px);
+}
+.nm-aurora i { position: absolute; border-radius: 50%; will-change: transform; }
+.nm-aurora i:nth-child(1) {
+  width: 46vw; height: 46vw; left: 8%; top: 4%;
+  background: radial-gradient(circle, rgba(47, 224, 140, .34), rgba(47, 224, 140, 0) 68%);
+  animation: nmA 16s ease-in-out infinite alternate;
+}
+.nm-aurora i:nth-child(2) {
+  width: 52vw; height: 52vw; right: 4%; top: 30%;
+  background: radial-gradient(circle, rgba(16, 185, 129, .26), rgba(16, 185, 129, 0) 68%);
+  animation: nmB 21s ease-in-out infinite alternate;
+}
+.nm-aurora i:nth-child(3) {
+  width: 38vw; height: 38vw; left: 34%; bottom: 2%;
+  background: radial-gradient(circle, rgba(156, 246, 200, .18), rgba(156, 246, 200, 0) 70%);
+  animation: nmC 26s ease-in-out infinite alternate;
+}
+@keyframes nmA { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(18vw, 10vh) scale(1.15); } 100% { transform: translate(6vw, 26vh) scale(.95); } }
+@keyframes nmB { 0% { transform: translate(0, 0) scale(1.05); } 50% { transform: translate(-22vw, -8vh) scale(.9); } 100% { transform: translate(-8vw, 14vh) scale(1.12); } }
+@keyframes nmC { 0% { transform: translate(0, 0) scale(.9); } 50% { transform: translate(-14vw, -18vh) scale(1.1); } 100% { transform: translate(12vw, -6vh) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .nm-aurora i { animation: none; } }
+
+/* Inhalt über dem Licht; der Hero-Inhalt (Formular) eine Stufe höher. */
+.wrap, .g-wrap { position: relative; z-index: 1; }
+.hero > .wrap { z-index: 2; }
+
+/* Formular gleichmäßig und etwas dunkler: das Licht soll es nicht anstrahlen. */
+.stepper__card {
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .02) 45%, rgba(255, 255, 255, .03)),
+    rgba(3, 8, 5, .72) !important;
+}
+
+/* Buttons ruhig: kein Wippen, kein Puls-Ring, kein wandernder Glanz. */
+.cta-float__in::before { box-shadow: none; }
+.cta-float__in::after { display: none; }

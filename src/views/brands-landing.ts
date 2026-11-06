@@ -19,6 +19,7 @@
  *
  * Styles: /assets/site.css · Verhalten: /assets/site.js + /assets/stepper.js
  */
+import { AURORA } from './aurora'
 import { breadcrumbs, clippingService, geoHead, ldGraph, ORGANIZATION } from './seo'
 import { INDUSTRIES } from '../lib/domain'
 import { AGENCY_CLIENTS, AGENCY_FOOTAGE, AGENCY_KINDS, AGENCY_PLATFORMS, AGENCY_SOCIALS, AGENCY_SOURCES } from '../lib/agency'
@@ -265,6 +266,7 @@ ${ldGraph(
 )}
 </head>
 <body class="page-home theme-brands">
+${AURORA}
 
 <!-- ══════════════════════════════════════════════════════════════════════
      NAV

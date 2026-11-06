@@ -525,3 +525,9 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   „Weiter“ im Formular, Schild über dem Formular, schwebender Button „Jetzt Videos hochladen“ und
   die Gold-Seiten-Buttons: durchscheinender Grünverlauf, helle Glaskante, weißer Rand, weiße Schrift,
   schwächerer Schein (`glass.css`, Abschnitt „Buttons in Liquid Glass“).
+- **Bewegtes Hintergrundlicht auf allen Landingpages** (Vorgabe des Auftraggebers, November 2026):
+  drei weiche grüne Lichtflecken wandern langsam hinter dem Glas (`AURORA` aus `src/views/aurora.ts`
+  direkt nach `<body>`, Styles in `glass.css`, Abschnitt „Bewegtes Hintergrundlicht“). Bei
+  „Bewegung reduzieren“ steht es still. Das Formular (`.stepper__card`) bleibt gleichmäßig und etwas
+  dunkler, es wird nicht angestrahlt. **Buttons sind nicht animiert:** kein Wippen, Puls oder Glanz
+  (früher `ctaBob`/`ctaPulse`/`ctaSheen`/`badgeLift` in `site.css`). Die Dashboards haben das Licht nicht.

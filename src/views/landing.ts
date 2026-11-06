@@ -9,6 +9,7 @@
  *
  * Styles: /assets/site.css · Verhalten: /assets/site.js + /assets/stepper.js
  */
+import { AURORA } from './aurora'
 import { breadcrumbs, clippingService, geoHead, ldGraph, ORGANIZATION } from './seo'
 import { INDUSTRIES } from '../lib/domain'
 import { DEFAULT_DIAL, dialOptions } from '../lib/phone'
@@ -80,6 +81,7 @@ ${ldGraph(
 )}
 </head>
 <body class="page-home">
+${AURORA}
 
 <!-- ══════════════════════════════════════════════════════════════════════
      NAV

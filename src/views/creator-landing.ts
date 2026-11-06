@@ -16,6 +16,7 @@
  *
  * Styles: /assets/site.css · Verhalten: /assets/site.js + /assets/stepper.js
  */
+import { AURORA } from './aurora'
 import { breadcrumbs, clippingService, geoHead, ldGraph, ORGANIZATION } from './seo'
 import {
   CREATOR_AD_OPENNESS,
@@ -300,6 +301,7 @@ ${ldGraph(
 )}
 </head>
 <body class="page-home theme-creator">
+${AURORA}
 
 <!-- ══════════════════════════════════════════════════════════════════════
      NAV
