@@ -1155,6 +1155,7 @@ const creatorColumns = {
   followers: schema.creators.followers,
   viewsTotal: schema.creators.viewsTotal,
   views30d: schema.creators.views30d,
+  source: schema.creators.source,
   createdAt: schema.creators.createdAt,
 }
 
@@ -1173,6 +1174,7 @@ type CreatorBase = {
   followers: string
   viewsTotal: string
   views30d: string
+  source: string | null
   createdAt: number
 }
 
@@ -1206,6 +1208,7 @@ function creatorRowOf(
     followers: r.followers,
     viewsTotal: r.viewsTotal,
     views30d: r.views30d,
+    source: r.source,
     ownCampaigns: x.ownCampaigns,
     acceptedCampaigns: x.acceptedCampaigns,
     joinedCampaigns: x.joinedCampaigns,

@@ -410,6 +410,7 @@ export async function provisionCreator(
       viewsTotal: string
       views30d: string
       handles: Record<string, string>
+      source?: string | null
     }
   },
 ): Promise<Provisioned<{ creatorId: string; customerId: string; clipperId: string }>> {
@@ -427,6 +428,7 @@ export async function provisionCreator(
     viewsTotal: o.profile.viewsTotal,
     views30d: o.profile.views30d,
     handles: JSON.stringify(o.profile.handles),
+    source: o.profile.source || null,
   }
 
   const existingCreator = await creatorForUser(env, user.userId)

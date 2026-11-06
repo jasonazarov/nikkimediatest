@@ -86,6 +86,8 @@ export const leads = sqliteTable(
     industry: text('industry').notNull(),
     footageAmount: text('footage_amount').notNull(),
     budgetRange: text('budget_range').notNull(),
+    /** „Wie bist du auf uns aufmerksam geworden?“ (AGENCY_SOURCES, Migration 0026), NULL bei älteren. */
+    source: text('source'),
     status: text('status').notNull().default('neu'),
     notes: text('notes'),
     createdAt: integer('created_at').notNull().$defaultFn(now),
@@ -265,6 +267,8 @@ export const creators = sqliteTable(
     views30d: text('views_30d').notNull(),
     /** JSON-Objekt { plattform: handle } — ohne führendes @ */
     handles: text('handles').notNull(),
+    /** „Wie bist du auf uns aufmerksam geworden?“ (AGENCY_SOURCES, Migration 0026), NULL bei älteren. */
+    source: text('source'),
     createdAt: integer('created_at').notNull().$defaultFn(now),
   },
   (t) => [uniqueIndex('creators_user_unique').on(t.userId)],

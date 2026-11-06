@@ -182,6 +182,8 @@ export function mailLeadAdmin(
     industry: string
     footageAmount: string
     budgetRange: string
+    /** „Wie bist du auf uns aufmerksam geworden?“ (Klartext) */
+    source?: string
     cloudLink?: string | null
   },
 ) {
@@ -202,6 +204,7 @@ export function mailLeadAdmin(
           ['Branche', o.industry],
           ['Rohmaterial', o.footageAmount],
           ['Videos pro Monat', o.budgetRange],
+          ['Aufmerksam durch', o.source || '–'],
           ['Cloud-Link', o.cloudLink || '–'],
         ]) +
         button(`${env.APP_URL}/admin/leads`, 'Im Admin-Bereich öffnen'),
@@ -421,6 +424,8 @@ export function mailCreatorSignupAdmin(
     followers: string
     viewsTotal: string
     views30d: string
+    /** „Wie bist du auf uns aufmerksam geworden?“ (Klartext) */
+    source?: string
     cloudLink: string | null
   },
 ) {
@@ -445,6 +450,7 @@ export function mailCreatorSignupAdmin(
           ['Follower', o.followers],
           ['Views insgesamt', o.viewsTotal],
           ['Views letzte 30 Tage', o.views30d],
+          ['Aufmerksam durch', o.source || '–'],
           ['Cloud-Link', o.cloudLink || '–'],
         ]) +
         button(`${env.APP_URL}/admin/creator`, 'Im Admin-Bereich öffnen'),

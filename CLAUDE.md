@@ -592,3 +592,9 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   (`draftsCatchUp` in `src/index.ts`), Demo-Konten ohne Mail. Abschicken (`POST /api/app/projects`)
   hakt den Entwurf ab. Im Admin beim Kunden (`/admin/kunden/:id`) steht der „CRM timeline“: Lead,
   Bestätigung, begonnene und angelegte Kampagnen, Push-Anfragen. Test: `npx tsx tests/gold/drafts.test.ts`.
+- **„Wie bist du auf uns aufmerksam geworden?“ auch auf `/` und `/creator`** (Vorgabe des Auftraggebers,
+  November 2026; Migration 0026 `leads.source`, `creators.source`): dieselbe Frage und Liste wie bei den
+  Agenturen (`AGENCY_SOURCES`: Ads, ChatGPT, Google Search, Weiterempfehlung), jeweils als Schritt vor
+  den Kontaktdaten (Startseite Schritt 5 von 6, Creator Schritt 8 von 10 vor den Handles). Damit auch auf
+  `/personal-brands` (gleiches `leadStepper`). Steht in der Admin-Mail („Aufmerksam durch“), beim Lead und
+  im Creator-Profil („Found us via“). Server: Pflicht im Formular, ohne Angabe weiter gültig (NULL).

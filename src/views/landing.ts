@@ -12,6 +12,7 @@
 import { AURORA } from './aurora'
 import { breadcrumbs, clippingService, geoHead, ldGraph, ORGANIZATION } from './seo'
 import { INDUSTRIES } from '../lib/domain'
+import { AGENCY_SOURCES } from '../lib/agency'
 import { DEFAULT_DIAL, dialOptions } from '../lib/phone'
 import { esc, jsonScript } from './layout'
 
@@ -25,11 +26,18 @@ const industryChips = (): string =>
               <label class="opt opt--chip"><input type="radio" name="industry" value="${esc(n)}"><span>${esc(n)}</span></label>`,
   ).join('')
 
+/** „Wie bist du auf uns aufmerksam geworden?“: dieselbe Liste wie im Agentur-Formular (/brands). */
+const sourceOptions = (): string =>
+  AGENCY_SOURCES.map(
+    (o) => `
+              <label class="opt"><input type="radio" name="source" value="${esc(o.value)}"><span><b>${esc(o.label)}</b></span></label>`,
+  ).join('')
+
 /** Texte und Ziel des Steppers — das Verhalten steckt in /assets/stepper.js. */
 export const LEAD_STEPPER_CONFIG = {
   endpoint: '/api/leads',
   redirect: '/app',
-  titles: ['Plattformen', 'Branche', 'Rohmaterial', 'Videos/Monat', 'Kontakt'],
+  titles: ['Plattformen', 'Branche', 'Rohmaterial', 'Videos/Monat', 'Woher', 'Kontakt'],
   stepLabel: 'Schritt {n} von {total} · {title}',
   submitText: 'Jetzt zum Upload-Dashboard',
   sendingText: 'Einen Moment …',
@@ -1502,13 +1510,13 @@ export const leadStepper = (): string => `<div class="stepper" id="stepper">
 
           <div class="stepper__head">
             <div class="stepper__meta">
-              <span data-step-label>Schritt 1 von 5 · Plattformen</span>
+              <span data-step-label>Schritt 1 von 6 · Plattformen</span>
               <span class="stepper__dots" aria-hidden="true">
-                <i class="is-on"></i><i></i><i></i><i></i><i></i>
+                <i class="is-on"></i><i></i><i></i><i></i><i></i><i></i>
               </span>
             </div>
-            <div class="stepper__bar" role="progressbar" aria-valuemin="1" aria-valuemax="5" aria-valuenow="1" aria-label="Fortschritt">
-              <i data-step-bar style="width:20%"></i>
+            <div class="stepper__bar" role="progressbar" aria-valuemin="1" aria-valuemax="6" aria-valuenow="1" aria-label="Fortschritt">
+              <i data-step-bar style="width:17%"></i>
             </div>
           </div>
 
@@ -1584,8 +1592,15 @@ export const leadStepper = (): string => `<div class="stepper" id="stepper">
             </div>
           </fieldset>
 
-          <!-- Schritt 5 — Kontaktdaten -->
-          <fieldset class="stepper__panel" data-panel="5" hidden>
+          <!-- Schritt 5 — Woher: dieselbe Frage und Liste wie auf /brands (AGENCY_SOURCES) -->
+          <fieldset class="stepper__panel" data-panel="5" data-require="source" hidden>
+            <legend class="stepper__q">Wie bist du auf uns aufmerksam geworden?</legend>
+            <div class="opts">${sourceOptions()}
+            </div>
+          </fieldset>
+
+          <!-- Schritt 6 — Kontaktdaten -->
+          <fieldset class="stepper__panel" data-panel="6" hidden>
             <legend class="stepper__q">Wohin dürfen wir antworten?</legend>
             <div class="fields">
               <label class="field">

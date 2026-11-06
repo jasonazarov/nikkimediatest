@@ -52,7 +52,7 @@ import { formatCompact, metricStrip, metricsPausedNote } from './metrics'
 import type { MetricRow, MetricTotals, MetricTotalsWithCreators, SyncOverview } from '../lib/metrics'
 import type { Lead, Role, User } from '../db/schema'
 import type { CrmEvent } from '../lib/crm'
-import { agencyPackageLabel, agencyPlatformLabel, pricePerThousandCents, viewsShort, type Briefing } from '../lib/agency'
+import { agencySourceLabel, agencyPackageLabel, agencyPlatformLabel, pricePerThousandCents, viewsShort, type Briefing } from '../lib/agency'
 
 /*
  * Administration — englisch, wie der ganze Admin-Bereich (siehe `langFor`
@@ -884,6 +884,7 @@ export function leadsPage(o: {
                     ${item('Industry', l.industry)}
                     ${item('Videos per month', l.budgetRange)}
                     ${item('Raw footage', footageLabel(l.footageAmount))}
+                    ${item('Found us via', l.source ? agencySourceLabel(l.source) : '–')}
                     ${item('Email', l.email)}
                     ${item('Phone', formatPhone(l.phone))}
                     ${item('Company', l.company ?? '–')}
@@ -1171,6 +1172,7 @@ export function leadDetailPage(o: {
               ${row('Industry', o.lead.industry)}
               ${row('Raw footage', footageLabel(o.lead.footageAmount))}
               ${row('Videos per month', o.lead.budgetRange)}
+              ${row('Found us via', o.lead.source ? agencySourceLabel(o.lead.source) : '–')}
             </dl>
           </div>
 
@@ -2788,6 +2790,8 @@ export interface CreatorRow {
   followers: string
   viewsTotal: string
   views30d: string
+  /** „Wie bist du auf uns aufmerksam geworden?“ (Migration 0026), null bei älteren. */
+  source?: string | null
   /** Eigene Kampagnen — Kampagnen in seinem Arbeitsbereich. */
   ownCampaigns: number
   /** Fremde Kampagnen, die er schneidet (`project_workers` über seine Clipper-Zeile). */
@@ -2937,6 +2941,7 @@ export function creatorProfilePage(o: {
           label: 'Views (own statement)',
           value: `${esc(inEnglish(VIEWS_TOTAL_EN, r.viewsTotal, viewsTotalLabel))} total · ${esc(inEnglish(VIEWS_30D_EN, r.views30d, views30dLabel))} in 30 days`,
         },
+        { label: 'Found us via', value: esc(r.source ? agencySourceLabel(r.source) : '–') },
         { label: 'Signed up', value: esc(dateEN(r.createdAt)), title: dateTimeEN(r.createdAt) },
         { label: 'Last login', value: esc(o.lastLoginAt ? dateTimeEN(o.lastLoginAt) : 'Never') },
         { label: 'Platforms & handles', value: `<div class="font-normal">${creatorPlatforms(r)}</div>` },

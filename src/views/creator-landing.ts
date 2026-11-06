@@ -28,22 +28,30 @@ import {
   INDUSTRIES,
 } from '../lib/domain'
 import { DEFAULT_DIAL, dialOptions } from '../lib/phone'
+import { AGENCY_SOURCES } from '../lib/agency'
 import { esc, jsonScript } from './layout'
 
 /** Anmeldung direkt ins Kampagnen-Dashboard. */
 const LOGIN_URL = '/login?next=%2Fkampagnen'
 
+/** „Wie bist du auf uns aufmerksam geworden?“: dieselbe Liste wie im Agentur-Formular (/brands). */
+const sourceOptions = (): string =>
+  AGENCY_SOURCES.map(
+    (o) => `
+              <label class="opt"><input type="radio" name="source" value="${esc(o.value)}"><span><b>${esc(o.label)}</b></span></label>`,
+  ).join('')
+
 /** Texte und Ziel des Steppers — das Verhalten steckt in /assets/stepper.js. */
 const STEPPER_CONFIG = {
   endpoint: '/api/creators',
   redirect: '/kampagnen',
-  titles: ['Ziel', 'Plattformen', 'Nische', 'Werbung', 'Follower', 'Views', 'Letzte 30 Tage', 'Handles', 'Kontakt'],
+  titles: ['Ziel', 'Plattformen', 'Nische', 'Werbung', 'Follower', 'Views', 'Letzte 30 Tage', 'Woher', 'Handles', 'Kontakt'],
   stepLabel: 'Schritt {n} von {total} · {title}',
   submitText: 'Zum Kampagnen-Dashboard',
   sendingText: 'Einen Moment …',
   errors: {
     pick: 'Bitte triff zuerst eine Auswahl.',
-    // Kommt in Schritt 8 (Handles) wie in Schritt 9 (Kontakt) — deshalb allgemein gehalten.
+    // Kommt in Schritt 9 (Handles) wie in Schritt 10 (Kontakt) — deshalb allgemein gehalten.
     contact: 'Bitte fülle alle Pflichtfelder aus, Handles, Name, E-Mail, Vorwahl und Telefonnummer, und stimme der Datenschutzerklärung zu.',
     link: 'Bitte gib einen vollständigen Link ein, der mit https:// beginnt, oder lass das Feld leer.',
     tooMany: 'Zu viele Anfragen von dieser Verbindung. Bitte versuche es später erneut.',
@@ -371,13 +379,13 @@ ${AURORA}
 
           <div class="stepper__head">
             <div class="stepper__meta">
-              <span data-step-label>Schritt 1 von 9 · Ziel</span>
+              <span data-step-label>Schritt 1 von 10 · Ziel</span>
               <span class="stepper__dots" aria-hidden="true">
-                <i class="is-on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                <i class="is-on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
               </span>
             </div>
-            <div class="stepper__bar" role="progressbar" aria-valuemin="1" aria-valuemax="9" aria-valuenow="1" aria-label="Fortschritt">
-              <i data-step-bar style="width:11%"></i>
+            <div class="stepper__bar" role="progressbar" aria-valuemin="1" aria-valuemax="10" aria-valuenow="1" aria-label="Fortschritt">
+              <i data-step-bar style="width:10%"></i>
             </div>
           </div>
 
@@ -431,17 +439,24 @@ ${AURORA}
             </div>
           </fieldset>
 
-          <!-- Schritt 8 — Handles: nur die Felder der in Schritt 2 gewählten
+          <!-- Schritt 8 — Woher: dieselbe Frage und Liste wie auf /brands (AGENCY_SOURCES) -->
+          <fieldset class="stepper__panel" data-panel="8" data-require="source" hidden>
+            <legend class="stepper__q">Wie bist du auf uns aufmerksam geworden?</legend>
+            <div class="opts">${sourceOptions()}
+            </div>
+          </fieldset>
+
+          <!-- Schritt 9 — Handles: nur die Felder der in Schritt 2 gewählten
                Plattformen sind sichtbar und Pflicht. -->
-          <fieldset class="stepper__panel" data-panel="8" hidden>
+          <fieldset class="stepper__panel" data-panel="9" hidden>
             <legend class="stepper__q">Gib deine Social-Media-Handles an, wir melden uns zeitnah bei dir.</legend>
             <p class="stepper__hint">Ein Feld je gewählter Plattform, mit oder ohne @.</p>
             <div class="fields">${handleFields()}
             </div>
           </fieldset>
 
-          <!-- Schritt 9 — Kontaktdaten -->
-          <fieldset class="stepper__panel" data-panel="9" hidden>
+          <!-- Schritt 10 — Kontaktdaten -->
+          <fieldset class="stepper__panel" data-panel="10" hidden>
             <legend class="stepper__q">Wohin dürfen wir deinen Zugang schicken?</legend>
             <div class="fields">
               <label class="field">

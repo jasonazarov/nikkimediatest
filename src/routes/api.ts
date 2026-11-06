@@ -247,6 +247,9 @@ apiRoutes.post('/leads', async (c) => {
   const industry = str(body.industry, 80)
   const footage = str(body.footage, 40)
   const budget = str(body.budget, 40)
+  // „Wie bist du auf uns aufmerksam geworden?“ wie bei den Agenturen. Das Formular
+  // verlangt es; ältere Aufrufe ohne Angabe bleiben gültig (NULL).
+  const source = str(body.source, 20)
   const fullName = str(body.fullName, 120)
   const company = str(body.company, 120)
   const email = str(body.email, 190).toLowerCase()
@@ -268,6 +271,7 @@ apiRoutes.post('/leads', async (c) => {
     (INDUSTRIES as readonly string[]).includes(industry) &&
     FOOTAGE.some((f) => f.value === footage) &&
     (BUDGETS as readonly string[]).includes(budget) &&
+    (!source || AGENCY_SOURCES.some((o) => o.value === source)) &&
     fullName.length > 1 &&
     EMAIL_RE.test(email) &&
     phone.startsWith('+') &&
@@ -312,6 +316,7 @@ apiRoutes.post('/leads', async (c) => {
       industry,
       footageAmount: footage,
       budgetRange: budget,
+      source: source || null,
       status: 'Neu',
       createdAt: ts,
       customerId: provisioned.customerId,
@@ -379,6 +384,7 @@ apiRoutes.post('/leads', async (c) => {
         industry,
         footageAmount: FOOTAGE.find((f) => f.value === footage)?.label ?? footage,
         budgetRange: budget,
+        source: source ? agencySourceLabel(source) : '–',
         cloudLink,
       }),
       projectId ? notifyMaterialAdded(c.env, projectId) : Promise.resolve(),
@@ -524,6 +530,7 @@ apiRoutes.post('/creators', async (c) => {
   const followers = str(body.followers, 20)
   const viewsTotal = str(body.viewsTotal, 20)
   const views30d = str(body.views30d, 20)
+  const source = str(body.source, 20)
   const fullName = str(body.fullName, 120)
   const email = str(body.email, 190).toLowerCase()
   const phone = composePhone(str(body.phoneDial, 8), str(body.phone, 60))
@@ -548,6 +555,7 @@ apiRoutes.post('/creators', async (c) => {
     CREATOR_FOLLOWERS.some((o) => o.value === followers) &&
     CREATOR_VIEWS_TOTAL.some((o) => o.value === viewsTotal) &&
     CREATOR_VIEWS_30D.some((o) => o.value === views30d) &&
+    (!source || AGENCY_SOURCES.some((o) => o.value === source)) &&
     fullName.length > 1 &&
     EMAIL_RE.test(email) &&
     phone.startsWith('+') &&
@@ -569,7 +577,7 @@ apiRoutes.post('/creators', async (c) => {
     email,
     fullName,
     phone,
-    profile: { goal, niche, platforms, openToAds, followers, viewsTotal, views30d, handles },
+    profile: { goal, niche, platforms, openToAds, followers, viewsTotal, views30d, handles, source: source || null },
   })
   if (!provisioned.ok) {
     return c.json({ error: 'Diese E-Mail-Adresse gehört bereits zu einem anderen Zugang.' }, 400)
@@ -649,6 +657,7 @@ apiRoutes.post('/creators', async (c) => {
         followers: followersLabel(followers),
         viewsTotal: viewsTotalLabel(viewsTotal),
         views30d: views30dLabel(views30d),
+        source: source ? agencySourceLabel(source) : '–',
         cloudLink,
       }),
       projectId ? notifyMaterialAdded(c.env, projectId) : Promise.resolve(),
