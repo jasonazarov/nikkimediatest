@@ -285,8 +285,14 @@ def port_open() -> bool:
 
 
 def start_server() -> subprocess.Popen:
+    global PORT, BASE
     if port_open():
-        sys.exit(f"Port {PORT} ist belegt. PREVIEW_PORT setzen oder den alten Prozess beenden.")
+        # Belegt, meist von einem früheren Lauf: einfach einen freien Port nehmen statt abzubrechen.
+        with socket.socket() as sock:
+            sock.bind(("127.0.0.1", 0))
+            PORT = sock.getsockname()[1]
+        BASE = f"http://127.0.0.1:{PORT}"
+        print(f"• Port 8799 belegt (alter Lauf?), nehme Port {PORT}")
     proc = subprocess.Popen(
         ["npx", "wrangler", "dev", "--local", "--port", str(PORT), "--persist-to", str(STATE),
          "--var", f"AUTH_SECRET:{SECRET}", "--show-interactive-dev-session=false"],
@@ -476,7 +482,12 @@ def share(listen_port: int) -> None:
 
         do_GET = do_POST = do_PUT = do_DELETE = do_PATCH = do_HEAD = do_OPTIONS = handle_one
 
-    srv = ThreadingHTTPServer(("0.0.0.0", listen_port), H)
+    try:
+        srv = ThreadingHTTPServer(("0.0.0.0", listen_port), H)
+    except OSError:
+        srv = ThreadingHTTPServer(("0.0.0.0", 0), H)
+        listen_port = srv.server_address[1]
+        print(f"• Port für die Vorschau war belegt, nehme Port {listen_port}")
     print(f"✓ Vorschau zum Klicken: http://localhost:{listen_port}/__vorschau")
     srv.serve_forever()
 
