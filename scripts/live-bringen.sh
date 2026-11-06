@@ -102,6 +102,7 @@ ok "Datenbank auf dem neuen Stand"
 # ---------------------------------------------------------------------- Live
 step "7/7  Prüfen und live stellen"
 printf 'Hinweis: eine rote Zeile „Authentication error [code: 10000]“ ist harmlos.\n'
-npm run ship || fail "Der Deploy hat angehalten (siehe oben). Die Live-Seite ist dann noch auf dem alten Stand."
+# Was ship selbst neu baut (Tailwind-CSS), wird dabei mit gesichert, statt den Livegang anzuhalten.
+npm run ship -- "Livegang: neu gebaute Dateien (Stand $NEW)" || fail "Der Deploy hat angehalten (siehe oben). Die Live-Seite ist dann noch auf dem alten Stand."
 
 printf '\n%s✓ Fertig. https://nikkimedia.co zeigt den neuen Stand (im Browser Cmd+Shift+R).%s\n' "$G$B" "$O"
