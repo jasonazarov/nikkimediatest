@@ -9,3 +9,6 @@ node_modules
 
 # Sicherungskopie aus einem abgebrochenen Login-Test
 .dev.vars.login-test-backup
+
+# Python-Zwischenspeicher der Werkzeuge in tools/
+__pycache__/
