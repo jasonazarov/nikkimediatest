@@ -78,7 +78,7 @@ const USE_CASES: UseCase[] = [
 /** Vorschaubilder, die unter /img/cases liegen (<account>-<shortcode>.jpg). */
 const IMAGES = new Set([
   'dindrop7-DRSI7B3CI1M', 'dindrop7-DNF5zC7o66_', 'dindrop7-DM-7GyZIkb0', 'dindrop7-DPRDIqUiIeB', 'dindrop7-DZlBQOrgilt', 'dindrop7-DbLpapmA_Bw', 'dindrop7-DbbJyZgIUjl',
-  'max_tornow_business-C1xEPryiQ4t', 'max_tornow_business-C8pRTW6MinC', 'max_tornow_business-C_PxECKAj61', 'max_tornow_business-DCHhYijJK4b',
+  'max_tornow_business-C1xEPryiQ4t', 'max_tornow_business-C0hXUyfixJt', 'max_tornow_business-C8pRTW6MinC', 'max_tornow_business-C_PxECKAj61', 'max_tornow_business-DCHhYijJK4b',
   'caspianbluecaviar-DKZ-ra1qDiR', 'caspianbluecaviar-DMzr3__qHsw', 'caspianbluecaviar-DP_uoY6jFCU', 'caspianbluecaviar-DQ4ga9SDEnj',
   'levantine_istanbul-C9406cJIC_D', 'levantine_istanbul-DBQxgMHAw1U', 'levantine_istanbul-DEUXjpeIHPR', 'levantine_istanbul-DUTFpaeiMZA',
   'levantine_istanbul-Da2pgoToIw_', 'panperium-DZF78B8je1g', 'panperium-DZfCoAoNLUi', 'panperium-DZurxhPjezN', 'panperium-DZvEvMPNa15',
@@ -125,7 +125,9 @@ export function showcaseClips(): ShowcaseClip[] {
   const out: ShowcaseClip[] = []
   for (const u of USE_CASES) {
     u.reels.forEach(([reel, views, handle], k) => {
-      const img = handle && IMAGES.has(`${handle}-${reel}`) ? `/img/cases/${handle}-${reel}.jpg` : null
+      // Bild unter dem Account des Reels, sonst unter dem Hauptaccount des Use Case.
+      const key = [handle, u.handle].find((h) => h && IMAGES.has(`${h}-${reel}`))
+      const img = key ? `/img/cases/${key}-${reel}.jpg` : null
       out.push({
         id: `${PREFIX}${u.slug}-${k}`,
         campaignId: PREFIX + u.slug,
