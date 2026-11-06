@@ -65,33 +65,16 @@ export const impressumPage = () =>
     'Impressum und Anbieterkennzeichnung von Nikki Media.',
     `      <h1>Impressum</h1>
 
-      <div class="note">
-        <strong>Hinweis für die Redaktion:</strong> Die folgenden Angaben sind Platzhalter.
-        Bitte vor dem Livegang durch die vollständigen und rechtsverbindlichen Daten ersetzen
-        (Rechtsform, Anschrift, Register- und Umsatzsteuer-Angaben). In Deutschland und
-        Österreich besteht Impressumspflicht.
-      </div>
-
-      <h2>Angaben gemäß § 5 TMG / § 5 ECG</h2>
+      <h2>NIKKI MEDIA</h2>
       <p>
-        Nikki Media<br>
-        Inhaber: Jason Azarov<br>
-        [Straße und Hausnummer]<br>
-        [PLZ und Ort]<br>
-        [Land]
+        <strong>Office &amp; Contact</strong><br>
+        Dubai Silicon Oasis<br>
+        Dubai, United Arab Emirates
       </p>
-
-      <h2>Kontakt</h2>
       <p>
         Telefon: <a href="tel:+436765990071">+43 676 5990071</a><br>
-        Anfragen laufen über das <a href="/#stepper">Anfrageformular</a> auf der Startseite.
+        Web: <a href="https://nikkimedia.co/">nikkimedia.co</a>
       </p>
-
-      <h2>Umsatzsteuer-Identifikationsnummer</h2>
-      <p>[UID / USt-IdNr. gemäß § 27 a Umsatzsteuergesetz]</p>
-
-      <h2>Verantwortlich für den Inhalt</h2>
-      <p>Jason Azarov, Anschrift wie oben.</p>
 
       <h2>Streitschlichtung</h2>
       <p>

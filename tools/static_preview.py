@@ -83,7 +83,8 @@ def main(out: Path) -> None:
     with sync_playwright() as pw:
         browser = pw.chromium.launch(executable_path="/opt/pw-browsers/chromium")
         for role, (seeds, prefix, limit) in CRAWL.items():
-            ctx = browser.new_context(viewport={"width": 1280, "height": 860}, timezone_id="Europe/Berlin")
+            ctx = browser.new_context(viewport={"width": 1280, "height": 860}, timezone_id="Europe/Berlin",
+                                      reduced_motion="reduce")  # Zähler und Balken zeigen sofort ihren Endwert
             if role:
                 ctx.add_cookies([{"name": f"nm_session_{role}", "value": TOKENS[role], "url": BASE}])
             page = ctx.new_page()
@@ -98,8 +99,8 @@ def main(out: Path) -> None:
                     continue
                 page.wait_for_timeout(700)
                 # Einmal durchscrollen: Balken und Zähler starten erst, wenn sie ins Bild kommen.
-                page.evaluate("""async () => { for (let y = 0; y < document.body.scrollHeight; y += 500) { window.scrollTo(0, y); await new Promise(r => setTimeout(r, 60)); } window.scrollTo(0, 0); }""")
-                page.wait_for_timeout(1400)
+                page.evaluate("""async () => { for (let y = 0; y < document.body.scrollHeight; y += 500) { window.scrollTo(0, y); await new Promise(r => setTimeout(r, 180)); } window.scrollTo(0, 0); }""")
+                page.wait_for_timeout(2200)
                 page.evaluate("document.querySelectorAll('.nma').forEach(e => e.remove())")
                 pages[(role, path)] = page.content()
                 for href in page.eval_on_selector_all("a[href]", "els => els.map(e => e.getAttribute('href'))"):
@@ -117,6 +118,9 @@ def main(out: Path) -> None:
         soup = BeautifulSoup(html, "html.parser")
         for s in soup.find_all("script", src=True):
             s.decompose()  # Daten-Skripte würden die fertig gerenderten Inhalte überschreiben
+        for img in soup.find_all("img"):
+            if not img.get("src"):
+                img.decompose()  # Vorschaubilder, die erst ein Skript lädt: ohne Server leer
         own = {p: f for (r, p), f in captured.items() if r == role}
 
         def target(url: str) -> str | None:
