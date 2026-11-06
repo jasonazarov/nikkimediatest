@@ -90,7 +90,7 @@ p.g-lead.g-h2--narrow { max-width: 58ch; }
   font: 800 1.05rem/1 var(--g-display); color: #02160c;
   background: linear-gradient(150deg, #b8fbd9, #2fe08c 55%, #12925a);
 }
-.g-nav__links { display: flex; gap: 4px; margin-right: auto; }
+.g-nav__links { display: flex; gap: 4px; margin-right: auto; white-space: nowrap; }
 .g-nav__links a { padding: 8px 12px; border-radius: 9px; font-size: .9rem; font-weight: 500; color: var(--g-mute); transition: color .15s ease, background .15s ease; }
 .g-nav__links a:hover { color: var(--g-text); background: rgba(255, 255, 255, .04); }
 .g-nav__links a[aria-current="page"] { color: var(--g-gold-hi); background: rgba(47, 224, 140, .1); }
@@ -461,3 +461,11 @@ p.g-lead.g-h2--narrow { max-width: 58ch; }
 .g-cta-box__title { margin-top: 8px; font: 700 clamp(1.3rem, 2.4vw, 1.7rem)/1.2 var(--g-display); color: var(--g-text); }
 .g-cta-box__text { margin-top: 8px; color: var(--g-mute); }
 .g-cta-box__row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+
+/* Seit „Fachartikel“ im Menü steht (November 2026): sechs Punkte, bei
+   mittleren Breiten enger gesetzt. Burger-Grenze unten gemessen. */
+@media (max-width: 1360px) {
+  .g-nav__in { gap: 18px; }
+  .g-nav__links { gap: 0; }
+  .g-nav__links a { padding: 8px 9px; font-size: .86rem; }
+}

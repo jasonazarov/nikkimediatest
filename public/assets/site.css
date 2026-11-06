@@ -1794,3 +1794,38 @@ ul { margin: 0; padding: 0; list-style: none; }
 .coopcard__list { margin-top: 24px; display: grid; gap: 10px; text-align: left; }
 .coopcard__list li { display: flex; align-items: flex-start; gap: 10px; color: var(--on-dark); font-size: .94rem; }
 @media (max-width: 420px) { .coopcard__code i { width: 36px; height: 46px; } }
+
+/* Seit „Fachartikel“ im Menü steht (November 2026), sind es sechs Punkte.
+   Mittlere Breiten: Menüpunkte etwas enger, damit die Leiste länger
+   vollständig bleibt. Die Umbruchpunkte darunter sind mit diesem Menü
+   gemessen (Playwright, je 10px, ohne Überlauf, Umbruch oder Überlappung). */
+@media (max-width: 1440px) {
+  .nav__links { gap: 0; }
+  .nav__links a { padding: 8px 8px; font-size: .82rem; }
+}
+/* Gemessene Grenzen mit sechs Menüpunkten (ersetzen die Werte weiter oben):
+     Seite      alles sichtbar   ohne Zweitknopf   Burger
+     /          ab 1280px        1120–1279px       bis 1119px
+     /clipper   ab 1250px        1090–1249px       bis 1089px
+     /creator   ab 1160px        (kein Zweitknopf) bis 1159px
+     /brands    ab 1120px        (kein Zweitknopf) bis 1119px */
+@media (max-width: 1279px) {
+  .page-home:not(.theme-clipper):not(.theme-creator):not(.theme-brands) .nav__actions .btn--ghost:not(.nav__login) { display: none; }
+}
+@media (max-width: 1119px) {
+  .page-home:not(.theme-clipper):not(.theme-creator):not(.theme-brands) .nav__links { display: none; }
+  .page-home:not(.theme-clipper):not(.theme-creator):not(.theme-brands) .nav__burger { display: block; }
+  .theme-brands .nav__links { display: none; }
+  .theme-brands .nav__burger { display: block; }
+}
+@media (max-width: 1249px) {
+  .theme-clipper .nav__actions .btn--ghost:not(.nav__login) { display: none; }
+}
+@media (max-width: 1089px) {
+  .theme-clipper .nav__links { display: none; }
+  .theme-clipper .nav__burger { display: block; }
+}
+@media (max-width: 1159px) {
+  .theme-creator .nav__links { display: none; }
+  .theme-creator .nav__burger { display: block; }
+}

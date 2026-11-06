@@ -324,6 +324,7 @@ ${AURORA}
     <!-- Dasselbe Menü wie auf / und /clipper (siehe landing.ts). -->
     <nav class="nav__links" aria-label="Hauptnavigation">
       <a href="/#case-studies">Case Studies</a>
+      <a href="/fachartikel">Fachartikel</a>
       <a href="/clipper">Clipper werden</a>
       <a href="/creator" aria-current="page">Creator werden</a>
       <a href="/brands">Für Agenturen</a>
@@ -342,6 +343,7 @@ ${AURORA}
 
 <div class="nav__mobile" id="mobilemenu">
   <a href="/#case-studies">Case Studies</a>
+  <a href="/fachartikel">Fachartikel</a>
   <a href="/clipper">Clipper werden</a>
   <a href="/creator" aria-current="page">Creator werden</a>
   <a href="/brands">Für Agenturen</a>

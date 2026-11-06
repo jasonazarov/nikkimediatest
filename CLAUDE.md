@@ -314,9 +314,11 @@ groß (`campaignCard`, `campaignGrid`). Überall heißt es „Kampagne“
 `/app/projekt/:id`) bleiben.
 
 **Header der Landingpages** — auf `/`, `/clipper`, `/creator` und `/brands`
-gleich: Case Studies · Clipper werden · Creator werden · Für Agenturen
-(→ `/brands`) · Kampagne starten (→ `/creator`). Wer das Menü ändert, misst
-die Umbruchstellen in `site.css` neu (Kommentar dort). Die Live-Zahl „Views heute“ hat je Tag einen eigenen
+gleich: Case Studies · Fachartikel (→ `/fachartikel`, seit November 2026) · Clipper werden · Creator
+werden · Für Agenturen (→ `/brands`) · Kampagne starten (→ `/creator`). Dieselben Punkte im mobilen Menü.
+Die Gold-Seiten (`/agenturen`, `/personal-brands`, `/investoren`, Blog) führen „Fachartikel“ als ersten
+Punkt in `NAV` (`gold-pages.ts`). Wer das Menü ändert, misst
+die Umbruchstellen in `site.css` neu (Kommentar dort; aktuelle Tabelle am Dateiende). Die Live-Zahl „Views heute“ hat je Tag einen eigenen
 Startwert und liegt immer zwischen 1,5 und 15 Mio. (`site.js`).
 
 **Agenturen: kalte und warme Leads** (`src/lib/agency.ts`, seit Migration

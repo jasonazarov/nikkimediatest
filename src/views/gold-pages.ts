@@ -295,7 +295,6 @@ export const goldFoot = () => `<footer class="g-foot">
   <div class="g-wrap g-foot__in">
     <a class="g-logo" href="/"><span class="g-logo__mark" aria-hidden="true">N</span><span>Nikki Media</span></a>
     <nav aria-label="Seiten">
-      <a href="/fachartikel">Fachartikel</a>
       <a href="/">Startseite</a>
       ${NAV.map((n) => `<a href="${n.href}">${esc(n.label)}</a>`).join('')}
       <a href="/impressum">Impressum</a>
@@ -308,6 +307,7 @@ export const goldFoot = () => `<footer class="g-foot">
 /* ------------------------------------------------------------ Rahmen */
 
 const NAV: { href: string; label: string; key?: Variant }[] = [
+  { href: '/fachartikel', label: 'Fachartikel' },
   { href: '/agenturen', label: 'Für Agenturen', key: 'agenturen' },
   { href: '/personal-brands', label: 'Für Personal Brands', key: 'personal-brands' },
   { href: '/investoren', label: 'Für Investoren', key: 'investoren' },

@@ -106,6 +106,7 @@ ${AURORA}
          Abschnitte der Seite erreicht man über die Knöpfe rechts und den Footer. -->
     <nav class="nav__links" aria-label="Hauptnavigation">
       <a href="#case-studies">Case Studies</a>
+      <a href="/fachartikel">Fachartikel</a>
       <a href="/clipper">Clipper werden</a>
       <a href="/creator">Creator werden</a>
       <a href="/brands">Für Agenturen</a>
@@ -125,6 +126,7 @@ ${AURORA}
 
 <div class="nav__mobile" id="mobilemenu">
   <a href="#case-studies">Case Studies</a>
+  <a href="/fachartikel">Fachartikel</a>
   <a href="/clipper">Clipper werden</a>
   <a href="/creator">Creator werden</a>
   <a href="/brands">Für Agenturen</a>
@@ -1438,6 +1440,7 @@ ${articlesHtml}<section class="section section--surface" id="faq">
         <div class="footer__list">
           <a href="#warum-clipping">Warum Clipping</a>
           <a href="#case-studies">Case Studies</a>
+          <a href="/fachartikel">Fachartikel</a>
           <a href="#ablauf">Ablauf</a>
           <a href="#gruender">Gründer</a>
           <a href="#faq">FAQ</a>
