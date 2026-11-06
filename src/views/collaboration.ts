@@ -1028,7 +1028,7 @@ export function campaignPage(o: {
           </button>
           <div class="p-3">
             <p class="truncate text-sm font-semibold" title="${esc(v.filename)}">${esc(v.caption || v.filename)}</p>
-            <p class="mt-0.5 text-xs text-slate-500">${dateDE(v.createdAt)} · ${formatViews(v.views)} Views</p>
+            <p class="mt-0.5 text-xs text-slate-500">${dateDE(v.createdAt)}${v.views >= 0 ? ` · ${formatViews(v.views)} Views` : ''}</p>
             <button type="button" data-download="${esc(v.id)}" class="mt-2.5 inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold transition hover:border-brand hover:text-brand">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
               Herunterladen

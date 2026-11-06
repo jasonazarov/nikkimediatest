@@ -23,52 +23,95 @@ import type { ViralClip } from './viral'
 interface UseCase {
   slug: string
   name: string
+  /** Hauptaccount bei Instagram. */
   handle: string
   /** Views gesamt, wie auf der Startseite. */
   views: number
-  /** Reels: [ID bei Instagram, Anteil an den Views, vor wie vielen Tagen veröffentlicht] */
-  reels: [string, number, number][]
+  /**
+   * Reels: [Shortcode, Views laut Auftraggeber (null = nicht bekannt), Account (null = nicht bekannt)].
+   * NUR echte Zahlen eintragen. Reels ohne Zahl stehen auf der Kampagnenseite ohne Views
+   * und zählen nicht bei „Virale Clips“.
+   */
+  reels: [string, number | null, string | null][]
 }
 
+/* Views je Reel: Angaben des Auftraggebers vom 06.11.2026. */
 const USE_CASES: UseCase[] = [
   {
     slug: 'dindrop', name: 'DinDrop', handle: 'dindrop7', views: 100_000_000,
-    reels: [['DZlBQOrgilt', 30, 12], ['DbLpapmA_Bw', 26, 19], ['DbbJyZgIUjl', 19, 6], ['DPRDIqUiIeB', 14, 64], ['DM-7GyZIkb0', 11, 98]],
+    reels: [
+      ['DRSI7B3CI1M', 35_400_000, 'dindrop7'], ['DNF5zC7o66_', 11_600_000, 'dindrop7'], ['DY77rgqAHmj', 500_000, 'dindrop7'],
+      ['DM-7GyZIkb0', null, 'dindrop7'], ['DPRDIqUiIeB', null, 'dindrop7'], ['DZlBQOrgilt', null, 'dindrop7'],
+      ['DbLpapmA_Bw', null, 'dindrop7'], ['DbbJyZgIUjl', null, 'dindrop7'],
+    ],
   },
   {
     slug: 'max-tornow', name: 'Max Tornow', handle: 'max_tornow_business', views: 70_000_000,
-    reels: [['C_PxECKAj61', 41, 23], ['C8pRTW6MinC', 27, 41], ['DCHhYijJK4b', 21, 77], ['C1xEPryiQ4t', 11, 132]],
+    reels: [
+      ['C1xEPryiQ4t', 13_100_000, 'max_tornow_business'], ['C0hXUyfixJt', 821_000, null],
+      ['C8pRTW6MinC', null, 'max_tornow_business'], ['C_PxECKAj61', null, 'max_tornow_business'], ['DCHhYijJK4b', null, 'max_tornow_business'],
+    ],
   },
   {
     slug: 'caspian-blue', name: 'Caspian Blue', handle: 'caspianbluecaviar', views: 40_000_000,
-    reels: [['DQ4ga9SDEnj', 35, 9], ['DP_uoY6jFCU', 28, 27], ['DMzr3__qHsw', 22, 55], ['DKZ-ra1qDiR', 15, 109]],
+    reels: [
+      ['DKZ-ra1qDiR', 6_400_000, 'caspianbluecaviar'], ['DaIZcxnqCPw', 475_000, 'caspianbluecaviar'],
+      ['DQ4ga9SDEnj', null, 'caspianbluecaviar'], ['DP_uoY6jFCU', null, 'caspianbluecaviar'], ['DMzr3__qHsw', null, 'caspianbluecaviar'],
+    ],
   },
   {
     slug: 'levantine-istanbul', name: 'Levantine Istanbul', handle: 'levantine_istanbul', views: 3_000_000,
-    reels: [['Da2pgoToIw_', 31, 4], ['DUTFpaeiMZA', 24, 33], ['DEUXjpeIHPR', 19, 71], ['DBQxgMHAw1U', 15, 96], ['C9406cJIC_D', 11, 140]],
+    reels: [
+      ['Da2pgoToIw_', null, 'levantine_istanbul'], ['DUTFpaeiMZA', null, 'levantine_istanbul'], ['DEUXjpeIHPR', null, 'levantine_istanbul'],
+      ['DBQxgMHAw1U', null, 'levantine_istanbul'], ['C9406cJIC_D', null, 'levantine_istanbul'],
+    ],
   },
   {
     slug: 'panperium', name: 'Panperium', handle: 'panperium', views: 450_000,
-    reels: [['DZvEvMPNa15', 30, 3], ['DZurxhPjezN', 25, 14], ['DZfCoAoNLUi', 20, 25], ['DZF78B8je1g', 15, 47], ['DbGw3_SCDud', 10, 88]],
+    reels: [
+      ['DZvEvMPNa15', null, 'panperium'], ['DZurxhPjezN', null, 'panperium'], ['DZfCoAoNLUi', null, 'panperium'],
+      ['DZF78B8je1g', null, 'panperium'], ['DbGw3_SCDud', null, 'panperium'],
+    ],
   },
 ]
 
-const DAY = 86400
+/** Vorschaubilder, die unter /img/cases liegen (<account>-<shortcode>.jpg). */
+const IMAGES = new Set([
+  'dindrop7-DM-7GyZIkb0', 'dindrop7-DPRDIqUiIeB', 'dindrop7-DZlBQOrgilt', 'dindrop7-DbLpapmA_Bw', 'dindrop7-DbbJyZgIUjl',
+  'max_tornow_business-C1xEPryiQ4t', 'max_tornow_business-C8pRTW6MinC', 'max_tornow_business-C_PxECKAj61', 'max_tornow_business-DCHhYijJK4b',
+  'caspianbluecaviar-DKZ-ra1qDiR', 'caspianbluecaviar-DMzr3__qHsw', 'caspianbluecaviar-DP_uoY6jFCU', 'caspianbluecaviar-DQ4ga9SDEnj',
+  'levantine_istanbul-C9406cJIC_D', 'levantine_istanbul-DBQxgMHAw1U', 'levantine_istanbul-DEUXjpeIHPR', 'levantine_istanbul-DUTFpaeiMZA',
+  'levantine_istanbul-Da2pgoToIw_', 'panperium-DZF78B8je1g', 'panperium-DZfCoAoNLUi', 'panperium-DZurxhPjezN', 'panperium-DZvEvMPNa15',
+  'panperium-DbGw3_SCDud',
+])
+
 const PREFIX = 'usecase-'
+const SHORTCODE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
+
+/**
+ * Veröffentlichungszeit aus dem Shortcode: Instagram-IDs tragen ab Bit 23 die
+ * Millisekunden seit 2011-08-24 21:07:01.721 UTC. Kein Abruf nötig, kein Raten.
+ */
+export function publishedAtOf(shortcode: string): number {
+  let id = 0n
+  for (const ch of shortcode) id = id * 64n + BigInt(SHORTCODE.indexOf(ch))
+  return Math.floor(Number((id >> 23n) + 1314220021721n) / 1000)
+}
 
 export interface ShowcaseClip {
   id: string
   campaignId: string
   campaign: string
-  handle: string
+  /** Account, wenn bekannt. */
+  handle: string | null
   reel: string
   url: string
-  image: string
-  views: number
+  image: string | null
+  /** Views laut Auftraggeber; null = nicht bekannt. */
+  views: number | null
   likes: number
   comments: number
   shares: number
-  /** Veröffentlicht (Unix-Sekunden), relativ zu `now`, damit die Grafik nicht veraltet. */
   publishedAt: number
 }
 
@@ -77,32 +120,54 @@ export const showsShowcase = (user: { role: string; demo?: number | null }) => u
 
 export const isShowcaseId = (id: string) => id.startsWith(PREFIX) && USE_CASES.some((u) => PREFIX + u.slug === id)
 
-/** Alle Reels aller Use Cases, nach Views absteigend. */
-export function showcaseClips(now = Math.floor(Date.now() / 1000)): ShowcaseClip[] {
+/** Alle Reels aller Use Cases: bekannte Views zuerst, absteigend. */
+export function showcaseClips(): ShowcaseClip[] {
   const out: ShowcaseClip[] = []
   for (const u of USE_CASES) {
-    const sum = u.reels.reduce((s, r) => s + r[1], 0)
-    let rest = u.views
-    u.reels.forEach(([reel, share, daysAgo], k) => {
-      const views = k === u.reels.length - 1 ? rest : Math.round((u.views * share) / sum)
-      rest -= views
+    u.reels.forEach(([reel, views, handle], k) => {
+      const img = handle && IMAGES.has(`${handle}-${reel}`) ? `/img/cases/${handle}-${reel}.jpg` : null
       out.push({
         id: `${PREFIX}${u.slug}-${k}`,
         campaignId: PREFIX + u.slug,
         campaign: u.name,
-        handle: u.handle,
+        handle,
         reel,
-        url: `https://www.instagram.com/${u.handle}/p/${reel}/`,
-        image: `/img/cases/${u.handle}-${reel}.jpg`,
+        url: `https://www.instagram.com/reel/${reel}/`,
+        image: img,
         views,
-        likes: Math.round(views / 25),
-        comments: Math.round(views / 900),
-        shares: Math.round(views / 400),
-        publishedAt: now - daysAgo * DAY - 15 * 3600,
+        // Likes, Kommentare und Shares sind nicht bekannt: 0 statt geschätzt.
+        likes: 0,
+        comments: 0,
+        shares: 0,
+        publishedAt: publishedAtOf(reel),
       })
     })
   }
-  return out.sort((a, b) => b.views - a.views)
+  return out.sort((a, b) => (b.views ?? -1) - (a.views ?? -1) || b.publishedAt - a.publishedAt)
+}
+
+/**
+ * Views je Use Case für die Grafik: jedes Reel mit bekannter Zahl an seinem
+ * Tag, der Rest bis zur Gesamtzahl der Startseite als ein Posten am Anfang
+ * des Zeitraums (seine Tage sind nicht bekannt).
+ */
+export function showcaseViewsRows(): { campaignId: string; campaign: string; views: number; at: number | null; known: boolean }[] {
+  const out: { campaignId: string; campaign: string; views: number; at: number | null; known: boolean }[] = []
+  const clips = showcaseClips()
+  for (const u of USE_CASES) {
+    let known = 0
+    for (const c of clips.filter((x) => x.campaignId === PREFIX + u.slug && x.views !== null)) {
+      known += c.views!
+      out.push({ campaignId: c.campaignId, campaign: c.campaign, views: c.views!, at: c.publishedAt, known: true })
+    }
+    if (u.views > known) out.push({ campaignId: PREFIX + u.slug, campaign: u.name, views: u.views - known, at: null, known: false })
+  }
+  return out
+}
+
+const thumbOf = (u: UseCase) => {
+  const r = u.reels.find(([reel, , h]) => h && IMAGES.has(`${h}-${reel}`))
+  return r ? ({ kind: 'image', src: `/img/cases/${r[2]}-${r[0]}.jpg` } as const) : ({ kind: 'none' } as const)
 }
 
 /** Die Use Cases als Kampagnenkarten (Band „Eigene Kampagne“, wie in der Vorschau). */
@@ -112,7 +177,7 @@ export function showcaseCampaigns(): AgencyCampaign[] {
     name: u.name,
     status: 'aktiv',
     own: true,
-    thumb: { kind: 'image', src: `/img/cases/${u.handle}-${u.reels[0][0]}.jpg` } as const,
+    thumb: thumbOf(u),
     clips: u.reels.length,
     views: u.views,
     clippers: 0,
@@ -121,20 +186,21 @@ export function showcaseCampaigns(): AgencyCampaign[] {
 }
 
 /** Eine Kampagne mit ihren Reels für die Kampagnenseite. */
-export function showcaseCampaign(id: string, now = Math.floor(Date.now() / 1000)): { campaign: AgencyCampaign; clips: AgencyClip[] } | null {
+export function showcaseCampaign(id: string): { campaign: AgencyCampaign; clips: AgencyClip[] } | null {
   const campaign = showcaseCampaigns().find((c) => c.id === id)
   if (!campaign) return null
-  const clips = showcaseClips(now)
+  // Reels mit Zahl zuerst (nach Views), dann die übrigen nach Datum.
+  const clips = showcaseClips()
     .filter((c) => c.campaignId === id)
-    .sort((a, b) => b.publishedAt - a.publishedAt)
     .map((c) => ({
       id: c.id,
-      filename: `${c.handle}-${c.reel}.mp4`,
-      caption: `@${c.handle}`,
+      filename: `${c.reel}.mp4`,
+      caption: c.handle ? `@${c.handle}` : campaign.name,
       createdAt: c.publishedAt,
-      posterUrl: c.image,
+      posterUrl: c.image ?? '',
       previewUrl: '',
-      views: c.views,
+      // -1: Views nicht bekannt, die Kachel zeigt dann keine Zahl.
+      views: c.views ?? -1,
     }))
   return { campaign, clips }
 }
@@ -144,10 +210,12 @@ export const showcaseClipUrl = (clipId: string): string | null => showcaseClips(
 
 /** Für „Virale Clips“: dieselbe Form wie die echten. */
 export const showcaseViral = (): ViralClip[] =>
-  showcaseClips().map((c) => ({
+  showcaseClips()
+    .filter((c) => c.views !== null)
+    .map((c) => ({
     id: c.id,
     campaign: c.campaign,
-    views: c.views,
+    views: c.views!,
     likes: c.likes,
     shares: c.shares,
     comments: c.comments,

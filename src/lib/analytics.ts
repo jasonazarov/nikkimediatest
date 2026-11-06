@@ -1,7 +1,7 @@
 import type { User } from '../db/schema'
 import { postScopeFor } from './viral'
 import type { Env } from './types'
-import { showcaseClips, showsShowcase, type ShowcaseClip } from './showcase'
+import { showcaseClips, showcaseViewsRows, showsShowcase } from './showcase'
 
 /**
  * Views-Analyse für die Grafik oben in jeder Übersicht und auf
@@ -60,7 +60,7 @@ const isoDay = (unix: number) => new Date(unix * 1000).toISOString().slice(0, 10
 
 export async function viewsAnalyticsFor(env: Env, user: User, now = Math.floor(Date.now() / 1000)): Promise<ViewsAnalytics> {
   // Demo-Agentur: die Use Cases von der Startseite zählen mit (lib/showcase.ts).
-  const extra = showsShowcase(user) ? showcaseClips(now) : []
+  const extra = showsShowcase(user) ? showcaseViewsRows() : []
   const scope = await postScopeFor(env, user)
   if (!scope && !extra.length) return empty()
   if (!scope) return build(empty(), [], [], [], extra, now)
@@ -134,27 +134,28 @@ function build(
   dayRows: { at: number; v: number }[],
   top: AnalyticsCampaign[],
   platforms: { platform: string; views: number }[],
-  extra: ShowcaseClip[],
+  extra: ReturnType<typeof showcaseViewsRows>,
   now: number,
 ): ViewsAnalytics {
   if (extra.length) {
+    // Reels je Use Case (auch die ohne bekannte Zahl) für Clips und Posts.
+    const reels = new Map<string, number>()
+    for (const c of showcaseClips()) reels.set(c.campaignId, (reels.get(c.campaignId) ?? 0) + 1)
     const camps = new Map<string, AnalyticsCampaign>()
     let views = 0
-    for (const c of extra) {
-      views += c.views
-      out.likes += c.likes
-      out.comments += c.comments
-      out.shares += c.shares
-      dayRows.push({ at: c.publishedAt, v: c.views })
-      const k = camps.get(c.campaignId) ?? { id: c.campaignId, name: c.campaign, views: 0, posts: 0, clips: 0 }
-      k.views += c.views
-      k.posts += 1
-      k.clips += 1
-      camps.set(c.campaignId, k)
+    for (const r of extra) {
+      views += r.views
+      // Ohne bekannten Tag: am Anfang des Zeitraums (zählt zu „Gesamt“, nicht zu den letzten Tagen).
+      dayRows.push({ at: r.at ?? now - (MAX_DAYS - 1) * DAY, v: r.views })
+      const n = reels.get(r.campaignId) ?? 0
+      const k = camps.get(r.campaignId) ?? { id: r.campaignId, name: r.campaign, views: 0, posts: n, clips: n }
+      k.views += r.views
+      camps.set(r.campaignId, k)
     }
+    const nReels = [...camps.values()].reduce((s, k) => s + k.clips, 0)
     out.total += views
-    out.posts += extra.length
-    out.clips += extra.length
+    out.posts += nReels
+    out.clips += nReels
     out.campaigns += camps.size
     out.syncedAt = out.syncedAt ?? now
     top = [...top, ...camps.values()].sort((a, b) => b.views - a.views).slice(0, 12)

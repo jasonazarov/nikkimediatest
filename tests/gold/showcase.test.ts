@@ -1,6 +1,6 @@
 import { makeD1 } from './d1'
 import assert from 'node:assert/strict'
-import { showcaseCampaign, showcaseCampaigns, showcaseClips, showsShowcase } from '../../src/lib/showcase'
+import { publishedAtOf, showcaseCampaign, showcaseCampaigns, showcaseClips, showsShowcase } from '../../src/lib/showcase'
 import { viralClipsFor } from '../../src/lib/viral'
 import { viewsAnalyticsFor } from '../../src/lib/analytics'
 
@@ -18,15 +18,27 @@ x(`INSERT INTO post_metrics (post_id,account_id,deliverable_id,project_id,platfo
   ('a','acc','d1','pown','tiktok','demo','https://t/a',1000,1,1),('b','acc2','d2','preal','tiktok','echt','https://t/b',2000,1,1)`)
 
 ;(async () => {
-  const sum = (id: string) => showcaseClips().filter((c) => c.campaignId === id).reduce((s, c) => s + c.views, 0)
-  assert.deepEqual(showcaseCampaigns().map((c) => [c.name, c.views, sum(c.id)]), [
-    ['DinDrop', 100_000_000, 100_000_000], ['Max Tornow', 70_000_000, 70_000_000], ['Caspian Blue', 40_000_000, 40_000_000],
-    ['Levantine Istanbul', 3_000_000, 3_000_000], ['Panperium', 450_000, 450_000]])
-  console.log('✓ Fünf Use Cases, Views der Reels ergeben genau die Zahlen der Startseite')
+  // Genau die Angaben des Auftraggebers, nichts geschätzt.
+  const known = showcaseClips().filter((c) => c.views !== null).map((c) => [c.reel, c.views, c.handle])
+  assert.deepEqual(known, [
+    ['DRSI7B3CI1M', 35_400_000, 'dindrop7'], ['C1xEPryiQ4t', 13_100_000, 'max_tornow_business'], ['DNF5zC7o66_', 11_600_000, 'dindrop7'],
+    ['DKZ-ra1qDiR', 6_400_000, 'caspianbluecaviar'], ['C0hXUyfixJt', 821_000, null], ['DY77rgqAHmj', 500_000, 'dindrop7'],
+    ['DaIZcxnqCPw', 475_000, 'caspianbluecaviar']])
+  assert.ok(showcaseClips().every((c) => c.likes === 0 && c.comments === 0 && c.shares === 0))
+  console.log('✓ Views je Reel genau wie angegeben, keine geschätzten Likes oder Shares')
 
-  assert.equal(showcaseCampaign('usecase-dindrop')?.clips.length, 5)
+  // Veröffentlichungstag aus dem Shortcode
+  assert.equal(new Date(publishedAtOf('DRSI7B3CI1M') * 1000).toISOString().slice(0, 10), '2025-11-20')
+  assert.equal(new Date(publishedAtOf('C0hXUyfixJt') * 1000).toISOString().slice(0, 10), '2023-12-06')
+  console.log('✓ Veröffentlichungstag aus dem Instagram-Link')
+
+  assert.deepEqual(showcaseCampaigns().map((c) => [c.name, c.views]), [
+    ['DinDrop', 100_000_000], ['Max Tornow', 70_000_000], ['Caspian Blue', 40_000_000], ['Levantine Istanbul', 3_000_000], ['Panperium', 450_000]])
+  const din = showcaseCampaign('usecase-dindrop')!
+  assert.deepEqual(din.clips.slice(0, 3).map((c) => c.views), [35_400_000, 11_600_000, 500_000])
+  assert.ok(din.clips.slice(3).every((c) => c.views === -1))
   assert.equal(showcaseCampaign('p-1'), null)
-  console.log('✓ Kampagnenseite: Reels mit Vorschaubild, fremde IDs nie')
+  console.log('✓ Kampagnen mit den Zahlen der Startseite, Reels ohne Zahl ohne Views')
 
   const demo = { id: 'udemo', role: 'agency', demo: 1 } as any
   const real = { id: 'ureal', role: 'agency', demo: 0 } as any
@@ -42,11 +54,10 @@ x(`INSERT INTO post_metrics (post_id,account_id,deliverable_id,project_id,platfo
   console.log('✓ Views-Grafik: Demo-Agentur mit Use Cases + eigenen, echte Agentur ohne')
 
   const v = await viralClipsFor(env, demo)
-  assert.equal(v.length, 8)
-  assert.equal(v[0].handle, 'dindrop7')
-  assert.ok(v.every((c) => c.thumb?.startsWith('/img/cases/') && c.url?.startsWith('https://www.instagram.com/')))
+  assert.deepEqual(v.map((c) => c.views), [35_400_000, 13_100_000, 11_600_000, 6_400_000, 821_000, 500_000, 475_000, 1000])
+  assert.ok(v.slice(0, 7).every((c) => c.url?.startsWith('https://www.instagram.com/reel/')))
   assert.deepEqual((await viralClipsFor(env, real)).map((c) => c.id), ['d2'])
-  console.log('✓ Virale Clips: die stärksten Reels mit Bild und Link, echte Agentur ohne')
+  console.log('✓ Virale Clips: genau die angegebenen Reels in der richtigen Reihenfolge, echte Agentur ohne')
 })().catch((e) => {
   console.error('✗', e)
   process.exit(1)
