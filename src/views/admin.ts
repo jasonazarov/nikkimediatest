@@ -485,9 +485,9 @@ function materialPreview(c: AdminCampaign): string {
 function teamPreview(c: AdminCampaign, links: ProfileLinks): string {
   if (!c.team.length) {
     return `<a href="/admin/projekte/${esc(c.id)}#team"
-               class="flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-2 text-xs font-bold text-amber-800 ring-1 ring-inset ring-amber-200 transition hover:bg-amber-100">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="h-4 w-4 shrink-0" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
-              No team yet: assign →
+               class="flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600 ring-1 ring-inset ring-slate-200 transition hover:bg-slate-100">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="h-4 w-4 shrink-0" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M19 8v6M16 11h6"/></svg>
+              No team yet · assign when ready
             </a>`
   }
   return `<div class="flex flex-wrap gap-1.5">${c.team.map((m) => teamChip(m, links.get(m.userId))).join('')}</div>`
@@ -746,11 +746,11 @@ export function overviewPage(o: {
     )} (creators) · Accounts: ${o.accounts.projectAccounts} on campaigns, ${o.accounts.creatorAccounts} on creators: Zernio bills per account: 1–2 free · 3–10 $6 · 11–100 $3 · 101+ $1 each.</p>` +
     reachBar(o.reach) +
     sectionHead(
-      'Waiting for a team',
+      'Without team yet',
       `<a href="/admin/projekte?team=none" class="shrink-0 text-sm font-semibold text-brand hover:underline">All without team →</a>`,
     ) +
     (o.waiting.length
-      ? `<p class="-mt-1 mb-4 text-sm text-slate-500">Active campaigns nobody works on yet, only you can see them. Open one to put its team together.</p>` +
+      ? `<p class="-mt-1 mb-4 text-sm text-slate-500">Active campaigns without clippers or creators yet. Nothing is required: assign a team whenever you are ready.</p>` +
         campaignGrid(o.waiting.slice(0, 6).map((c) => adminCampaignCard(c, o.links)))
       : `<p class="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-semibold text-emerald-800">Every active campaign has a team.</p>`) +
     sectionHead('Latest campaigns', `<a href="/admin/projekte" class="shrink-0 text-sm font-semibold text-brand hover:underline">All campaigns →</a>`) +
@@ -1440,7 +1440,7 @@ function newCampaignModal(owners: OwnerOption[]): string {
       <div id="np-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-labelledby="np-title">
         <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
           <h2 id="np-title" class="font-display text-lg font-bold">New campaign</h2>
-          <p class="mt-1 text-sm text-slate-500">The raw footage folder is created automatically. Put the team together on the campaign page; you hear about it as soon as footage or a cloud link arrives.</p>
+          <p class="mt-1 text-sm text-slate-500">The raw footage folder is created automatically. A team is optional: assign clippers or creators whenever you are ready, on the campaign page.</p>
           ${
             single
               ? `<p class="mt-4 text-sm">For <strong>${esc(single.label)}</strong></p>
@@ -1498,7 +1498,7 @@ const NEW_CAMPAIGN_JS = `
       if (!name.value.trim()) return fail('Please enter a campaign name.');
       btn.disabled = true;
       send('/api/admin/projects', 'POST', { customerId: owner.value, name: name.value.trim() })
-        .then(function (d) { window.location.href = d.id ? '/admin/projekte/' + encodeURIComponent(d.id) + '#team' : window.location.href; })
+        .then(function (d) { window.location.href = d.id ? '/admin/projekte/' + encodeURIComponent(d.id) : window.location.href; })
         .catch(function (e) { fail(e.message); btn.disabled = false; });
     });
   })();`
@@ -3579,7 +3579,7 @@ function teamPanel(o: {
         ${
           o.members.length
             ? `<ul class="mt-4 divide-y divide-slate-100 border-y border-slate-100">${memberRows}</ul>`
-            : `<p class="mt-5 rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800 ring-1 ring-inset ring-amber-200">No team yet: only you can see this campaign. Add clippers or creators below; they are emailed as soon as there is footage.</p>`
+            : `<p class="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600 ring-1 ring-inset ring-slate-200">No team yet, and that is fine: the campaign is saved and only you can see it. Assign clippers or creators whenever you are ready; they are emailed as soon as there is footage.</p>`
         }
         <p data-role-msg class="mt-2 hidden text-sm font-semibold text-red-600" role="alert"></p>
 

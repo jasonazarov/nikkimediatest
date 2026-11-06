@@ -263,3 +263,13 @@ html.nmd .nmw-stats { width: 100% !important; max-width: 100% !important; flex: 
 .nmw-check li span { width: 14px; flex: none; color: var(--w-soft); }
 .nmw-check li.is-ok { color: var(--w-text); }
 .nmw-check li.is-ok span { color: var(--w-green); }
+
+/* „Kampagne pushen“ (upsell.js): Stufen als Angebotskarten, +35 % hervorgehoben */
+.nmu--push { position: relative; overflow: hidden; background: radial-gradient(70% 120% at 100% 0%, rgba(47, 224, 140, .14), transparent 60%), var(--w-card) !important; border-color: rgba(47, 224, 140, .28) !important; }
+.nmu__eyebrow { font-size: .74rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--w-green); }
+.nmu--push .nmu__title { margin-top: 4px; }
+.nmu__offer { position: relative; }
+.nmu__offer.is-pick { border-color: rgba(47, 224, 140, .55) !important; background: linear-gradient(180deg, rgba(47, 224, 140, .12), rgba(47, 224, 140, .02)) !important; box-shadow: 0 10px 30px rgba(47, 224, 140, .08); }
+.nmu__badge { position: absolute; top: 12px; right: 12px; padding: 3px 9px; border-radius: 99px; font-size: .68rem; font-weight: 700; color: #02160c; background: var(--w-green); }
+.nmu__unit { font-size: .8rem; color: var(--w-mute); }
+#kampagne-pushen { margin-top: 18px; }

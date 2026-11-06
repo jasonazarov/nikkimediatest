@@ -424,9 +424,11 @@ die Preisstaffelung ganz oben bleiben muss; bei gesperrtem Agentur-Zugang fehlt 
 Text: Leerzeile = Absatz, „## “ = Zwischenüberschrift, „- “ = Liste. Alles wird escaped. Fehlt die
 Tabelle (Migration nicht eingespielt), zeigen die Seiten einfach keinen Block (`safeArticles`).
 
-**Upsells** (`src/lib/upsell.ts`, `public/assets/upsell.js`, Admin `/admin/upsells`): auf der Übersicht
-von Kunden (nur nach `converted_at`) und freigeschalteten Agenturen je laufender Kampagne +10/+25/+50 %
-Views. Ein Klick ist eine ANFRAGE (`upsell_requests`, Mail an `ADMIN_EMAIL`), kein Auftrag. Preise
+**Upsells / „Kampagne pushen“** (`src/lib/upsell.ts`, `public/assets/upsell.js`, Admin `/admin/upsells`):
+seit November 2026 **+20/+35/+50 % Budget** (zum selben Preis je 1.000 Views, also gleich viel mehr Views;
++35 % als „Unsere Empfehlung“). Auf der Übersicht UND auf jeder Kampagnenseite von Kunden (nur nach
+`converted_at`), freigeschalteten Agenturen und Creatorn (nur ihre EIGENEN Kampagnen, beim Creator unter
+dem Inhalt wegen der Preisstaffelung). Clipper und Admin haben keine eigenen Kampagnen, also kein Angebot. Ein Klick ist eine ANFRAGE (`upsell_requests`, Mail an `ADMIN_EMAIL`), kein Auftrag. Preise
 rechnet nur der Server: Briefing-Preis je 1.000 Views, sonst 5 €; Basis Briefing-Views, sonst
 erreichte Views, sonst 1 Mio.
 
@@ -500,3 +502,6 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
 - **Werkzeuge in Python** (`tools/`): `preview.py` (lokale Testdatenbank, Worker, Screenshots je
   Rolle), `seo_audit.py` (prüft alle öffentlichen Seiten), `guard.py` (Backend-Wächter),
   `og_image.py` (Vorschaubild). Wettbewerb: `docs/WETTBEWERB_DACH.md`.
+
+- **Kampagne ohne Team anlegen:** Im Admin führt „New campaign“ nicht mehr in den Team-Bereich, und „No
+  team yet“ ist ein neutraler Hinweis statt einer Warnung. Ein Team ist nie Pflicht; zuweisen, wann es passt.

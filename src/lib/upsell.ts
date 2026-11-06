@@ -22,7 +22,12 @@ import type { Env } from './types'
  * Kundenpreis aus, den die Agentur ihrem Kunden nennt.
  */
 
-export const UPSELL_PERCENTS = [10, 25, 50] as const
+/**
+ * „Kampagne pushen“: +20, +35 oder +50 % Budget (Vorgabe des Auftraggebers,
+ * November 2026; vorher +10/+25/+50 % Views). Mehr Budget heißt zum selben
+ * Preis je 1.000 Views genau so viel Prozent mehr Views.
+ */
+export const UPSELL_PERCENTS = [20, 35, 50] as const
 export type UpsellPercent = (typeof UPSELL_PERCENTS)[number]
 
 /** Richtwert: 5.000 € je Mio. Views = 500 Cent je 1.000 Views. */
@@ -30,7 +35,7 @@ export const PRICE_PER_THOUSAND_CENTS = 500
 export const DEFAULT_BASE_VIEWS = 1_000_000
 export const MARGIN_MAX_PCT = 300
 
-export type UpsellArea = 'customer' | 'agency'
+export type UpsellArea = 'customer' | 'agency' | 'creator'
 
 export interface UpsellOffer {
   percent: UpsellPercent
@@ -99,9 +104,13 @@ interface ProjectRow {
   reached: number | null
 }
 
-/** Die Angebote je laufender Kampagne des Nutzers (Kunde oder Agentur). Beendete Kampagnen fehlen. */
+/**
+ * Die Angebote je laufender Kampagne des Nutzers. Beendete Kampagnen fehlen.
+ * Kunde und Agentur: ihre Kampagnen. Creator: nur die EIGENEN (sein
+ * Arbeitsbereich), nie zugewiesene Kampagnen anderer.
+ */
 export async function upsellCampaigns(env: Env, user: User): Promise<{ marginPct: number; campaigns: UpsellCampaign[] }> {
-  if (user.role !== 'customer' && user.role !== 'agency') return { marginPct: 0, campaigns: [] }
+  if (user.role !== 'customer' && user.role !== 'agency' && user.role !== 'creator') return { marginPct: 0, campaigns: [] }
   const customer = await customerOf(env, user.id)
   if (!customer) return { marginPct: 0, campaigns: [] }
   // Leads ohne Auftrag bekommen kein Upsell — erst, wenn der Admin sie zum Kunden erklärt hat.
@@ -179,7 +188,7 @@ export async function createUpsell(
   percentRaw: unknown,
 ): Promise<CreatedUpsell | { error: string; status: number }> {
   const percent = Number(percentRaw) as UpsellPercent
-  if (!UPSELL_PERCENTS.includes(percent)) return { error: 'Bitte wähle +10 %, +25 % oder +50 %.', status: 400 }
+  if (!UPSELL_PERCENTS.includes(percent)) return { error: `Bitte wähle +${UPSELL_PERCENTS.join(' %, +')} % Budget.`, status: 400 }
   if (typeof projectId !== 'string' || !projectId) return { error: 'Bitte wähle eine Kampagne.', status: 400 }
 
   const { campaigns, marginPct } = await upsellCampaigns(env, user)

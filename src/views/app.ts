@@ -20,6 +20,8 @@ import {
   type ThumbView,
   quickActions,
   howItWorks,
+  upsellSection,
+  type PushArea,
 } from './layout'
 import { formatBytes } from '../lib/r2'
 import { DEFAULT_DIAL, dialOptions, splitPhone } from '../lib/phone'
@@ -996,6 +998,9 @@ export function filesPage(v: FilesView & { area?: CustomerArea }): string {
   const t = area.text
   const here = v.folder ? area.folderHref(v.folder.id) : area.projectHref(v.project.id)
   const root = !v.folder
+  // „Kampagne pushen“ auf der Kampagnenseite (lib/upsell.ts); upsell.js blendet es aus, wo es nichts anzubieten gibt.
+  const role = v.user.role
+  const pushHere = root && (role === 'customer' || role === 'agency' || role === 'creator')
 
   const crumbs =
     `<a href="${esc(area.home)}" class="hover:text-brand">${t.listTitle}</a>` +
@@ -1244,6 +1249,7 @@ export function filesPage(v: FilesView & { area?: CustomerArea }): string {
 
   const body = `
       ${header}
+      ${pushHere ? upsellSection(role as PushArea, v.project.id) : ''}
 
       ${material}
 
@@ -1287,6 +1293,7 @@ export function filesPage(v: FilesView & { area?: CustomerArea }): string {
     active: area.active,
     body,
     script: filesScript(v.folder?.id ?? null, v.project.id, here),
+    push: pushHere,
   })
 }
 

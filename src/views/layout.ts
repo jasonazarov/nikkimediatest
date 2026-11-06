@@ -140,6 +140,8 @@ export interface ShellOptions {
   script?: string
   /** Seite trägt selbst eine `viewsSection` (z. B. /admin/analytics) — lädt assets/views.js. */
   analytics?: boolean
+  /** Seite trägt selbst eine `upsellSection` (Kampagnenseite) — lädt assets/upsell.js. */
+  push?: boolean
 }
 
 /** Vorschläge des FAQ-Agenten je Bereich (assets/agent.js). Admin bekommt keinen Agenten. */
@@ -162,16 +164,26 @@ const viralPlacement = (o: ShellOptions): 'top' | 'bottom' | null => {
   return o.user.role === 'clipper' || o.user.role === 'creator' ? 'bottom' : 'top'
 }
 
-/** Platzhalter auf der Übersicht; assets/upsell.js füllt ihn über GET /api/upsell. */
-export const upsellSection = (area: 'customer' | 'agency') => `
-      <section class="nmu" id="mehr-reichweite" data-upsell data-area="${area}" aria-labelledby="nmu-title">
+export type PushArea = 'customer' | 'agency' | 'creator'
+
+/**
+ * „Kampagne pushen“: +20 / +35 / +50 % Budget (lib/upsell.ts). Platzhalter;
+ * assets/upsell.js füllt ihn über GET /api/upsell und entfernt ihn, wenn es
+ * nichts anzubieten gibt. Auf der Übersicht mit allen laufenden Kampagnen,
+ * auf einer Kampagnenseite (`projectId`) nur für diese eine.
+ */
+export const upsellSection = (area: PushArea, projectId?: string) => `
+      <section class="nmu nmu--push" ${projectId ? 'id="kampagne-pushen"' : 'id="mehr-reichweite"'} data-upsell data-area="${area}"${
+        projectId ? ` data-project="${esc(projectId)}"` : ''
+      } aria-labelledby="nmu-title">
         <div class="nmu__head">
           <div>
-            <h2 id="nmu-title" class="nmu__title">Mehr Reichweite für deine Kampagne</h2>
+            <p class="nmu__eyebrow">Kampagne pushen</p>
+            <h2 id="nmu-title" class="nmu__title">${projectId ? 'Mehr Budget, mehr Clipper, mehr Views' : 'Pushe deine laufenden Kampagnen'}</h2>
             <p class="nmu__sub">${
               area === 'agency'
-                ? 'Mehr Views zu den Konditionen der Kampagne. Euer Kundenpreis enthält eure Marge aus „Preise &amp; Marge“.'
-                : 'Mehr Views zu den Konditionen deiner Kampagne. Ein Klick ist eine Anfrage, Jason bestätigt sie persönlich.'
+                ? 'Legt 20, 35 oder 50 % Budget drauf: zum selben Preis je 1.000 Views, also genau so viel mehr Reichweite. Euer Kundenpreis enthält eure Marge aus „Preise &amp; Marge“.'
+                : 'Leg 20, 35 oder 50 % Budget drauf: zum selben Preis je 1.000 Views, also genau so viel mehr Reichweite. Ein Klick ist eine Anfrage, Jason bestätigt sie persönlich.'
             }</p>
           </div>
         </div>
@@ -235,9 +247,10 @@ export function shell(o: ShellOptions): string {
   const siteLabel = lang === 'en' ? 'Website' : 'Zur Website'
   const viral = viralPlacement(o)
   const suggest = AGENT_SUGGEST[o.user.role]
-  // „Mehr Reichweite“ (lib/upsell.ts): auf der Übersicht von Kunde und Agentur, nie bei gesperrtem Zugang.
-  const upsell: 'customer' | 'agency' | null =
-    viral && (o.user.role === 'customer' || o.user.role === 'agency') ? o.user.role : null
+  // „Kampagne pushen“ (lib/upsell.ts): auf der Übersicht von Kunde, Agentur und Creator, nie bei gesperrtem Zugang.
+  // Beim Creator steht es unter dem Inhalt, weil oben die Preisstaffelung bleiben muss.
+  const upsell: PushArea | null =
+    viral && !o.push && (o.user.role === 'customer' || o.user.role === 'agency' || o.user.role === 'creator') ? o.user.role : null
 
   const link = (item: NavItem) => {
     const on = item.href === o.active
@@ -337,8 +350,8 @@ export function shell(o: ShellOptions): string {
   <div class="nmd-main">
     <main class="nmd-content">
       <div class="mx-auto max-w-7xl">
-${withTopSections(o.body, (viral === 'top' ? viewsSection(o.user.role, lang) + viralSection(o.user.role, lang) : '') + (upsell ? upsellSection(upsell) : ''))}
-${viral === 'bottom' ? viewsSection(o.user.role, lang) + viralSection(o.user.role, lang) : ''}
+${withTopSections(o.body, (viral === 'top' ? viewsSection(o.user.role, lang) + viralSection(o.user.role, lang) : '') + (upsell && viral === 'top' ? upsellSection(upsell) : ''))}
+${viral === 'bottom' ? (upsell ? upsellSection(upsell) : '') + viewsSection(o.user.role, lang) + viralSection(o.user.role, lang) : ''}
       </div>
     </main>
   </div>
@@ -385,7 +398,7 @@ ${viral === 'bottom' ? viewsSection(o.user.role, lang) + viralSection(o.user.rol
 <script src="/assets/thumb.js" defer></script>
 ${viral ? '<script src="/assets/viral.js" defer></script>\n<script src="/assets/views.js" defer></script>' : ''}
 ${o.analytics ? '<script src="/assets/views.js" defer></script>' : ''}
-${upsell ? '<script src="/assets/upsell.js" defer></script>' : ''}
+${upsell || o.push ? '<script src="/assets/upsell.js" defer></script>' : ''}
 ${suggest ? `<script type="application/json" id="agent-config">${jsonScript({ suggest })}</script>\n<script src="/assets/agent.js" defer></script>` : ''}
 ${o.script ? `<script>\n${o.script}\n</script>` : ''}
 </body>

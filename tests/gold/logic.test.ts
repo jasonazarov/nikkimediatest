@@ -24,13 +24,13 @@ let pass = 0; const ok = (name: string, fn: () => any) => Promise.resolve(fn()).
     assert.equal(r.campaigns.length, 1)
     const c = r.campaigns[0]
     assert.equal(c.baseSource, 'briefing'); assert.equal(c.perThousandCents, 400)
-    assert.deepEqual(c.offers.map(o => [o.percent, o.extraViews, o.priceCents]), [[10,200000,80000],[25,500000,200000],[50,1000000,400000]])
-    assert.equal(c.offers[0].clientPriceCents, 80000) // Marge 0
+    assert.deepEqual(c.offers.map(o => [o.percent, o.extraViews, o.priceCents]), [[20,400000,160000],[35,700000,280000],[50,1000000,400000]])
+    assert.equal(c.offers[0].clientPriceCents, 160000) // Marge 0
   })
   await ok('Marge 30 % wird gespeichert und auf den Kundenpreis gerechnet', async () => {
     assert.equal(await U.setMargin(env, agency, 30), 30)
     const r = await U.upsellCampaigns(env, agency)
-    assert.equal(r.marginPct, 30); assert.equal(r.campaigns[0].offers[1].clientPriceCents, 260000)
+    assert.equal(r.marginPct, 30); assert.equal(r.campaigns[0].offers[1].clientPriceCents, 364000)
   })
   await ok('Marge: ungültige Werte und falsche Rolle abgewiesen', async () => {
     assert.ok('error' in (await U.setMargin(env, agency, -5) as any))
@@ -40,33 +40,44 @@ let pass = 0; const ok = (name: string, fn: () => any) => Promise.resolve(fn()).
   })
   await ok('Lead (nicht zum Kunden erklärt) bekommt keine Upsells', async () => {
     assert.equal((await U.upsellCampaigns(env, cust)).campaigns.length, 0)
-    assert.equal((await U.createUpsell(env, cust, 'pc', 10) as any).status, 404)
+    assert.equal((await U.createUpsell(env, cust, 'pc', 20) as any).status, 404)
     x(`UPDATE customers SET converted_at = ? WHERE id = 'cc'`, now)
   })
   await ok('Kunde ohne Briefing: Basis 1 Mio. zu 5 €, beendete Kampagne fehlt, kein Kundenpreis', async () => {
     const r = await U.upsellCampaigns(env, cust)
     assert.deepEqual(r.campaigns.map(c => c.id), ['pc'])
     const c = r.campaigns[0]
-    assert.equal(c.baseSource, 'default'); assert.equal(c.offers[0].priceCents, 50000); assert.equal(c.offers[0].clientPriceCents, null)
+    assert.equal(c.baseSource, 'default'); assert.equal(c.offers[0].priceCents, 100000); assert.equal(c.offers[0].clientPriceCents, null)
   })
   await ok('Erreichte Views werden Basis, sobald es Zahlen gibt', async () => {
     x(`INSERT INTO deliverables (id,project_id,r2_key,filename,created_at) VALUES ('d1','pc','k','f.mp4',?)`, now)
     x(`INSERT INTO post_metrics (post_id,account_id,deliverable_id,project_id,platform,views,impressions,synced_at) VALUES ('p1','a1','d1','pc','tiktok',2345678,0,?)`, now)
     const c = (await U.upsellCampaigns(env, cust)).campaigns[0]
-    assert.equal(c.baseSource, 'reached'); assert.equal(c.baseViews, 2345678); assert.equal(c.offers[1].extraViews, 586000)
+    assert.equal(c.baseSource, 'reached'); assert.equal(c.baseViews, 2345678); assert.equal(c.offers[1].extraViews, 821000)
   })
   await ok('Anfrage anlegen, Doppelklick wird abgewiesen, Status „pending“', async () => {
-    const r: any = await U.createUpsell(env, cust, 'pc', 25)
-    assert.ok(r.id); assert.equal(r.offer.priceCents, 293000)
-    const again: any = await U.createUpsell(env, cust, 'pc', 25); assert.equal(again.status, 409)
+    const r: any = await U.createUpsell(env, cust, 'pc', 35)
+    assert.ok(r.id); assert.equal(r.offer.priceCents, 410500)
+    const again: any = await U.createUpsell(env, cust, 'pc', 35); assert.equal(again.status, 409)
     const c = (await U.upsellCampaigns(env, cust)).campaigns[0]
     assert.deepEqual(c.offers.map(o => o.pending), [false, true, false])
   })
   await ok('Fremde, beendete Kampagnen, falsche Prozente und Clipper abgewiesen', async () => {
-    assert.equal((await U.createUpsell(env, cust, 'px', 10) as any).status, 404)
-    assert.equal((await U.createUpsell(env, cust, 'pend', 10) as any).status, 404)
-    assert.equal((await U.createUpsell(env, cust, 'pc', 15) as any).status, 400)
-    assert.equal((await U.createUpsell(env, clip, 'pc', 10) as any).status, 404)
+    assert.equal((await U.createUpsell(env, cust, 'px', 20) as any).status, 404)
+    assert.equal((await U.createUpsell(env, cust, 'pend', 20) as any).status, 404)
+    assert.equal((await U.createUpsell(env, cust, 'pc', 25) as any).status, 400) // alte Stufe gilt nicht mehr
+    assert.equal((await U.createUpsell(env, clip, 'pc', 20) as any).status, 404)
+  })
+  await ok('Creator: nur eigene Kampagnen pushen, zugewiesene und fremde nicht', async () => {
+    x(`INSERT INTO users (id,email,role,full_name,created_at) VALUES ('ucr','cr@x.de','creator','Creator R',?)`, now)
+    x(`INSERT INTO customers (id,user_id,storage_bytes,created_at) VALUES ('ccr','ucr',0,?)`, now)
+    x(`INSERT INTO projects (id,customer_id,name,status,created_at) VALUES ('pcr','ccr','Eigene','aktiv',?)`, now)
+    const creator: any = { id: 'ucr', role: 'creator' }
+    const r = await U.upsellCampaigns(env, creator)
+    assert.deepEqual(r.campaigns.map(c => c.id), ['pcr']); assert.equal(r.campaigns[0].offers[2].clientPriceCents, null)
+    assert.equal((await U.createUpsell(env, creator, 'pc', 20) as any).status, 404)
+    const made: any = await U.createUpsell(env, creator, 'pcr', 20); assert.ok(made.id)
+    x(`DELETE FROM upsell_requests WHERE id = ?`, made.id)
   })
   await ok('Agentur-Anfrage speichert Kundenpreis mit Marge', async () => {
     const r: any = await U.createUpsell(env, agency, 'pa', 50)

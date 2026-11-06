@@ -1,14 +1,19 @@
 /* ==========================================================================
-   NIKKI MEDIA, „Mehr Reichweite“ (+10 / +25 / +50 %) in der Übersicht
+   NIKKI MEDIA, „Kampagne pushen“ (+20 / +35 / +50 % Budget)
    Markup: upsellSection() in src/views/layout.ts · Daten: GET/POST /api/upsell
    (src/lib/upsell.ts). Preise rechnet der Server, der Browser zeigt sie nur.
-   Ohne passende Kampagne verschwindet der ganze Bereich.
+   Übersicht: alle laufenden Kampagnen mit Reitern. Kampagnenseite
+   (data-project): nur diese eine. Ohne passende Kampagne verschwindet der
+   ganze Bereich.
    ========================================================================== */
 (function () {
   'use strict';
   var box = document.querySelector('[data-upsell]');
   if (!box) return;
   var area = box.getAttribute('data-area');
+  var only = box.getAttribute('data-project');
+  /* Was jede Stufe bringt: kurz und ohne Versprechen, die wir nicht messen. */
+  var PITCH = { 20: 'Mehr Clips im Umlauf', 35: 'Mehr Clipper auf deiner Kampagne', 50: 'Maximaler Schub' };
   var body = box.querySelector('[data-upsell-body]');
   var state = { campaigns: [], marginPct: 0, current: 0 };
 
@@ -54,18 +59,20 @@
 
     var grid = el('div', 'nmu__grid');
     c.offers.forEach(function (o) {
-      var card = el('div', 'nmu__offer');
+      var card = el('div', 'nmu__offer' + (o.percent === 35 ? ' is-pick' : ''));
+      if (o.percent === 35) card.appendChild(el('span', 'nmu__badge', 'Unsere Empfehlung'));
       card.appendChild(el('span', 'nmu__pct', '+' + o.percent + ' %'));
-      card.appendChild(el('span', 'nmu__views', '+' + num(o.extraViews) + ' Views'));
+      card.appendChild(el('span', 'nmu__unit', 'mehr Budget · ' + (PITCH[o.percent] || '')));
+      card.appendChild(el('span', 'nmu__views', '≈ +' + num(o.extraViews) + ' Views'));
       if (area === 'agency' && o.clientPriceCents != null) {
         var p = el('span', 'nmu__price', euro(o.clientPriceCents));
         card.appendChild(p);
         card.appendChild(el('span', 'nmu__note', 'Euer Kundenpreis · unser Preis ' + euro(o.priceCents) + (state.marginPct ? ' · ' + state.marginPct + ' % Marge' : '')));
       } else {
-        card.appendChild(el('span', 'nmu__price', euro(o.priceCents)));
-        card.appendChild(el('span', 'nmu__note', 'zusätzlich, nach erreichten Views'));
+        card.appendChild(el('span', 'nmu__price', '+' + euro(o.priceCents)));
+        card.appendChild(el('span', 'nmu__note', 'zusätzliches Budget, abgerechnet nach erreichten Views'));
       }
-      var btn = el('button', 'nmu__btn', o.pending ? 'Angefragt' : 'Anfragen');
+      var btn = el('button', 'nmu__btn', o.pending ? 'Angefragt' : 'Kampagne pushen');
       btn.type = 'button';
       btn.disabled = !!o.pending;
       if (!o.pending) btn.addEventListener('click', function () { request(c, o, btn, card); });
@@ -97,12 +104,12 @@
         o.pending = true;
         btn.textContent = 'Angefragt';
         card.classList.add('is-done');
-        msg.textContent = res.status === 409 ? res.d.error : 'Angefragt: +' + num(o.extraViews) + ' Views für „' + c.name + '“. Jason meldet sich persönlich bei dir.';
+        msg.textContent = res.status === 409 ? res.d.error : 'Angefragt: +' + o.percent + ' % Budget (≈ +' + num(o.extraViews) + ' Views) für „' + c.name + '“. Jason meldet sich persönlich bei dir.';
         msg.className = 'nmu__msg is-good';
       })
       .catch(function (e) {
         btn.disabled = false;
-        btn.textContent = 'Anfragen';
+        btn.textContent = 'Kampagne pushen';
         msg.textContent = e.message;
         msg.className = 'nmu__msg is-bad';
       });
@@ -112,6 +119,7 @@
     .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
     .then(function (d) {
       state.campaigns = (d && d.campaigns) || [];
+      if (only) state.campaigns = state.campaigns.filter(function (k) { return k.id === only; });
       state.marginPct = (d && d.marginPct) || 0;
       if (!state.campaigns.length) { box.remove(); return; }
       render();

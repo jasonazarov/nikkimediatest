@@ -21,7 +21,7 @@ import type { AppEnv } from '../lib/types'
  *   GET  /api/viral-clips   „Virale Clips“ oben in jeder Übersicht (je Rolle, siehe lib/viral.ts)
  *   GET  /api/views-analytics  Views-Grafik der Übersichten und /admin/analytics (lib/analytics.ts)
  *   POST /api/investors     Anfrage über /investoren → Mail an ADMIN_EMAIL + audit_log
- *   GET  /api/upsell        Angebote +10/25/50 % je Kampagne (Kunde, Agentur; lib/upsell.ts)
+ *   GET  /api/upsell        Angebote +20/35/50 % Budget je Kampagne (Kunde, Agentur, Creator; lib/upsell.ts)
  *   POST /api/upsell        Anfrage anlegen → upsell_requests + Mail an ADMIN_EMAIL
  *   PUT  /api/agency/margin Aufschlag der Agentur auf unsere Preise
  *   /api/gold-admin/…       Fachartikel anlegen/ändern/löschen, Upsell-Status (nur Admin)
@@ -122,12 +122,12 @@ marketplaceApi.post('/investors', async (c) => {
 /* ------------------------------------------------------------- Upsells */
 
 /**
- * Wer Upsells sehen und anfragen darf: Kunden immer, Agenturen nur mit
- * freigeschaltetem Zugang (wie alle anderen Agentur-Bereiche).
+ * Wer Upsells sehen und anfragen darf: Kunden und Creator (eigene Kampagnen)
+ * immer, Agenturen nur mit freigeschaltetem Zugang (wie alle anderen Agentur-Bereiche).
  */
 async function upsellUser(c: any): Promise<{ user: any } | Response> {
   const area = c.req.query('area') ?? (await c.req.json().catch(() => ({}))).area
-  if (area !== 'customer' && area !== 'agency') return c.json({ error: 'Unbekannter Bereich.' }, 400)
+  if (area !== 'customer' && area !== 'agency' && area !== 'creator') return c.json({ error: 'Unbekannter Bereich.' }, 400)
   const user = await currentUser(c.env, c, area)
   if (!user) return c.json({ error: 'Nicht angemeldet.' }, 401)
   if (area === 'agency') {
@@ -146,7 +146,7 @@ marketplaceApi.get('/upsell', async (c) => {
 marketplaceApi.post('/upsell', async (c) => {
   const body = (await c.req.json().catch(() => ({}))) as Record<string, unknown>
   const area = body.area
-  if (area !== 'customer' && area !== 'agency') return c.json({ error: 'Unbekannter Bereich.' }, 400)
+  if (area !== 'customer' && area !== 'agency' && area !== 'creator') return c.json({ error: 'Unbekannter Bereich.' }, 400)
   const user = await currentUser(c.env, c, area)
   if (!user) return c.json({ error: 'Nicht angemeldet.' }, 401)
   if (area === 'agency') {

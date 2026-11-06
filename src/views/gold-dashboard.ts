@@ -386,7 +386,7 @@ export function adminUpsellsPage(o: { user: User; rows: UpsellRow[] }): string {
   const open = o.rows.filter((r) => r.status === 'offen')
   const sum = open.reduce((s, r) => s + r.priceCents, 0)
   const body =
-    pageTitle('Upsells', `Requests for more reach (+${UPSELL_PERCENTS.join(' / +')} %) from customer and agency dashboards. A request is not an order: confirm it with the client first.`) +
+    pageTitle('Upsells', `“Push campaign” requests (+${UPSELL_PERCENTS.join(' / +')} % budget) from customer, agency and creator dashboards. A request is not an order: confirm it with the client first.`) +
     `<p class="mb-6 text-sm text-slate-500"><b class="text-slate-900">${open.length}</b> open · <b class="text-slate-900">${esc(formatEuro(sum))}</b> open volume</p>` +
     (o.rows.length
       ? card(`<div class="overflow-x-auto"><table class="w-full text-sm">

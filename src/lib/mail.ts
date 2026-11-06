@@ -999,17 +999,17 @@ export function mailUpsellAdmin(
   return send(env, {
     to: env.ADMIN_EMAIL,
     replyTo: o.email,
-    subject: `Upsell +${o.percent} %: ${o.campaign} (${o.fullName})`,
+    subject: `Kampagne pushen +${o.percent} % Budget: ${o.campaign} (${o.fullName})`,
     html: layout(
       env,
       'Upsell-Anfrage',
-      h1(`Mehr Reichweite angefragt: +${o.percent} %`) +
+      h1(`Kampagne pushen: +${o.percent} % Budget angefragt`) +
         dl([
-          ['Von', `${o.fullName} (${o.role === 'agency' ? 'Agentur' : 'Kunde'})`],
+          ['Von', `${o.fullName} (${o.role === 'agency' ? 'Agentur' : o.role === 'creator' ? 'Creator, eigene Kampagne' : 'Kunde'})`],
           ['E-Mail', o.email],
           ['Kampagne', o.campaign],
           ['Zusätzliche Views', o.extraViews.toLocaleString('de-DE')],
-          ['Preis', o.price],
+          ['Zusätzliches Budget', o.price],
           ...(o.clientPrice ? ([['Kundenpreis der Agentur', o.clientPrice]] as [string, string][]) : []),
         ]) +
         button(`${env.APP_URL}/admin/upsells`, 'Im Admin-Bereich öffnen'),
