@@ -45,14 +45,13 @@ const sourceOptions = (): string =>
 const STEPPER_CONFIG = {
   endpoint: '/api/creators',
   redirect: '/kampagnen',
-  titles: ['Ziel', 'Plattformen', 'Nische', 'Werbung', 'Follower', 'Views', 'Letzte 30 Tage', 'Woher', 'Handles', 'Kontakt'],
+  titles: ['Ziel', 'Plattformen', 'Nische', 'Werbung', 'Reichweite', 'Woher', 'Kontakt'],
   stepLabel: 'Schritt {n} von {total} · {title}',
   submitText: 'Zum Kampagnen-Dashboard',
   sendingText: 'Einen Moment …',
   errors: {
     pick: 'Bitte triff zuerst eine Auswahl.',
-    // Kommt in Schritt 9 (Handles) wie in Schritt 10 (Kontakt) — deshalb allgemein gehalten.
-    contact: 'Bitte fülle alle Pflichtfelder aus, Handles, Name, E-Mail, Vorwahl und Telefonnummer, und stimme der Datenschutzerklärung zu.',
+    contact: 'Bitte fülle Name, E-Mail, Vorwahl und Telefonnummer aus und stimme der Datenschutzerklärung zu.',
     link: 'Bitte gib einen vollständigen Link ein, der mit https:// beginnt, oder lass das Feld leer.',
     tooMany: 'Zu viele Anfragen von dieser Verbindung. Bitte versuche es später erneut.',
     generic: 'Das hat leider nicht geklappt. Bitte versuche es erneut.',
@@ -139,16 +138,16 @@ const nicheChips = (): string =>
   ).join('')
 
 /**
- * Schritt 8: je Plattform ein Handle-Feld. Sichtbar (und damit Pflicht und
- * Teil der Nutzlast) ist nur, was in Schritt 2 angehakt wurde — das regelt
+ * Im Kontakt-Schritt ganz unten: je Plattform ein Handle-Feld, freiwillig.
+ * Sichtbar (und Teil der Nutzlast) ist nur, was in Schritt 2 angehakt wurde, das regelt
  * `data-show-if` in stepper.js.
  */
 const handleFields = (): string =>
   CREATOR_PLATFORMS.map(
     (p) => `
               <label class="field" data-show-if="platforms:${esc(p.value)}" hidden>
-                <span class="field__l"><img src="/img/platforms/${esc(p.value)}.svg" alt="" width="16" height="16" loading="lazy" decoding="async">${esc(p.label)} <i>*</i></span>
-                <input type="text" name="handle_${esc(p.value)}" required maxlength="100" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@deinname">
+                <span class="field__l"><img src="/img/platforms/${esc(p.value)}.svg" alt="" width="16" height="16" loading="lazy" decoding="async">${esc(p.label)}</span>
+                <input type="text" name="handle_${esc(p.value)}" maxlength="100" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@deinname">
               </label>`,
   ).join('')
 
@@ -381,13 +380,13 @@ ${AURORA}
 
           <div class="stepper__head">
             <div class="stepper__meta">
-              <span data-step-label>Schritt 1 von 10 · Ziel</span>
+              <span data-step-label>Schritt 1 von 7 · Ziel</span>
               <span class="stepper__dots" aria-hidden="true">
-                <i class="is-on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                <i class="is-on"></i><i></i><i></i><i></i><i></i><i></i><i></i>
               </span>
             </div>
-            <div class="stepper__bar" role="progressbar" aria-valuemin="1" aria-valuemax="10" aria-valuenow="1" aria-label="Fortschritt">
-              <i data-step-bar style="width:10%"></i>
+            <div class="stepper__bar" role="progressbar" aria-valuemin="1" aria-valuemax="7" aria-valuenow="1" aria-label="Fortschritt">
+              <i data-step-bar style="width:14%"></i>
             </div>
           </div>
 
@@ -420,45 +419,37 @@ ${AURORA}
             </div>
           </fieldset>
 
-          <!-- Schritt 5 — Follower insgesamt -->
-          <fieldset class="stepper__panel" data-panel="5" data-require="followers" hidden>
-            <legend class="stepper__q">Wie viele Follower hast du insgesamt auf deinen Social-Media-Kanälen?</legend>
-            <div class="opts">${radioOptions('followers', CREATOR_FOLLOWERS)}
+          <!-- Schritt 5 — Reichweite: Follower, Views insgesamt, Views 30 Tage in EINEM
+               Schritt (Vorgabe des Auftraggebers, November 2026). Springt erst weiter,
+               wenn alle drei gewählt sind (stepper.js: data-require mit drei Gruppen). -->
+          <fieldset class="stepper__panel" data-panel="5" data-require="followers viewsTotal views30d" hidden>
+            <legend class="stepper__q">Wie groß ist deine Reichweite?</legend>
+            <div class="substep">
+              <p class="substep__q">Follower insgesamt</p>
+              <div class="opts opts--pills">${radioOptions('followers', CREATOR_FOLLOWERS)}
+              </div>
+            </div>
+            <div class="substep">
+              <p class="substep__q">Views insgesamt</p>
+              <div class="opts opts--pills">${radioOptions('viewsTotal', CREATOR_VIEWS_TOTAL)}
+              </div>
+            </div>
+            <div class="substep">
+              <p class="substep__q">Views in den letzten 30 Tagen</p>
+              <div class="opts opts--pills">${radioOptions('views30d', CREATOR_VIEWS_30D)}
+              </div>
             </div>
           </fieldset>
 
-          <!-- Schritt 6 — Views allgemein -->
-          <fieldset class="stepper__panel" data-panel="6" data-require="viewsTotal" hidden>
-            <legend class="stepper__q">Wie viele Views hast du allgemein auf deinen Social-Media-Plattformen?</legend>
-            <div class="opts">${radioOptions('viewsTotal', CREATOR_VIEWS_TOTAL)}
-            </div>
-          </fieldset>
-
-          <!-- Schritt 7 — Views der letzten 30 Tage -->
-          <fieldset class="stepper__panel" data-panel="7" data-require="views30d" hidden>
-            <legend class="stepper__q">Wie viele Views hattest du in den letzten 30 Tagen?</legend>
-            <div class="opts">${radioOptions('views30d', CREATOR_VIEWS_30D)}
-            </div>
-          </fieldset>
-
-          <!-- Schritt 8 — Woher: dieselbe Frage und Liste wie auf /brands (AGENCY_SOURCES) -->
-          <fieldset class="stepper__panel" data-panel="8" data-require="source" hidden>
+          <!-- Schritt 6 — Woher: dieselbe Frage und Liste wie auf /brands (AGENCY_SOURCES) -->
+          <fieldset class="stepper__panel" data-panel="6" data-require="source" hidden>
             <legend class="stepper__q">Wie bist du auf uns aufmerksam geworden?</legend>
             <div class="opts">${sourceOptions()}
             </div>
           </fieldset>
 
-          <!-- Schritt 9 — Handles: nur die Felder der in Schritt 2 gewählten
-               Plattformen sind sichtbar und Pflicht. -->
-          <fieldset class="stepper__panel" data-panel="9" hidden>
-            <legend class="stepper__q">Gib deine Social-Media-Handles an, wir melden uns zeitnah bei dir.</legend>
-            <p class="stepper__hint">Ein Feld je gewählter Plattform, mit oder ohne @.</p>
-            <div class="fields">${handleFields()}
-            </div>
-          </fieldset>
-
-          <!-- Schritt 10 — Kontaktdaten -->
-          <fieldset class="stepper__panel" data-panel="10" hidden>
+          <!-- Schritt 7 — Kontaktdaten, ganz unten freiwillig die Social-Media-Handles -->
+          <fieldset class="stepper__panel" data-panel="7" hidden>
             <legend class="stepper__q">Wohin dürfen wir deinen Zugang schicken?</legend>
             <div class="fields">
               <label class="field">
@@ -496,6 +487,14 @@ ${AURORA}
                 <input type="url" name="cloudLink" inputmode="url" autocomplete="url" maxlength="2000" placeholder="https://drive.google.com/…">
                 <span class="field__hint">Google Drive, Dropbox, iCloud, OneDrive, WeTransfer … Daraus wird direkt deine erste Kampagne. Dateien kannst du danach auch im Dashboard hochladen.</span>
               </label>
+            </div>
+
+            <!-- Ganz unten, freiwillig: die Handles der in Schritt 2 gewählten Plattformen
+                 (Vorgabe des Auftraggebers, November 2026; vorher ein eigener Pflichtschritt). -->
+            <div class="substep substep--last">
+              <p class="substep__q">Deine Social-Media-Kanäle <em>(optional)</em></p>
+              <div class="fields">${handleFields()}
+              </div>
             </div>
 
             <!-- Honeypot: für Menschen unsichtbar, Bots füllen ihn aus. -->

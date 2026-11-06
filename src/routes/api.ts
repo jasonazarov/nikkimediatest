@@ -536,7 +536,8 @@ apiRoutes.post('/creators', async (c) => {
   const email = str(body.email, 190).toLowerCase()
   const phone = composePhone(str(body.phoneDial, 8), str(body.phone, 60))
 
-  // Je gewählter Plattform ein Handle — führendes @ und Leerraum fallen weg.
+  // Je gewählter Plattform ein Handle, freiwillig (seit November 2026 ganz unten im
+  // Kontakt-Schritt). Führendes @ und Leerraum fallen weg.
   const handles: Record<string, string> = {}
   for (const platform of platforms) {
     const handle = str(body[`handle_${platform}`], 100).replace(/^@+/, '').trim()
@@ -551,7 +552,6 @@ apiRoutes.post('/creators', async (c) => {
     CREATOR_GOALS.some((o) => o.value === goal) &&
     (INDUSTRIES as readonly string[]).includes(niche) &&
     platforms.length > 0 &&
-    platforms.every((p) => handles[p]) &&
     CREATOR_AD_OPENNESS.some((o) => o.value === openToAds) &&
     CREATOR_FOLLOWERS.some((o) => o.value === followers) &&
     CREATOR_VIEWS_TOTAL.some((o) => o.value === viewsTotal) &&

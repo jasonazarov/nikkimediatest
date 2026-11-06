@@ -1829,3 +1829,32 @@ ul { margin: 0; padding: 0; list-style: none; }
   .theme-creator .nav__links { display: none; }
   .theme-creator .nav__burger { display: block; }
 }
+
+/* --------------------------------------------------------------------------
+   Mehrere Fragen in einem Schritt (Vorgabe des Auftraggebers, November 2026):
+   /creator „Reichweite“ (Follower, Views, 30 Tage), /brands „Eure Agentur“
+   (Kunden + Art der Agentur), dazu die freiwilligen Social-Media-Felder ganz
+   unten im Kontakt-Schritt. Jede Teilfrage ist ein .substep mit kleiner
+   Überschrift. .opts--pills setzt die Antworten als kompakte Pillen, damit
+   drei Fragen ohne Scrollen in die Karte passen.
+   -------------------------------------------------------------------------- */
+.stepper__q + .substep { margin-top: 14px; }
+.substep + .substep { margin-top: 16px; }
+.substep__q { margin: 0 0 8px; font-size: .86rem; font-weight: 700; line-height: 1.35; color: var(--text); }
+.substep__q em { font-style: normal; font-weight: 500; color: var(--text-soft); }
+.substep--last { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
+.opts.opts--pills { display: flex; flex-wrap: wrap; gap: 6px; grid-template-columns: none; grid-auto-rows: auto; }
+.opts--pills .opt { display: flex; }
+.opts--pills .opt > span { padding: 8px 14px; border-radius: 999px; }
+.opts--pills .opt > span b { font-size: .84rem; font-weight: 600; white-space: nowrap; }
+@media (max-width: 679px) {
+  .opts.opts--pills { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .opts--pills .opt > span { flex: 1; text-align: center; border-radius: var(--r-sm); padding: 9px 8px; }
+  .opts--pills .opt > span b { white-space: normal; font-size: .8rem; }
+}
+@media (min-width: 680px) {
+  /* Desktop: jede Teilfrage in einer Zeile, die Pillen füllen die Breite. */
+  .opts--pills .opt { flex: 1 1 auto; }
+  .opts--pills .opt > span { padding: 8px 10px; text-align: center; }
+  .opts--pills .opt > span b { font-size: .8rem; }
+}

@@ -33,7 +33,7 @@ const LOGIN_URL = '/login?next=%2Fcollaboration'
 export const AGENCY_STEPPER_CONFIG = {
   endpoint: '/api/agencies',
   redirect: '/collaboration',
-  titles: ['Plattformen', 'Kunden', 'Wer seid ihr?', 'Aufmerksam geworden', 'Nische', 'Social Media', 'Rohmaterial', 'Kontakt'],
+  titles: ['Plattformen', 'Eure Agentur', 'Aufmerksam geworden', 'Nische', 'Rohmaterial', 'Kontakt'],
   stepLabel: 'Schritt {n} von {total} · {title}',
   submitText: 'Kooperation anfragen',
   sendingText: 'Einen Moment …',
@@ -127,7 +127,7 @@ const socialFields = (): string =>
                   s.logo
                     ? `<img src="/img/platforms/${esc(s.value)}.svg" alt="" width="16" height="16" loading="lazy" decoding="async">`
                     : '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>'
-                }${esc(s.label)} <em>(optional)</em></span>
+                }${esc(s.label)}</span>
                 <input type="text" name="social_${esc(s.value)}" maxlength="200" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="${esc(s.placeholder)}">
               </label>`,
   ).join('')
@@ -713,13 +713,13 @@ export const agencyStepper = (): string => `<div class="stepper" id="stepper">
 
           <div class="stepper__head">
             <div class="stepper__meta">
-              <span data-step-label>Schritt 1 von 8 · Plattformen</span>
+              <span data-step-label>Schritt 1 von 6 · Plattformen</span>
               <span class="stepper__dots" aria-hidden="true">
-                <i class="is-on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                <i class="is-on"></i><i></i><i></i><i></i><i></i><i></i>
               </span>
             </div>
-            <div class="stepper__bar" role="progressbar" aria-valuemin="1" aria-valuemax="8" aria-valuenow="1" aria-label="Fortschritt">
-              <i data-step-bar style="width:13%"></i>
+            <div class="stepper__bar" role="progressbar" aria-valuemin="1" aria-valuemax="6" aria-valuenow="1" aria-label="Fortschritt">
+              <i data-step-bar style="width:17%"></i>
             </div>
           </div>
 
@@ -731,50 +731,45 @@ export const agencyStepper = (): string => `<div class="stepper" id="stepper">
             </div>
           </fieldset>
 
-          <!-- Schritt 2 — Kunden mit Interesse an Clipping (Ja / Nein) -->
-          <fieldset class="stepper__panel" data-panel="2" data-require="clients" hidden>
-            <legend class="stepper__q">Hast du einen Kunden oder mehrere, die sich für Clipping interessieren?</legend>
-            <div class="opts">${radioOptions('clients', AGENCY_CLIENTS)}
+          <!-- Schritt 2 — Kunden und Art der Agentur in EINEM Schritt (Vorgabe des
+               Auftraggebers, November 2026). Springt erst weiter, wenn beides gewählt
+               ist; „Andere Agentur“ öffnet ein Textfeld und wartet. -->
+          <fieldset class="stepper__panel" data-panel="2" data-require="clients kind" hidden>
+            <legend class="stepper__q">Erzähl uns kurz von deiner Agentur</legend>
+            <div class="substep">
+              <p class="substep__q">Hast du einen Kunden oder mehrere, die sich für Clipping interessieren?</p>
+              <div class="opts">${radioOptions('clients', AGENCY_CLIENTS)}
+              </div>
+            </div>
+            <div class="substep">
+              <p class="substep__q">Was für eine Agentur seid ihr?</p>
+              <div class="opts">${radioOptions('kind', AGENCY_KINDS)}
+              </div>
+              <div class="fields" style="margin-top:12px">
+                <label class="field field--wide" data-show-if="kind:sonstiges" hidden>
+                  <span class="field__l">Was für eine Agentur seid ihr? <i>*</i></span>
+                  <input type="text" name="kindOther" required minlength="2" maxlength="120" placeholder="z. B. Performance-, Werbe- oder Content-Agentur">
+                </label>
+              </div>
             </div>
           </fieldset>
 
-          <!-- Schritt 3 — Wer sich einträgt; „Sonstiges“ öffnet ein Textfeld -->
-          <fieldset class="stepper__panel" data-panel="3" data-require="kind" hidden>
-            <legend class="stepper__q">Was für eine Agentur seid ihr?</legend>
-            <div class="opts">${radioOptions('kind', AGENCY_KINDS)}
-            </div>
-            <div class="fields" style="margin-top:14px">
-              <label class="field field--wide" data-show-if="kind:sonstiges" hidden>
-                <span class="field__l">Was für eine Agentur seid ihr? <i>*</i></span>
-                <input type="text" name="kindOther" required minlength="2" maxlength="120" placeholder="z. B. Performance-, Werbe- oder Content-Agentur">
-              </label>
-            </div>
-          </fieldset>
-
-          <!-- Schritt 4 — Woher -->
-          <fieldset class="stepper__panel" data-panel="4" data-require="source" hidden>
+          <!-- Schritt 3 — Woher -->
+          <fieldset class="stepper__panel" data-panel="3" data-require="source" hidden>
             <legend class="stepper__q">Wie bist du auf uns aufmerksam geworden?</legend>
             <div class="opts">${radioOptions('source', AGENCY_SOURCES)}
             </div>
           </fieldset>
 
-          <!-- Schritt 5 — Nische: dieselbe Liste wie auf / und /creator -->
-          <fieldset class="stepper__panel" data-panel="5" data-require="niche" hidden>
+          <!-- Schritt 4 — Nische: dieselbe Liste wie auf / und /creator -->
+          <fieldset class="stepper__panel" data-panel="4" data-require="niche" hidden>
             <legend class="stepper__q">Für welche Nische werden die Clipping-Services gebraucht?</legend>
             <div class="opts opts--chips">${nicheChips()}
             </div>
           </fieldset>
 
-          <!-- Schritt 6 — Social-Media-Kanäle, alle freiwillig -->
-          <fieldset class="stepper__panel" data-panel="6" hidden>
-            <legend class="stepper__q">Deine Social-Media-Kanäle</legend>
-            <p class="stepper__hint">Alle Felder freiwillig: mit oder ohne @.</p>
-            <div class="fields">${socialFields()}
-            </div>
-          </fieldset>
-
-          <!-- Schritt 7 — Rohmaterial, dazu optional ein Link -->
-          <fieldset class="stepper__panel" data-panel="7" data-require="footage" hidden>
+          <!-- Schritt 5 — Rohmaterial, dazu optional ein Link -->
+          <fieldset class="stepper__panel" data-panel="5" data-require="footage" hidden>
             <legend class="stepper__q">Wie viel Rohmaterial hast du?</legend>
             <div class="opts">${radioOptions('footage', AGENCY_FOOTAGE)}
             </div>
@@ -787,8 +782,8 @@ export const agencyStepper = (): string => `<div class="stepper" id="stepper">
             </div>
           </fieldset>
 
-          <!-- Schritt 8 — Kontaktdaten, zuletzt der Cooperation-Code -->
-          <fieldset class="stepper__panel" data-panel="8" hidden>
+          <!-- Schritt 6 — Kontaktdaten, Cooperation-Code, ganz unten freiwillig Social Media -->
+          <fieldset class="stepper__panel" data-panel="6" hidden>
             <legend class="stepper__q">Wohin dürfen wir euren Zugang schicken?</legend>
             <div class="fields">
               <label class="field">
@@ -820,6 +815,14 @@ export const agencyStepper = (): string => `<div class="stepper" id="stepper">
                 <input type="text" name="cooperationCode" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false"
                        placeholder="Für exklusive Kunden nach einem Erstgespräch">
               </label>
+            </div>
+
+            <!-- Ganz unten, freiwillig: die Social-Media-Kanäle der Agentur
+                 (Vorgabe des Auftraggebers, November 2026; vorher ein eigener Schritt). -->
+            <div class="substep substep--last">
+              <p class="substep__q">Eure Social-Media-Kanäle <em>(optional)</em></p>
+              <div class="fields">${socialFields()}
+              </div>
             </div>
 
             <div class="hp" aria-hidden="true">

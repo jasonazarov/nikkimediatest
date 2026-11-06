@@ -613,3 +613,10 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   Abschnitt „Push popup“ im Admin beim Kunden (`/admin/kunden/:id`) und bei der Agentur (`/admin/agenturen/:id`),
   `PUT /api/admin/customers/:id/push-popup`. NULL = Standard 7 Tage, 0 = aus, sonst 1 bis 90. `GET /api/upsell`
   liefert `popupDays`; der Cookie speichert den Zeitpunkt der letzten Anzeige, eine Änderung greift deshalb sofort.
+- **Weniger Schritte in den Formularen /creator und /brands** (Vorgabe des Auftraggebers, November 2026):
+  `/creator` hat 7 statt 10 Schritte: „Reichweite“ fasst Follower, Views insgesamt und Views 30 Tage in EINEM
+  Schritt zusammen (`data-require="followers viewsTotal views30d"`, Antworten als Pillen `.opts--pills`, passt ohne
+  Scrollen in die Karte), die Handles stehen freiwillig ganz unten im Kontakt-Schritt (Server verlangt sie nicht mehr).
+  `/brands` (und `/agenturen`) hat 6 statt 8 Schritte: „Eure Agentur“ = Kunden + Art der Agentur in einem Schritt,
+  die Social-Media-Kanäle stehen freiwillig ganz unten im Kontakt-Schritt. Teilfragen als `.substep` (site.css,
+  Abschnitt „Mehrere Fragen in einem Schritt“). Der Schritt springt erst weiter, wenn alle Teilfragen beantwortet sind.
