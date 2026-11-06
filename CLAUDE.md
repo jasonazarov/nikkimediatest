@@ -515,10 +515,9 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   LinkedIn, Favicons fremder Clouds): CSS-Filter auf `img[src*="/img/platforms/"]`, `/img/cloud/` und
   Favicons (in `glass.css` und `dash-whop.css`, Filter exakt auf #2fe08c berechnet); die eingebetteten
   Admin-Logos tragen die Klasse `nm-brand-ico`. Instagram-Ringe auf der Startseite sind grün.
-- **Unsere Preise je Bereich** (Vorgabe des Auftraggebers, November 2026; `PRICE_RANGES` in
-  `src/lib/agency.ts`): Personal Brands genau 5 € je 1.000 Views (1 Mio. = 5.000 €), Gastronomie 5 bis
-  7 € (1 Mio. = 5.000 bis 7.000 €), alle anderen Bereiche ab 5 €. Gilt für das erste Briefing einer
-  Agentur und für „Neue Kampagne erstellen“: Das Formular füllt das Budget passend vor und erklärt die
-  Spanne (bei festem Preis ist das Feld gesperrt), der Server weist ein Budget außerhalb ab.
+- **Unser Preis: fest 5 € je 1.000 Views für alle Bereiche** (5.000 € pro 1 Mio. Views; Vorgabe des
+  Auftraggebers, November 2026; `DEFAULT_PRICE_RANGE` in `src/lib/agency.ts`, Ausnahmen je Bereich in
+  `PRICE_RANGES`). Gilt für das erste Briefing einer Agentur und „Neue Kampagne erstellen“: Das Formular
+  füllt das Budget vor und sperrt das Feld, der Server weist jedes andere Budget ab.
 - **Ehemals goldene Kästen** (Preis pro 1.000 Views, Briefing-Streifen, Code einlösen, Freischaltung):
   Klasse `nmw-brand-glass` (Markengrün in Liquid Glass, `dash-whop.css`).

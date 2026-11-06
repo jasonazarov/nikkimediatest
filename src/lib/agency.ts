@@ -218,13 +218,11 @@ export function parseNewCampaign(body: Record<string, unknown>): (Briefing & { n
 
 /* ---------------------------------------------------------------- Preise
 
-   Unsere Preise je 1.000 Views (Vorgabe des Auftraggebers, November 2026).
-   Ein Budget wird nur angenommen, wenn es zu diesen Preisen passt. Das
-   Formular füllt es passend vor, der Server prüft es noch einmal.
-
-     Personal Brands   genau 5 € je 1.000 Views (1 Mio. Views = 5.000 €)
-     Gastronomie       5 bis 7 € je 1.000 Views (1 Mio. Views = 5.000 bis 7.000 €)
-     alle anderen      ab 5 € je 1.000 Views (Richtwert 1 Mio. = 5.000 €, nie darunter)
+   Unser Preis je 1.000 Views (Vorgabe des Auftraggebers, November 2026):
+   für ALLE Bereiche fest 5 € je 1.000 Views, also 5.000 € pro 1 Mio. Views.
+   Ein Budget wird nur angenommen, wenn es genau dazu passt. Das Formular
+   füllt es vor und sperrt das Feld, der Server prüft es noch einmal.
+   Eigene Preise einzelner Bereiche gehören in PRICE_RANGES (min/max in Cent).
    ------------------------------------------------------------------------ */
 
 export interface PriceRange {
@@ -234,11 +232,8 @@ export interface PriceRange {
   max: number | null
 }
 
-export const PRICE_RANGES: Record<string, PriceRange> = {
-  'Personal Brands': { min: 500, max: 500 },
-  Gastronomie: { min: 500, max: 700 },
-}
-export const DEFAULT_PRICE_RANGE: PriceRange = { min: 500, max: null }
+export const PRICE_RANGES: Record<string, PriceRange> = {}
+export const DEFAULT_PRICE_RANGE: PriceRange = { min: 500, max: 500 }
 
 export const priceRangeFor = (niche: string | null | undefined): PriceRange =>
   (niche && PRICE_RANGES[niche]) || DEFAULT_PRICE_RANGE

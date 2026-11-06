@@ -662,14 +662,14 @@ try {
   )
   const ohneBriefing = await agenturHole('/api/app/projects', warmCookie, { name: 'Ohne Briefing' })
   pruefe('Agentur legt keine Kampagne ohne Briefing an', ohneBriefing.status === 403, `HTTP ${ohneBriefing.status}`)
-  const neueKampagne = { name: 'Kunde Sommer', niche: 'Gastronomie', platforms: ['tiktok', 'instagram'], views: 500000, budget: '3000', binding: true }
-  // Unsere Preise (lib/agency.ts): Gastronomie 5–7 € je 1.000 Views, Personal Brands genau 5 €, sonst ab 5 €.
+  const neueKampagne = { name: 'Kunde Sommer', niche: 'Gastronomie', platforms: ['tiktok', 'instagram'], views: 500000, budget: '2500', binding: true }
+  // Unser Preis (lib/agency.ts): für alle Bereiche fest 5 € je 1.000 Views (5.000 € pro 1 Mio.).
   const zuBillig = await agenturHole('/api/collaboration/campaigns', warmCookie, { ...neueKampagne, budget: '2000' })
-  const zuTeuer = await agenturHole('/api/collaboration/campaigns', warmCookie, { ...neueKampagne, budget: '4000' })
+  const zuTeuer = await agenturHole('/api/collaboration/campaigns', warmCookie, { ...neueKampagne, budget: '3000' })
   const pbFalsch = await agenturHole('/api/collaboration/campaigns', warmCookie, { ...neueKampagne, niche: 'Personal Brands', views: 1000000, budget: '6000' })
   const sonstZuBillig = await agenturHole('/api/collaboration/campaigns', warmCookie, { ...neueKampagne, niche: 'Fitness & Sport', budget: '2000' })
   pruefe(
-    'Budget außerhalb unserer Preise wird abgewiesen (Gastro 5–7 €, Personal Brands 5 €, sonst ab 5 €)',
+    'Budget abweichend vom Preis 5 € je 1.000 Views wird abgewiesen, in jedem Bereich',
     zuBillig.status === 400 && zuTeuer.status === 400 && pbFalsch.status === 400 && sonstZuBillig.status === 400,
     `HTTP ${zuBillig.status}/${zuTeuer.status}/${pbFalsch.status}/${sonstZuBillig.status}`,
   )
@@ -687,18 +687,18 @@ try {
     'Weitere Kampagne entsteht mit ihrem Briefing',
     zweite.status === 200 &&
       String(zweiteBody.redirect) === `/collaboration/meine/${zweiteBody.id}` &&
-      zaehle(`SELECT count(*) AS n FROM projects WHERE id='${String(zweiteBody.id).replace(/'/g, '')}' AND name='Kunde Sommer' AND briefing_views=500000 AND briefing_budget_cents=300000 AND briefing_niche='Gastronomie' AND briefing_platforms='["tiktok","instagram"]';`) === 1,
+      zaehle(`SELECT count(*) AS n FROM projects WHERE id='${String(zweiteBody.id).replace(/'/g, '')}' AND name='Kunde Sommer' AND briefing_views=500000 AND briefing_budget_cents=250000 AND briefing_niche='Gastronomie' AND briefing_platforms='["tiktok","instagram"]';`) === 1,
     `HTTP ${zweite.status} → ${JSON.stringify(zweiteBody)}`,
   )
   const zweiteSeite = await (await agenturHole(`/collaboration/meine/${zweiteBody.id}`, warmCookie)).text()
-  pruefe('Die Kampagnenseite zeigt das Briefing samt Preis pro 1.000 Views', zweiteSeite.includes('data-briefing-info') && zweiteSeite.includes('500K Views') && zweiteSeite.includes('6 €'))
+  pruefe('Die Kampagnenseite zeigt das Briefing samt Preis pro 1.000 Views', zweiteSeite.includes('data-briefing-info') && zweiteSeite.includes('500K Views') && zweiteSeite.includes('5 €'))
 
   const agenturImKundenbereich = await agenturHole('/app', warmCookie)
   pruefe('Agentur-Sitzung öffnet nicht den Kundenbereich', agenturImKundenbereich.status === 302, `HTTP ${agenturImKundenbereich.status}`)
 
   legeCode(KALT, '13572468')
   const kaltCookie = agenturSitzung(await post('/login/code', { email: KALT, code: '13572468', next: '/collaboration' }))
-  const kaltBriefing = await agenturHole('/api/collaboration/briefing', kaltCookie, { views: 250000, budget: '1500', package: 'armee' })
+  const kaltBriefing = await agenturHole('/api/collaboration/briefing', kaltCookie, { views: 250000, budget: '1250', package: 'armee' })
   const kaltBriefingBody = await kaltBriefing.json().catch(() => ({}))
   pruefe('Kalter Lead bleibt nach dem Briefing gesperrt', kaltBriefing.status === 200 && kaltBriefingBody.unlocked === false, JSON.stringify(kaltBriefingBody))
   const kaltSeite = await (await agenturHole('/collaboration', kaltCookie)).text()
