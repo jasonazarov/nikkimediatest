@@ -52,6 +52,7 @@ import { formatCompact, metricStrip, metricsPausedNote } from './metrics'
 import type { MetricRow, MetricTotals, MetricTotalsWithCreators, SyncOverview } from '../lib/metrics'
 import type { Lead, Role, User } from '../db/schema'
 import type { CrmEvent } from '../lib/crm'
+import { pushPopupSection } from './admin-push'
 import { agencySourceLabel, agencyPackageLabel, agencyPlatformLabel, pricePerThousandCents, viewsShort, type Briefing } from '../lib/agency'
 
 /*
@@ -1676,6 +1677,8 @@ export function customerDetailPage(o: {
   }[]
   /** CRM-Verlauf (lib/crm.ts), neueste zuerst. */
   timeline?: CrmEvent[]
+  /** „Kampagne pushen“-Popup: gespeicherter Abstand in Tagen (NULL = Standard). */
+  pushPopupDays?: number | null
 }): string {
   /*
    * Die personenbezogenen Daten des Kunden — hier änderbar.
@@ -1796,6 +1799,7 @@ export function customerDetailPage(o: {
       ? campaignGrid(cards)
       : emptyState('No campaign yet', creator ? 'This creator has not created a campaign yet.' : 'This customer has not created a campaign yet, you can create one for them.')) +
     crmTimeline(o.timeline ?? []) +
+    (creator ? '' : pushPopupSection(o.customer.customerId, o.pushPopupDays ?? null, 'customer')) +
     contactBlock +
     `<div class="mb-3 mt-9">
        <h2 class="font-display text-lg font-bold">Raw footage</h2>

@@ -58,6 +58,42 @@ export const discounted = (cents: number, pct: number) => Math.round(cents * (1 
  * `DEFAULT_CAMPAIGN_DAYS`. Danach bleibt das Angebot, aber ohne Rabatt.
  */
 export const DEFAULT_CAMPAIGN_DAYS = 30
+
+/**
+ * „Kampagne pushen“ als Popup (upsell.js): alle wie viele Tage, je Kunde bzw.
+ * Agentur im Admin einstellbar (`customers.push_popup_days`, Migration 0027).
+ * NULL = Standard, 0 = aus.
+ */
+export const PUSH_POPUP_DEFAULT_DAYS = 7
+export const PUSH_POPUP_MAX_DAYS = 90
+export const popupDaysOf = (raw: unknown): number => {
+  if (raw === null || raw === undefined) return PUSH_POPUP_DEFAULT_DAYS
+  const n = Number(raw)
+  return Number.isFinite(n) && n >= 0 ? Math.min(PUSH_POPUP_MAX_DAYS, Math.round(n)) : PUSH_POPUP_DEFAULT_DAYS
+}
+
+/** Admin: Popup-Abstand eines Kunden setzen. `null` = zurück auf Standard, 0 = aus, sonst 1 bis 90 Tage. */
+export async function setPushPopupDays(env: Env, customerId: string, raw: unknown): Promise<{ days: number | null } | { error: string }> {
+  let days: number | null
+  if (raw === null || raw === '' || raw === 'default') days = null
+  else {
+    const n = Math.round(Number(raw))
+    if (!Number.isFinite(n) || n < 0 || n > PUSH_POPUP_MAX_DAYS) return { error: `Please enter 0 (off) to ${PUSH_POPUP_MAX_DAYS} days.` }
+    days = n
+  }
+  const r = await env.DB.prepare('UPDATE customers SET push_popup_days = ? WHERE id = ?').bind(days, customerId).run()
+  if (!r.meta?.changes) return { error: 'Customer not found.' }
+  return { days }
+}
+
+export async function pushPopupSetting(env: Env, customerId: string): Promise<number | null> {
+  try {
+    const r = (await env.DB.prepare('SELECT push_popup_days FROM customers WHERE id = ?').bind(customerId).first()) as { push_popup_days: number | null } | null
+    return r ? r.push_popup_days : null
+  } catch {
+    return null
+  }
+}
 const DAY = 86_400
 export function campaignWindow(createdAt: number, durationDays: number | null | undefined, now = nowSec()) {
   const days = Number(durationDays) > 0 ? Number(durationDays) : DEFAULT_CAMPAIGN_DAYS
@@ -111,10 +147,11 @@ interface CustomerRow {
   id: string
   margin_pct: number
   converted_at: number | null
+  push_popup_days: number | null
 }
 
 async function customerOf(env: Env, userId: string): Promise<CustomerRow | null> {
-  return (await env.DB.prepare('SELECT id, margin_pct, converted_at FROM customers WHERE user_id = ? LIMIT 1').bind(userId).first()) as CustomerRow | null
+  return (await env.DB.prepare('SELECT id, margin_pct, converted_at, push_popup_days FROM customers WHERE user_id = ? LIMIT 1').bind(userId).first()) as CustomerRow | null
 }
 
 export async function marginOf(env: Env, user: User): Promise<number> {
@@ -152,12 +189,12 @@ interface ProjectRow {
  * Kunde und Agentur: ihre Kampagnen. Creator: nur die EIGENEN (sein
  * Arbeitsbereich), nie zugewiesene Kampagnen anderer.
  */
-export async function upsellCampaigns(env: Env, user: User, now = nowSec()): Promise<{ marginPct: number; campaigns: UpsellCampaign[] }> {
-  if (user.role !== 'customer' && user.role !== 'agency' && user.role !== 'creator') return { marginPct: 0, campaigns: [] }
+export async function upsellCampaigns(env: Env, user: User, now = nowSec()): Promise<{ marginPct: number; campaigns: UpsellCampaign[]; popupDays: number }> {
+  if (user.role !== 'customer' && user.role !== 'agency' && user.role !== 'creator') return { marginPct: 0, campaigns: [], popupDays: 0 }
   const customer = await customerOf(env, user.id)
-  if (!customer) return { marginPct: 0, campaigns: [] }
+  if (!customer) return { marginPct: 0, campaigns: [], popupDays: 0 }
   // Leads ohne Auftrag bekommen kein Upsell — erst, wenn der Admin sie zum Kunden erklärt hat.
-  if (user.role === 'customer' && !customer.converted_at) return { marginPct: 0, campaigns: [] }
+  if (user.role === 'customer' && !customer.converted_at) return { marginPct: 0, campaigns: [], popupDays: 0 }
   const marginPct = user.role === 'agency' ? Number(customer.margin_pct) || 0 : 0
 
   const { results } = await env.DB.prepare(
@@ -172,7 +209,9 @@ export async function upsellCampaigns(env: Env, user: User, now = nowSec()): Pro
     .bind(customer.id)
     .all()
   const rows = (results ?? []) as unknown as ProjectRow[]
-  if (!rows.length) return { marginPct, campaigns: [] }
+  // Popup nur für Kunde und Agentur; Creator haben keinen Push-Rabatt.
+  const popupDays = user.role === 'creator' ? 0 : popupDaysOf(customer.push_popup_days)
+  if (!rows.length) return { marginPct, campaigns: [], popupDays }
 
   const open = new Set<string>()
   const { results: pend } = await env.DB.prepare(
@@ -218,7 +257,7 @@ export async function upsellCampaigns(env: Env, user: User, now = nowSec()): Pro
       }),
     }
   })
-  return { marginPct, campaigns }
+  return { marginPct, campaigns, popupDays }
 }
 
 export interface CreatedUpsell {

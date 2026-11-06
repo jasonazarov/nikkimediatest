@@ -1,5 +1,6 @@
 import { ADMIN_NAV, badge, card, dateEN, dateTimeEN, emptyState, esc, formatEuro, kpiBar, pageTitle, sectionHead, shell } from './layout'
 import { formatPhone, telHref } from '../lib/phone'
+import { pushPopupSection } from './admin-push'
 import {
   BOOKING_STATUS_LABEL,
   agencyClientsLabelEn,
@@ -382,6 +383,8 @@ export function agencyDetailPage(o: {
   bookings: BookingRow[]
   /** Alle eigenen Kampagnen der Agentur, neueste zuerst. */
   campaigns: AgencyCampaignRow[]
+  /** „Kampagne pushen“-Popup: gespeicherter Abstand in Tagen (NULL = Standard). */
+  pushPopupDays?: number | null
 }): string {
   const l = o.row.lead
   const platforms: string[] = (() => {
@@ -482,6 +485,8 @@ export function agencyDetailPage(o: {
             )
           : emptyState('No campaigns yet', 'Every campaign of this agency starts with its briefing: views, budget and package.')
       }
+
+      ${l.customerId ? pushPopupSection(l.customerId, o.pushPopupDays ?? null, 'agency') : ''}
 
       ${sectionHead('Creator bookings')}
       ${card(bookingList(o.bookings, false))}`

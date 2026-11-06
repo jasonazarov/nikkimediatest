@@ -113,6 +113,8 @@ export const customers = sqliteTable(
     convertedAt: integer('converted_at'),
     /** Aufschlag einer Agentur auf unsere Preise in Prozent (Migration 0023, nur Anzeige). */
     marginPct: integer('margin_pct').notNull().default(0),
+    /** „Kampagne pushen“-Popup alle X Tage (Migration 0027): NULL = 7, 0 = aus. */
+    pushPopupDays: integer('push_popup_days'),
     createdAt: integer('created_at').notNull().$defaultFn(now),
   },
   (t) => [index('customers_user_idx').on(t.userId)],

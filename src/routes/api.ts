@@ -12,6 +12,7 @@ import {
 } from '../lib/auth'
 import { audit } from '../lib/audit'
 import { saveDraft, submitDraft } from '../lib/drafts'
+import { setPushPopupDays } from '../lib/upsell'
 import { loginSelfTest } from '../lib/selftest'
 import {
   BUDGETS,
@@ -2136,6 +2137,15 @@ adminApi.post('/leads/:id', async (c) => {
  * den zugehörigen Lead suchen zu müssen. Existiert der Lead noch, zieht er
  * mit, damit nicht zwei Stellen Verschiedenes behaupten.
  */
+/** „Kampagne pushen“-Popup: alle wie viele Tage (0 = aus, null = Standard 7). Admin-Abschnitt „Push popup“. */
+adminApi.put('/customers/:id/push-popup', async (c) => {
+  const body = await c.req.json().catch(() => ({}))
+  const r = await setPushPopupDays(c.env, c.req.param('id'), (body as any).days)
+  if ('error' in r) return c.json({ error: r.error }, r.error === 'Customer not found.' ? 404 : 400)
+  await audit(c.env, { actorId: c.get('user').id, action: 'customer.push_popup', entity: 'customer', entityId: c.req.param('id'), payload: { days: r.days } })
+  return c.json({ ok: true, days: r.days })
+})
+
 adminApi.post('/customers/:id', async (c) => {
   const body = await c.req.json().catch(() => ({}))
   const db = getDb(c.env)

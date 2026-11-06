@@ -1,6 +1,6 @@
 import { makeD1 } from './d1'
 import assert from 'node:assert/strict'
-import { campaignWindow, DEFAULT_CAMPAIGN_DAYS, upsellCampaigns } from '../../src/lib/upsell'
+import { campaignWindow, DEFAULT_CAMPAIGN_DAYS, setPushPopupDays, upsellCampaigns } from '../../src/lib/upsell'
 
 // Push-Rabatt nur innerhalb des Kampagnenzeitraums (Popup alle 7 Tage zeigt die Resttage).
 const db = makeD1(new URL('../../migrations', import.meta.url).pathname)
@@ -29,4 +29,17 @@ x(`INSERT INTO projects (id,customer_id,name,status,created_at,briefing_duration
   assert.deepEqual(by.pold.offers.map((o) => o.discountPct), [0, 0, 0])
   assert.ok(by.pold.offers.every((o) => o.priceCents === o.listPriceCents))
   console.log('✓ Rabatt nur bis Kampagnenende, danach Angebot zum Listenpreis')
+
+  const cust: any = { id: 'uc', role: 'customer' }
+  assert.equal((await upsellCampaigns(env, cust, now)).popupDays, 7)
+  assert.deepEqual(await setPushPopupDays(env, 'cc', 3), { days: 3 })
+  assert.equal((await upsellCampaigns(env, cust, now)).popupDays, 3)
+  assert.deepEqual(await setPushPopupDays(env, 'cc', 0), { days: 0 })
+  assert.equal((await upsellCampaigns(env, cust, now)).popupDays, 0)
+  assert.ok('error' in (await setPushPopupDays(env, 'cc', 91)))
+  assert.ok('error' in (await setPushPopupDays(env, 'cc', 'x')))
+  assert.ok('error' in (await setPushPopupDays(env, 'nope', 5)))
+  assert.deepEqual(await setPushPopupDays(env, 'cc', null), { days: null })
+  assert.equal((await upsellCampaigns(env, cust, now)).popupDays, 7)
+  console.log('✓ Popup-Abstand je Kunde: Standard 7, 0 = aus, 1 bis 90, ungültig abgewiesen')
 })().catch((e) => { console.error('✗', e); process.exit(1) })

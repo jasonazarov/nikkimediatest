@@ -6,7 +6,10 @@
    (data-project): nur diese eine. Ohne passende Kampagne verschwindet der
    ganze Bereich.
    Popup (Vorgabe des Auftraggebers, November 2026): auf der Übersicht von
-   Kunde und Agentur höchstens alle 7 Tage (Cookie nm_push_pop_<bereich>),
+   Kunde und Agentur höchstens alle X Tage, X je Kunde im Admin einstellbar
+   (popupDays vom Server, Standard 7, 0 = aus). Der Cookie
+   nm_push_pop_<bereich> merkt sich, WANN es zuletzt kam, damit eine
+   geänderte Einstellung sofort greift.
    nur für Kampagnen, deren Zeitraum noch läuft, mit den Tagen bis zum Ende,
    weil der Push-Rabatt nur bis dahin gilt (daysLeft/endsAt vom Server).
    ========================================================================== */
@@ -19,7 +22,7 @@
   /* Was jede Stufe bringt: kurz und ohne Versprechen, die wir nicht messen. */
   var PITCH = { 20: 'Mehr Clips im Umlauf', 35: 'Mehr Clipper auf deiner Kampagne', 50: 'Maximaler Schub' };
   var POP_COOKIE = 'nm_push_pop_' + area;
-  var POP_EVERY = 7 * 24 * 3600;
+  var POP_KEEP = 180 * 24 * 3600; // Cookie hält länger als jeder Abstand (max. 90 Tage)
 
   var euro = function (c) {
     return (c / 100).toLocaleString('de-DE', { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 }) + ' €';
@@ -151,17 +154,24 @@
   render();
   }
 
-  function cookieSet() { return document.cookie.split('; ').some(function (k) { return k.indexOf(POP_COOKIE + '=') === 0; }); }
+  /* Wann das Popup zuletzt kam (Unix-Sekunden), 0 = noch nie. */
+  function lastShown() {
+    var hit = document.cookie.split('; ').filter(function (k) { return k.indexOf(POP_COOKIE + '=') === 0; })[0];
+    var v = hit ? Number(hit.slice(POP_COOKIE.length + 1)) : 0;
+    return v > 1000000000 ? v : 0; // alter Wert „1“ aus der ersten Fassung zählt als „noch nie“
+  }
 
-  /* Popup alle 7 Tage: nur Übersicht, nur Kunde und Agentur, nur mit laufendem Rabatt. */
-  function maybePopup(all, marginPct) {
-    if (only || (area !== 'customer' && area !== 'agency') || cookieSet()) return;
+  /* Popup alle X Tage (Admin-Einstellung): nur Übersicht, nur Kunde und Agentur, nur mit laufendem Rabatt. */
+  function maybePopup(all, marginPct, popupDays) {
+    if (only || (area !== 'customer' && area !== 'agency') || !(popupDays > 0)) return;
+    var nowSec = Math.floor(Date.now() / 1000);
+    if (lastShown() && nowSec - lastShown() < popupDays * 24 * 3600) return;
     var live = all.filter(function (c) { return c.daysLeft > 0 && discounts(c); })
       .sort(function (a, b) { return a.daysLeft - b.daysLeft; });
     if (!live.length) return;
     var congrats = document.getElementById('nmg-pop');
     if (congrats && !congrats.hidden) return; // Glückwunsch zuerst, Push beim nächsten Mal
-    document.cookie = POP_COOKIE + '=1; Max-Age=' + POP_EVERY + '; Path=/; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+    document.cookie = POP_COOKIE + '=' + nowSec + '; Max-Age=' + POP_KEEP + '; Path=/; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
 
     var pop = el('div', 'nmu-pop');
     var card = el('div', 'nmu-pop__card nmu');
@@ -203,7 +213,7 @@
       var mine = only ? all.filter(function (k) { return k.id === only; }) : all;
       if (!mine.length) { box.remove(); return; }
       panel(box.querySelector('[data-upsell-body]'), { campaigns: mine, marginPct: marginPct, current: 0 });
-      maybePopup(all, marginPct);
+      maybePopup(all, marginPct, d && d.popupDays != null ? d.popupDays : 7);
     })
     .catch(function () { box.remove(); });
 })();

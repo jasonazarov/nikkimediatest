@@ -60,7 +60,7 @@ import { alias } from 'drizzle-orm/sqlite-core'
 import { agenciesPage, agencyDetailPage, type AgencyRow, type BookingRow, type CodeRow } from '../views/admin-agencies'
 import { projectBriefing } from '../lib/agency'
 import { allArticles, articleById } from '../lib/articles'
-import { allUpsells } from '../lib/upsell'
+import { allUpsells, pushPopupSetting } from '../lib/upsell'
 import { adminArticleEditPage, adminArticlesPage, adminUpsellsPage } from '../views/gold-dashboard'
 
 /*
@@ -909,16 +909,18 @@ adminRoutes.get('/kunden/:id', async (c) => {
     })),
   )
 
-  const [campaigns, team, timeline] = await Promise.all([
+  const [campaigns, team, timeline, pushPopupDays] = await Promise.all([
     campaignSummaries(c.env, { customerId: customer.customerId }),
     people(c.env),
     customerTimeline(c.env, { customerId: customer.customerId, userId: customer.userId }),
+    pushPopupSetting(c.env, customer.customerId),
   ])
   const links = profileLinksOf(team)
 
   return c.html(
     customerDetailPage({
       timeline,
+      pushPopupDays,
       user: c.get('user'),
       customer,
       campaigns,
@@ -1837,7 +1839,7 @@ adminRoutes.get('/agenturen', async (c) => {
 adminRoutes.get('/agenturen/:id', async (c) => {
   const [row] = await agencyRows(c.env, c.req.param('id'))
   if (!row) return c.notFound()
-  const [bookings, projects] = await Promise.all([
+  const [bookings, projects, pushPopupDays] = await Promise.all([
     bookingRows(c.env, row.lead.userId),
     row.lead.customerId
       ? getDb(c.env)
@@ -1846,12 +1848,14 @@ adminRoutes.get('/agenturen/:id', async (c) => {
           .where(eq(schema.projects.customerId, row.lead.customerId))
           .orderBy(desc(schema.projects.createdAt))
       : Promise.resolve([]),
+    row.lead.customerId ? pushPopupSetting(c.env, row.lead.customerId) : Promise.resolve(null),
   ])
   return c.html(
     agencyDetailPage({
       user: c.get('user'),
       row,
       bookings,
+      pushPopupDays,
       campaigns: projects.map((p) => ({ id: p.id, name: p.name, createdAt: p.createdAt, briefing: projectBriefing(p) })),
     }),
   )

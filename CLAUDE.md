@@ -607,3 +607,7 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   Laufzeit (`briefing_duration_days`; ohne Angabe, also Agentur-Briefing und ältere Kampagnen,
   `DEFAULT_CAMPAIGN_DAYS` = 30). Danach bleibt das Angebot, aber OHNE Push-Rabatt (Server). Test:
   `npx tsx tests/gold/push.test.ts`.
+  **Abstand je Kunde einstellbar** (Vorgabe des Auftraggebers, Migration 0027 `customers.push_popup_days`):
+  Abschnitt „Push popup“ im Admin beim Kunden (`/admin/kunden/:id`) und bei der Agentur (`/admin/agenturen/:id`),
+  `PUT /api/admin/customers/:id/push-popup`. NULL = Standard 7 Tage, 0 = aus, sonst 1 bis 90. `GET /api/upsell`
+  liefert `popupDays`; der Cookie speichert den Zeitpunkt der letzten Anzeige, eine Änderung greift deshalb sofort.
