@@ -24,7 +24,7 @@ Der Gedanke dahinter: Auf Plattformen wie TikTok, Instagram Reels und YouTube Sh
 
 1.000 Clips im Monat sind rund 33 pro Tag. Ein einzelnes Team schafft das kaum. Ein Netzwerk schon:
 
-- **Rohmaterial:** Ein paar Stunden Podcast, Interviews oder Event-Aufnahmen reichen für viele hundert Clips.
+- **Rohmaterial:** Ein paar Stunden starkes Material, etwa Podcast, Interviews oder Event-Aufnahmen, reichen für viele hundert Clips. Masse funktioniert nur, wenn das Material clipbar ist: klare Aussagen, echte Persönlichkeit, starke Momente.
 - **Viele Clipper:** Bei Nikki Media arbeiten über 5.000 Cutter und Creator im Netzwerk. Pro Kampagne wird ein Team zugeordnet.
 - **Viele Accounts:** Jeder Clipper postet über eigene, in deiner Nische aufgewärmte Accounts.
 - **Varianten statt Kopien:** Derselbe Gedanke bekommt unterschiedliche Hooks, Schnitte und Untertitel.
@@ -44,11 +44,7 @@ Distribution in Masse hat eine Kehrseite. Wer tausende Clips ohne Prüfung verte
 
 ## Was kostet Distribution in Masse?
 
-Weil nicht pro Clip, sondern pro 1.000 Views bezahlt wird, steigen die Kosten nicht mit der Zahl der Clips, sondern mit der erreichten Reichweite. Bei einem Richtwert von 5 € pro 1.000 Views gilt:
-
-- 2 Mio. Views: rund 10.000 €
-- 5 Mio. Views: rund 25.000 €
-- 10 Mio. Views: rund 50.000 €
+Weil nicht pro Clip, sondern pro 1.000 Views bezahlt wird, steigen die Kosten nicht mit der Zahl der Clips, sondern mit der erreichten Reichweite. Bei ~5 € pro 1.000 Views zahlst du für Aufmerksamkeit, nicht für Produktion.
 
 Clips, die keine Reichweite bringen, kosten nichts. Das ist der große Vorteil gegenüber Produktionsbudgets, bei denen jedes Video bezahlt wird, egal wie es läuft.
 

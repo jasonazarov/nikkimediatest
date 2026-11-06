@@ -5,7 +5,7 @@ excerpt: Vom Erstgespräch bis zum viralen Clip: So läuft eine Clipping-Kampagn
 author: Jason Azarov
 keywords: Hinter den Kulissen, Clipping Kampagne Ablauf, Onboarding, Aufwärmphase, Views prüfen
 ---
-**Kurz gesagt:** Eine Clipping-Kampagne bei Nikki Media läuft in vier Schritten: Anfrage, Strategiegespräch, Onboarding und Livegang. Danach schneiden und posten Clipper, bis das vereinbarte Budget in Views erreicht ist. Bezahlt wird nur echte Reichweite, Richtwert 5 € pro 1.000 Views.
+**Kurz gesagt:** Eine Clipping-Kampagne bei Nikki Media läuft in vier Schritten: Anfrage, Strategiegespräch, Onboarding und Livegang. Danach schneiden und posten Clipper, bis das vereinbarte Budget in Views erreicht ist. Bezahlt wird nur echte Reichweite, ~5 € pro 1.000 Views.
 
 ## Schritt 1: Die Anfrage
 

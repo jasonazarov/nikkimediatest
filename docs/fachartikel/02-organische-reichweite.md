@@ -31,15 +31,15 @@ Diese Zahlen zeigen: Reichweite ist keine Frage der Branche. Auch Kaviar und ein
 
 ## Organische Reichweite planbar machen
 
-Organisch heißt nicht zufällig. Mit Clipping wird Reichweite zu einer Größe, die du einkaufen kannst wie Werbung, nur dass du für echte Aufmerksamkeit bezahlst und nicht für eingeblendete Anzeigen. Bei Nikki Media liegt der Richtwert bei 5 € pro 1.000 Views. Ein Beispiel:
-
-- 200.000 Views kosten rund 1.000 €.
-- 1 Mio. Views kosten rund 5.000 €.
-- 5 Mio. Views kosten rund 25.000 €.
+Organisch heißt nicht zufällig. Mit Clipping wird Reichweite zu einer Größe, die du einkaufen kannst wie Werbung, nur dass du für echte Aufmerksamkeit bezahlst und nicht für eingeblendete Anzeigen. Bei Nikki Media liegt der Preis bei ~5 € pro 1.000 Views. Mit dem Views-Regler auf der [Startseite](/) siehst du sofort, welche Reichweite zu deinem Budget passt.
 
 Im Vertrag steht eine garantierte Anzahl organischer Views. Die Clipper posten, bis das Budget erreicht ist. Videos, die nicht laufen, kosten dich nichts.
 
 > Faustregel: Wer Reichweite will, braucht entweder sehr viel Zeit oder sehr viele Absender. Clipping liefert die Absender.
+
+## Reichweite in Masse wird zu Omnipräsenz
+
+Reichweite ist mehr als eine Zahl. Wenn dieselbe Zielgruppe dir innerhalb weniger Wochen immer wieder begegnet, entsteht Omnipräsenz: Du wirst als die bekannteste Stimme deiner Nische wahrgenommen. Genau hier liegt die Hebelwirkung von Clipping. Mehr dazu im Artikel [Was ist Omnipräsenz auf Social Media?](/fachartikel/omnipraesenz-social-media)
 
 ## Was organische Reichweite besser macht als Ads
 
@@ -54,4 +54,4 @@ Werbeanzeigen werden übersprungen, organische Videos werden angeschaut. Ein Cli
 
 ## Fazit
 
-Organische Reichweite ist 2026 eine Frage der Distribution. Wer viele starke Clips über viele Accounts verteilt, kommt planbar auf Millionen Views. Wie das für dein Material aussieht, zeigt dir der Views-Regler auf [nikkimedia.co](/), oder du [stellst direkt eine Anfrage](/#stepper).
+Organische Reichweite ist 2026 eine Frage von gutem Content und starker Distribution. Wer viele starke Clips über viele Accounts verteilt, kommt planbar auf Millionen Views und wird in seiner Nische omnipräsent. Wie das für dein Material aussieht, zeigt dir der Views-Regler auf [nikkimedia.co](/), oder du [stellst direkt eine Anfrage](/#stepper).

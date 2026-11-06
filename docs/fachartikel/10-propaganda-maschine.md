@@ -41,7 +41,7 @@ Bei Nikki Media gehört dazu ein Briefing mit Tabus, die Prüfung jedes Videos u
 
 ## Was so eine Maschine kostet
 
-Das Material hast du oft schon. Die Verteilung wird über Clipping eingekauft, abgerechnet pro 1.000 Views. Bei einem Richtwert von 5 € pro 1.000 Views kosten 1 Mio. Views rund 5.000 €, 10 Mio. Views rund 50.000 €. Clips ohne Reichweite kosten nichts.
+Das Material hast du oft schon. Die Verteilung wird über Clipping eingekauft, abgerechnet pro 1.000 Views. Der Preis liegt bei ~5 € pro 1.000 Views. Clips ohne Reichweite kosten nichts.
 
 ## Ergebnisse, die zeigen, wie groß das werden kann
 

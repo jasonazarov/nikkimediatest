@@ -37,11 +37,27 @@ Der Weg über Clipping funktioniert anders:
 
 So wirst du omnipräsent, obwohl du selbst nur einmal vor der Kamera gesessen hast. Wie die Verteilung in großem Stil aussieht, beschreibt der Artikel [Distribution in Masse](/fachartikel/distribution-in-masse).
 
+## Die Hebelwirkung der Omnipräsenz
+
+Omnipräsenz ist ein Hebel: Ein kleiner Einsatz bewegt eine große Wirkung. Du nimmst einmal Material auf, und daraus entstehen hunderte Begegnungen mit deiner Zielgruppe. Jede Begegnung zahlt auf dasselbe Konto ein, nämlich auf das Bild, das deine Zielgruppe von dir hat.
+
+Diese Wirkung baut sich in Stufen auf:
+
+1. **Wahrnehmung:** Man sieht dich zum ersten Mal und merkt sich vielleicht nichts.
+2. **Wiedererkennung:** Beim dritten, vierten Mal erkennt man dein Gesicht und deinen Namen.
+3. **Vertrauen:** Nach vielen Begegnungen wirkst du vertraut, als würde man dich persönlich kennen.
+4. **Autorität:** Wer überall auftaucht, gilt als die führende Stimme seiner Nische.
+5. **Nachfrage:** Wenn der Bedarf entsteht, fällt der Zielgruppe zuerst dein Name ein. Anfragen kommen von selbst.
+
+Der Hebel liegt darin, dass sich diese Stufen gegenseitig verstärken. Je bekannter du bist, desto eher wird ein neuer Clip angeschaut, geteilt und kommentiert. Je öfter er geteilt wird, desto mehr neue Menschen erreicht er. Aus Reichweite wird Bekanntheit, aus Bekanntheit wird Marktführerschaft in deiner Nische, im DACH-Raum oft schneller, als viele denken, weil die meisten Wettbewerber noch auf einem einzigen Account posten.
+
+> Omnipräsenz ist der Moment, in dem Reichweite zu Marktmacht wird.
+
 ## Ein Beispiel aus der Praxis
 
-Max Tornow, Business-Mentor, gehört zu unseren [Case Studies](/#case-studies). Über Clipping kamen 70 Mio. organische Views über zwei Accounts zusammen. Für eine Personal Brand bedeutet das: Ein großer Teil der deutschsprachigen Zielgruppe ist ihm in kurzer Zeit mehrfach begegnet. Genau das ist Omnipräsenz.
+Max Tornow, Business-Mentor, gehört zu unseren [Case Studies](/#case-studies). Über Clipping kamen 70 Mio. organische Views über zwei Accounts zusammen. Für eine Personal Brand bedeutet das: Die Zielgruppe ist ihm in kurzer Zeit immer wieder begegnet, auf vielen Accounts und in vielen Varianten. Genau das ist Omnipräsenz.
 
-> Omnipräsenz ist kein Zufall und keine Frage des Talents. Sie ist das Ergebnis von Menge, Regelmäßigkeit und Verteilung.
+> Omnipräsenz ist kein Zufall und keine Frage des Talents. Sie ist das Ergebnis von gutem Content, Menge, Regelmäßigkeit und Verteilung.
 
 ## Omnipräsenz ohne Überpräsenz
 
@@ -49,7 +65,7 @@ Eine berechtigte Frage: Nervt es nicht, wenn man jemanden ständig sieht? Der Un
 
 ## Was kostet Omnipräsenz?
 
-Weil bei Clipping pro 1.000 Views abgerechnet wird, ist Omnipräsenz planbar. Bei einem Richtwert von 5 € pro 1.000 Views kosten 1 Mio. Views rund 5.000 €. Eine Million Begegnungen mit deiner Zielgruppe für den Preis, den viele für ein einziges Fotoshooting ausgeben.
+Weil bei Clipping pro 1.000 Views abgerechnet wird, ist Omnipräsenz planbar. Bei ~5 € pro 1.000 Views kostet jede einzelne Begegnung mit deiner Zielgruppe nur einen Bruchteil eines Cents. Du bezahlst nur für Views, die wirklich passiert sind.
 
 ## Fazit
 

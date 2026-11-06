@@ -5,7 +5,7 @@ excerpt: Clipping macht aus langen Videos hunderte Kurzclips, die viele Accounts
 author: Jason Azarov
 keywords: Clipping, Content Clipping, Clipper, Kurzvideos, Content Repurposing
 ---
-**Kurz gesagt:** Clipping bedeutet, aus vorhandenem Videomaterial viele kurze Clips im Hochformat zu schneiden und sie über ein Netzwerk aus vielen Accounts gleichzeitig auf Instagram, TikTok, YouTube und Facebook zu posten. Bezahlt wird nicht pro Video, sondern pro erreichter Reichweite, bei Nikki Media mit einem Richtwert von 5 € pro 1.000 Views.
+**Kurz gesagt:** Clipping bedeutet, aus vorhandenem Videomaterial viele kurze Clips im Hochformat zu schneiden und sie über ein Netzwerk aus vielen Accounts gleichzeitig auf Instagram, TikTok, YouTube und Facebook zu posten. Bezahlt wird nicht pro Video, sondern pro erreichter Reichweite, bei Nikki Media mit ~5 € pro 1.000 Views.
 
 ## Was bedeutet Clipping genau?
 
@@ -25,12 +25,16 @@ Wichtig für die Suche: **Content Clipping** hat nichts mit Presse-Clipping zu t
 
 Mehr zum Ablauf einer Kampagne findest du im Artikel [Hinter den Kulissen einer Clipping-Kampagne](/fachartikel/hinter-den-kulissen-clipping-kampagne).
 
+## Warum Omnipräsenz der eigentliche Gewinn ist
+
+Clipping bringt nicht nur Views. Weil deine Clips über viele Accounts gleichzeitig laufen, begegnet dir deine Zielgruppe immer wieder: auf TikTok, auf Instagram, auf YouTube. Daraus entsteht Omnipräsenz, das Gefühl, dass an dir in deiner Nische niemand vorbeikommt. Wer omnipräsent ist, wird als Nummer eins wahrgenommen. Wie diese Hebelwirkung funktioniert, erklärt der Artikel [Was ist Omnipräsenz auf Social Media?](/fachartikel/omnipraesenz-social-media)
+
 ## Für wen lohnt sich Clipping?
 
 Clipping funktioniert überall dort, wo eine Person, ein Produkt oder eine Idee Aufmerksamkeit verdient, aber zu wenige Menschen davon wissen:
 
 - **Personal Brands:** Coaches, Unternehmer, Experten und Speaker, die ein Gesicht und eine Meinung haben. Mehr dazu auf [Für Personal Brands](/personal-brands).
-- **Unternehmen:** Gastronomie, E-Commerce, Immobilien, Beauty oder B2B. Entscheidend ist nicht die Branche, sondern ob sich der Content clippen lässt.
+- **Unternehmen:** Gastronomie, E-Commerce, Immobilien, Beauty oder B2B. Entscheidend ist nicht die Branche, sondern ob sich der Content clippen lässt: klare Aussagen, starke Momente, echte Persönlichkeit. Mehr dazu in [Was ist guter Content für Clipping?](/fachartikel/guter-content-fuer-clipping)
 - **Agenturen:** Social-Media- und Marketingagenturen, die ihren Kunden Reichweite verkaufen, ohne selbst ein Netzwerk aus Clippern aufzubauen. Siehe [Für Agenturen](/agenturen).
 - **Musik, Podcasts und Streams:** Formate mit viel Material und vielen starken Momenten.
 
@@ -47,7 +51,7 @@ Ein paar Beispiele aus unseren Kampagnen, die auf der Startseite als [Case Studi
 
 ## Was kostet Clipping?
 
-Abgerechnet wird über den CPM, also den Preis pro 1.000 Views. Bei Nikki Media liegt der Richtwert bei 5 € pro 1.000 Views. Eine Million organische Views kosten damit 5.000 €. Im Vertrag steht eine garantierte Anzahl Views, die aus Budget und CPM berechnet wird. Clips ohne Views kosten nichts. Wie sich das mit Werbeanzeigen vergleicht, erklärt der Artikel [Was ist CPM?](/fachartikel/was-ist-cpm-clipping).
+Abgerechnet wird über den CPM, also den Preis pro 1.000 Views. Bei Nikki Media liegt der Preis bei ~5 € pro 1.000 Views. Im Vertrag steht eine garantierte Anzahl Views, die aus Budget und CPM berechnet wird. Clips ohne Views kosten nichts. Wie sich das mit Werbeanzeigen vergleicht, erklärt der Artikel [Was ist CPM?](/fachartikel/was-ist-cpm-clipping).
 
 ## Woran erkennt man seriöses Clipping?
 

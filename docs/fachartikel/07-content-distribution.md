@@ -11,7 +11,7 @@ keywords: Content Distribution, Distributionsstrategie, Kurzvideos verteilen, Co
 
 Content Distribution beschreibt alle Maßnahmen, mit denen ein Inhalt nach seiner Produktion verbreitet wird. Dazu gehören die Wahl der Plattformen, das Format, der Zeitpunkt, die Zahl der Varianten und die Frage, wer den Inhalt postet. Content Marketing fragt: „Was sagen wir?“ Content Distribution fragt: „Wie hören es möglichst viele der richtigen Menschen?“
 
-Warum Distribution oft wichtiger ist als der Inhalt selbst, erklärt der Artikel [Warum Distribution wichtiger ist als guter Content](/fachartikel/distribution-wichtiger-als-content).
+Warum guter Content und Distribution zusammengehören, erklärt der Artikel [Warum braucht guter Content eine starke Distribution?](/fachartikel/guter-content-braucht-distribution).
 
 ## Die wichtigsten Kanäle für Video-Distribution
 
@@ -36,7 +36,7 @@ Alle vier nutzen das Hochformat 9:16. Ein guter Clip funktioniert deshalb auf al
 
 Die meisten Unternehmen verteilen auf ihren eigenen Kanälen. Das ist Distribution mit angezogener Handbremse. Der größte Hebel liegt darin, dass andere Accounts deine Inhalte posten. Genau das passiert beim Clipping: Ein Netzwerk aus Clippern veröffentlicht deine Clips über eigene Accounts, die vorher in deiner Nische aufgewärmt wurden.
 
-Bei Nikki Media umfasst dieses Netzwerk über 5.000 Cutter und Creator. Abgerechnet wird pro 1.000 Views, Richtwert 5 €. Wie groß so ein Netzwerk arbeitet, beschreibt [Was ist eine Clipping-Armee?](/fachartikel/clipping-armee).
+Bei Nikki Media umfasst dieses Netzwerk über 5.000 Cutter und Creator. Abgerechnet wird pro 1.000 Views, mit ~5 €. Wie groß so ein Netzwerk arbeitet, beschreibt [Was ist eine Clipping-Armee?](/fachartikel/clipping-armee).
 
 ## Typische Fehler in der Content Distribution
 

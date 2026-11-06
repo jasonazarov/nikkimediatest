@@ -18,7 +18,7 @@ Heute entsteht ein großer Teil der öffentlichen Wahrnehmung auf TikTok, Instag
 - **Kontrolle:** Klassische PR hängt von Redaktionen ab. Bei Kurzvideos entscheidest du, was gesagt wird.
 - **Tempo:** Ein Artikel braucht Wochen. Ein Clip kann innerhalb von Stunden hunderttausende Menschen erreichen.
 - **Messbarkeit:** Bei Presse-Clippings schätzt man Reichweiten. Bei Kurzvideos siehst du die Views jedes einzelnen Clips.
-- **Kosten:** Klassische PR wird oft pauschal pro Monat bezahlt. Clipping wird pro 1.000 Views abgerechnet, Richtwert bei Nikki Media 5 €.
+- **Kosten:** Klassische PR wird oft pauschal pro Monat bezahlt. Clipping wird pro 1.000 Views abgerechnet, bei Nikki Media mit ~5 €.
 
 Klassische PR bleibt wertvoll, etwa für Glaubwürdigkeit in Fachmedien. Aber für Bekanntheit in der Breite ist die PR-Maschine mit Kurzvideos heute oft der schnellere Weg.
 
@@ -49,7 +49,7 @@ DinDrop ist eine Creator-Brand, die über Clipping mehr als 100 Mio. organische 
 
 ## Was eine PR-Maschine kostet
 
-Bei Clipping zahlst du für erreichte Reichweite. Mit einem Richtwert von 5 € pro 1.000 Views kosten 1 Mio. Views rund 5.000 €. Im Vertrag steht eine garantierte Anzahl Views, Clips ohne Reichweite kosten nichts. Das macht PR zum ersten Mal wirklich planbar.
+Bei Clipping zahlst du für erreichte Reichweite. Der Preis liegt bei ~5 € pro 1.000 Views. Im Vertrag steht eine garantierte Anzahl Views, Clips ohne Reichweite kosten nichts. Das macht PR zum ersten Mal wirklich planbar.
 
 ## Häufige Fragen
 

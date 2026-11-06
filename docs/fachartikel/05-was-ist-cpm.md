@@ -5,7 +5,7 @@ excerpt: CPM sind die Kosten pro 1.000 Views. Wir erklären die Formel, vergleic
 author: Jason Azarov
 keywords: CPM, Kosten pro 1000 Views, Tausender-Kontakt-Preis, Clipping Preise, Paid Ads
 ---
-**Kurz gesagt:** CPM steht für „Cost per Mille“, also die Kosten pro 1.000 Views oder Einblendungen. Im Clipping ist der CPM die zentrale Preisgröße: Bei Nikki Media liegt der Richtwert bei 5 € pro 1.000 organische Views. Eine Million Views kosten damit 5.000 €.
+**Kurz gesagt:** CPM steht für „Cost per Mille“, also die Kosten pro 1.000 Views oder Einblendungen. Im Clipping ist der CPM die zentrale Preisgröße: Bei Nikki Media liegt er bei ~5 € pro 1.000 organische Views.
 
 ## Was bedeutet CPM?
 
@@ -13,15 +13,13 @@ CPM kommt aus der Werbung und heißt auf Deutsch Tausender-Kontakt-Preis, kurz T
 
 **CPM = Budget ÷ Views × 1.000**
 
-Ein Beispiel: Du zahlst 2.500 € und bekommst 500.000 Views. 2.500 ÷ 500.000 × 1.000 = 5 € CPM.
-
-Umgekehrt rechnest du aus, wie viele Views ein Budget bringt: **Views = Budget ÷ CPM × 1.000**. Mit 10.000 € und einem CPM von 5 € kommst du auf 2 Mio. Views.
+Umgekehrt rechnest du aus, wie viele Views ein Budget bringt: **Views = Budget ÷ CPM × 1.000**. Je niedriger der CPM, desto mehr Menschen erreichst du mit demselben Budget.
 
 ## Welcher CPM ist im Clipping üblich?
 
-Im Clipping-Markt werden CPMs je nach Anbieter, Nische und Region sehr unterschiedlich angegeben. Bei internationalen Marktplätzen liegen die Sätze für Clipper oft zwischen wenigen Cent und einigen Dollar pro 1.000 Views. Agenturen, die eine Kampagne komplett übernehmen, also Schnitt, Accounts, Prüfung und Auswertung, liegen höher.
+Im Clipping-Markt werden CPMs je nach Anbieter, Nische und Region sehr unterschiedlich angegeben. Entscheidend ist, was im Preis enthalten ist: nur das Posten oder die ganze Kampagne mit Schnitt, Accounts, Prüfung und Auswertung.
 
-Bei Nikki Media gilt ein fester Richtwert: **5 € pro 1.000 Views** für Kampagnen im DACH-Raum. Den finalen Preis halten wir vor dem Start schriftlich fest.
+Bei Nikki Media liegt der CPM bei **~5 € pro 1.000 Views** für Kampagnen im DACH-Raum, mit allem, was zur Kampagne gehört. Den finalen Preis halten wir vor dem Start schriftlich fest.
 
 ## Clipping vs. Paid Ads: der CPM-Vergleich
 
@@ -33,15 +31,9 @@ In Branchenvergleichen werden die CPMs von Paid Social, also bezahlten Anzeigen 
 
 > Ein günstiger CPM ist gut. Ein CPM für Views, die wirklich angeschaut werden, ist besser.
 
-## Rechenbeispiele mit 5 € CPM
+## Was dein Budget bringt
 
-- **100.000 Views:** 500 €
-- **500.000 Views:** 2.500 €
-- **1 Mio. Views:** 5.000 €
-- **5 Mio. Views:** 25.000 €
-- **10 Mio. Views:** 50.000 €
-
-Auf [nikkimedia.co](/) kannst du mit dem Views-Regler jede Reichweite durchrechnen.
+Bei ~5 € pro 1.000 Views wächst die Reichweite direkt mit dem Budget: doppeltes Budget, doppelte Views. Auf [nikkimedia.co](/) rechnet der Views-Regler jede Reichweite sofort durch, von 1 bis 50 Mio. Views.
 
 ## Was im CPM enthalten sein sollte
 
@@ -61,7 +53,17 @@ Ein CPM, der weit unter dem Markt liegt, ist oft ein Warnsignal. Gekaufte Views,
 
 ## CPM für Agenturen
 
-Agenturen kaufen Reichweite bei uns zum Richtwert ein und verkaufen sie mit eigener Marge an ihre Kunden weiter. Die Marge legt ihr selbst fest. Mehr auf [Für Agenturen](/agenturen).
+Agenturen kaufen Reichweite bei uns zu ~5 € pro 1.000 Views ein und verkaufen sie mit eigener Marge an ihre Kunden weiter. Die Marge legt ihr selbst fest. Mehr auf [Für Agenturen](/agenturen).
+
+## Häufige Fragen zum CPM
+
+### Ist ein niedriger CPM immer besser?
+
+Nicht unbedingt. Ein CPM ist nur so viel wert wie die Views dahinter. Echte Views aus deiner Zielgruppe im DACH-Raum sind mehr wert als billige Views aus Regionen, in denen niemand dein Angebot kaufen kann.
+
+### Warum ist organische Reichweite oft günstiger als Werbung?
+
+Bei Werbung bezahlst du die Plattform dafür, dass sie deine Anzeige einblendet. Bei Clipping entsteht die Reichweite durch Inhalte, die Menschen freiwillig anschauen. Der Algorithmus verteilt sie weiter, weil sie gut ankommen.
 
 ## Fazit
 

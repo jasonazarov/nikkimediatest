@@ -1,23 +1,23 @@
 # Fachartikel: Entwürfe und Themenplan (Stand November 2026)
 
-13 fertige Entwürfe, je einer pro Leitbegriff. Jeder besteht den SEO/GEO-Check im Admin-Editor
-(Titel 30–65 Zeichen als Frage, Kurzfassung 110–165 Zeichen, mind. 600 Wörter, mind. zwei „## “,
-Zahlen, interner Link, Liste/Merksatz). Keine langen Gedankenstriche im Text.
+17 Entwürfe, NICHT veröffentlicht und NICHT eingespielt. Eingespielt wird nur mit ausdrücklicher Freigabe
+des Auftraggebers. Jeder Entwurf besteht den SEO/GEO-Check im Admin-Editor (Titel 30–65 Zeichen als Frage,
+Kurzfassung 110–165 Zeichen, mind. 600 Wörter, mind. zwei „## “, Zahlen, interner Link, Liste/Merksatz).
+Keine langen Gedankenstriche im Text.
 
-**Import (unveröffentlicht):** `node scripts/fachartikel-import.mjs` (live) bzw. `--local` (Vorschau).
-Danach im Admin unter „Fachartikel“ lesen, anpassen und mit „Published“ freischalten.
-Vorhandene Adressen werden nicht überschrieben.
+**Vorgaben des Auftraggebers für alle Artikel:**
+- Preis nur als „~5 € pro 1.000 Views“, keine hochgerechneten Summen (keine „1 Mio. = 5.000 €“).
+- Verdienst der Clipper nie beziffern: Gute Clipper sind am Erfolg der Kampagnen beteiligt, die Nikki Media gewinnt.
+- Omnipräsenz ist genauso wichtig wie Reichweite: Begriff und Hebelwirkung erklären.
+- Schlechter Content ist nicht clipbar: Kein Artikel darf behaupten, Distribution ersetze guten Content.
+- Clipper brauchen keine Vorerfahrung, sie werden beim Onboarding gebrieft.
 
-**Fakten, die in den Artikeln stehen (nur aus unserer Seite):** 5 € pro 1.000 Views (1 Mio. = 5.000 €),
-über 5.000 Cutter und Creator, Aufwärmphase 2–3 Tage, Strategiegespräch ~45 Min., Kampagnen 30/60/90 Tage,
-Insights-Nachweis ab 10.000 Views, Case Studies der Startseite (DinDrop >100 Mio., Reel 35,4 Mio.;
-Max Tornow 70 Mio. über 2 Accounts; Caspian Blue Caviar >40 Mio.; Levantine Istanbul 3 Mio., 0 → 70.000 Follower).
-Marktzahlen (Paid-Social-CPM 20–80 $, Clipper-Sätze international) sind als Marktangaben formuliert.
+**Import (unveröffentlicht, nur nach Freigabe):** `node scripts/fachartikel-import.mjs` (live) bzw. `--local` (Vorschau).
 
-**Bitte vor dem Veröffentlichen prüfen:** Aussagen zur Werbekennzeichnung (04), Steuerhinweis (13),
-das Rechenbeispiel „jeder zehntausendste Zuschauer fragt an“ (12, als Beispiel markiert).
+**Bitte vor dem Veröffentlichen prüfen:** Werbekennzeichnung (04), Steuer- und Arbeitsvertragshinweis (13, 16),
+„rund 100 Mio. Menschen im DACH-Raum“ (14), Zeitangabe „ein bis zwei Stunden am Tag“ aus Marktquellen (16, 17).
 
-## Die 13 Entwürfe
+## Die Entwürfe
 
 | Nr. | Leitbegriff | Titel | Adresse |
 |---|---|---|---|
@@ -26,17 +26,18 @@ das Rechenbeispiel „jeder zehntausendste Zuschauer fragt an“ (12, als Beispi
 | 03 | Omnipräsenz | Was ist Omnipräsenz auf Social Media und wie erreicht man sie? | /fachartikel/omnipraesenz-social-media |
 | 04 | Clipping Armee | Was ist eine Clipping-Armee und wie arbeitet sie? | /fachartikel/clipping-armee |
 | 05 | CPM | Was ist CPM? Kosten pro 1.000 Views im Clipping erklärt | /fachartikel/was-ist-cpm-clipping |
-| 06 | Distribution | Warum ist Distribution wichtiger als guter Content? | /fachartikel/distribution-wichtiger-als-content |
+| 06 | Distribution | Warum braucht guter Content eine starke Distribution? | /fachartikel/guter-content-braucht-distribution |
 | 07 | Content Distribution | Content Distribution: Wie verteilt man Videos richtig? | /fachartikel/content-distribution-videos-verteilen |
 | 08 | Distribution in Masse | Distribution in Masse: Wie funktionieren 1.000 Clips im Monat? | /fachartikel/distribution-in-masse |
 | 09 | Hinter den Kulissen | Hinter den Kulissen: Wie läuft eine Clipping-Kampagne ab? | /fachartikel/hinter-den-kulissen-clipping-kampagne |
 | 10 | Propaganda Maschine | Die eigene Propaganda-Maschine: Was steckt hinter dem Begriff? | /fachartikel/propaganda-maschine-marketing |
 | 11 | PR Maschine | Wie baut man eine PR-Maschine mit Kurzvideos auf? | /fachartikel/pr-maschine-kurzvideos |
-| 12 | Anfragen durch Omnipräsenz | Wie gewinnt man Anfragen durch Omnipräsenz? | /fachartikel/anfragen-gewinnen-durch-omnipraesenz |
-| 13 | Geld als Clipper | Wie verdient man als Clipper Geld? Ein ehrlicher Überblick | /fachartikel/geld-verdienen-als-clipper |
-
-Die Artikel verlinken untereinander (Themen-Cluster): 01 ist die Säulenseite, 05/06/07/08 bilden den
-Distributions-Cluster, 03/10/11/12 den Personal-Brand-Cluster, 13 führt zu /clipper.
+| 12 | Anfragen gewinnen | Wie gewinnt man Anfragen durch Omnipräsenz? | /fachartikel/anfragen-gewinnen-durch-omnipraesenz |
+| 13 | Geld als Clipper verdienen | Wie verdient man als Clipper Geld? Ein ehrlicher Überblick | /fachartikel/geld-verdienen-als-clipper |
+| 14 | Clipping | Warum sollte jedes Unternehmen auf Clipping setzen? | /fachartikel/warum-clipping-nutzen |
+| 15 | guter Content | Was ist guter Content für Clipping? | /fachartikel/guter-content-fuer-clipping |
+| 16 | Clipping Nebenverdienst | Für wen ist Clipping? Ein Nebenverdienst neben dem Job | /fachartikel/clipping-nebenverdienst-neben-dem-job |
+| 17 | Clipping ohne Erfahrung | Braucht man Vorerfahrung für Clipping? | /fachartikel/clipping-ohne-vorerfahrung |
 
 ## Themenplan: weitere Artikel je Leitbegriff
 
@@ -93,6 +94,10 @@ Distributions-Cluster, 03/10/11/12 den Personal-Brand-Cluster, 13 führt zu /cli
 - Creator vs. Clipper: Welcher Weg passt zu dir?
 - Nebenverdienst mit Social Media in Österreich, Deutschland und der Schweiz
 
+**Clipper (Zusatz)**
+- Ein Tag als Clipper neben dem Vollzeitjob
+- Die häufigsten Anfängerfehler beim Clipping
+
 **Für Agenturen (Zusatz-Cluster)**
 - Clipping im Agentur-Portfolio: Reichweite mit eigener Marge verkaufen
 - White Label: Wie Agenturen Clipping unter eigenem Namen anbieten
@@ -120,4 +125,8 @@ Inbound, Founder-led Content, Personal Branding, Autorität, Narrativ, Creator E
 - [inblog: Content Repurposing](https://inblog.ai/de/glossary/content-repurposing)
 - [Ssemble: Marktplatz fürs Clipping](https://www.ssemble.com/de/clip-rewards)
 - [OpenClip: Clipper Pay Rates](https://openclip.app/clipping/clipper-pay-rates)
+- [Ombrie im App Store](https://apps.apple.com/de/app/ombrie/id6754709586)
+- [OpenClip: How to become a clipper](https://openclip.app/guides/how-to-become-a-clipper)
+- [OpenClip: Clipping side hustle, realistic earnings](https://openclip.app/guides/clipping-side-hustle-realistic-earnings)
+- [Findclout: How to become a clipper](https://findclout.com/blog/how-to-become-a-clipper)
 - Wettbewerb im DACH-Raum: `docs/WETTBEWERB_DACH.md`

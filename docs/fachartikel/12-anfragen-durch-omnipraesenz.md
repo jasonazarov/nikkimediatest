@@ -51,7 +51,7 @@ Levantine Istanbul, eine Fire-Cuisine-Bar, wuchs über Clipping von 0 auf 70.000
 
 ## Was kostet ein Strom an Anfragen?
 
-Bei Clipping zahlst du für Sichtbarkeit, nicht für Klicks oder Leads. Richtwert: 5 € pro 1.000 Views. Ein Beispiel: Mit 5.000 € erreichst du 1 Mio. Views in deiner Zielgruppe. Wenn nur jeder zehntausendste Zuschauer anfragt, sind das 100 Anfragen. Wie viele es bei dir sind, hängt von Angebot, Profil und Branche ab.
+Bei Clipping zahlst du für Sichtbarkeit, nicht für Klicks oder Leads. Der Preis liegt bei ~5 € pro 1.000 Views. Jede Million Views bedeutet eine Million Begegnungen mit deiner Zielgruppe. Wie viele davon zu Anfragen werden, hängt von Angebot, Profil und Branche ab. Sicher ist: Wer nicht gesehen wird, wird auch nicht angefragt.
 
 ## Häufige Fragen
 
