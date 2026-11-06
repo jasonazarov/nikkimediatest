@@ -1,0 +1,11 @@
+node_modules
+.wrangler
+.DS_Store
+.dev.vars
+
+# lokale Secrets
+.dev.vars
+.env
+
+# Sicherungskopie aus einem abgebrochenen Login-Test
+.dev.vars.login-test-backup

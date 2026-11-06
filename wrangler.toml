@@ -1,0 +1,119 @@
+# ---------------------------------------------------------------------------
+# EINE einzige öffentliche Adresse: https://nikkimedia.co
+#
+# `npx wrangler deploy` aktualisiert immer genau diese Adresse. Es gibt
+# bewusst keine Test-, Vorschau- oder Versionslinks daneben:
+#
+#   workers_dev  = false  schaltet nikki-media.deploy-claude.workers.dev ab.
+#                         Das war die alte Testadresse.
+#   preview_urls = false  schaltet die Versionsadressen ab. Cloudflare vergibt
+#                         sonst pro hochgeladener Version zusätzlich eine
+#                         eigene URL <version>-nikki-media.…workers.dev — das
+#                         war der Grund für den ständig neuen Link.
+#
+# Beide Schalter müssen auf false bleiben. Die Domain steht unten unter
+# [[routes]]. www.nikkimedia.co leitet im Worker dauerhaft auf nikkimedia.co
+# um (src/index.ts), damit es auch dort keinen zweiten Link gibt.
+# ---------------------------------------------------------------------------
+name = "nikki-media"
+main = "src/index.ts"
+compatibility_date = "2025-11-01"
+compatibility_flags = ["nodejs_compat"]
+account_id = "c80a29b391c87cab55592199b80c7663"
+workers_dev = false
+preview_urls = false
+
+# Statische Dateien (CSS, JS, Bilder, Plattform-Logos).
+# Assets werden vor dem Worker ausgeliefert; alles andere landet im Worker.
+[assets]
+directory = "./public"
+binding = "ASSETS"
+not_found_handling = "none"
+
+[observability]
+enabled = true
+
+# ---------------------------------------------------------------------------
+# D1 — Datenbank
+# Anlegen:  npx wrangler d1 create nikki-media
+# Danach die ausgegebene database_id hier eintragen.
+# ---------------------------------------------------------------------------
+[[d1_databases]]
+binding = "DB"
+database_name = "nikki-media"
+database_id = "405c50a6-7503-4440-a066-eeadd33c842f"
+migrations_dir = "migrations"
+
+# ---------------------------------------------------------------------------
+# R2 — Videospeicher
+#
+# R2 IST aktiviert. Der Bucket `nikki-media` besteht, die Secrets
+# R2_ACCESS_KEY_ID und R2_SECRET_ACCESS_KEY sind gesetzt, Uploads laufen.
+#
+# Das Binding bleibt trotzdem auskommentiert, und das ist Absicht: der Code
+# spricht R2 über presignte S3-URLs an (src/lib/r2.ts), weil ein Upload nie
+# durch den Worker laufen darf — dessen Request-Größenlimit würde jedes
+# größere Video abweisen. `r2Ready()` prüft deshalb die Secrets, nicht das
+# Binding. Das Binding wäre nur eine Abkürzung für head/delete.
+#
+# Frühere Fassungen dieses Kommentars behaupteten, R2 sei nicht
+# freigeschaltet. Das stimmt seit dem 11.08.2026 nicht mehr.
+# ---------------------------------------------------------------------------
+# [[r2_buckets]]
+# binding = "MEDIA"
+# bucket_name = "nikki-media"
+
+# ---------------------------------------------------------------------------
+# Cron — zwei Takte, siehe `scheduled` in src/index.ts
+#
+#   0 7 * * *     täglich: Speicher-Check (Warnung ab 100 GB pro Kunde),
+#                 Papierkorb leeren, Sessions aufräumen — und die
+#                 Veröffentlichung nachfassen.
+#   */15 * * * *  alle 15 Minuten: NUR die Veröffentlichung nachfassen.
+#
+# Der zweite Takt ist nicht Bequemlichkeit. Beim ersten echten Clip scheiterten
+# acht von siebzehn Accounts an Zeitüberschreitungen — Fehler, die von selbst
+# vergehen. Mit dem Tageslauf als einziger Rettung hätte der Kunde über
+# fünfzehn Stunden auf eine halb veröffentlichte Kampagne gesehen. Den Abstand
+# zwischen zwei Versuchen JE ZIEL regelt RETRY_BACKOFF_SEC in publisher.ts
+# (frühestens nach 10 Minuten, danach wachsend, höchstens drei Versuche) —
+# der Takt hier weckt nur.
+# ---------------------------------------------------------------------------
+[triggers]
+crons = ["0 7 * * *", "*/15 * * * *"]
+
+# ---------------------------------------------------------------------------
+# Nicht-geheime Konfiguration. Geheimnisse per `wrangler secret put` setzen,
+# siehe README.md und .env.example.
+# ---------------------------------------------------------------------------
+[vars]
+APP_URL = "https://nikkimedia.co"
+MAIL_FROM = "Nikki Media <noreply@nikkimedia.co>"
+ADMIN_EMAIL = "jason.azarov@outlook.at"
+ADMIN_NAME = "Jason Azarov"
+R2_BUCKET = "nikki-media"
+R2_PUBLIC_ACCOUNT_ID = "c80a29b391c87cab55592199b80c7663"
+STORAGE_WARN_BYTES = "107374182400"
+
+# Die Anbindung an den Veröffentlichungsanbieter braucht zwei Geheimnisse.
+# Sie stehen NICHT hier, sondern werden gesetzt über
+#   npx wrangler secret put BUNDLE_API_KEY
+#   npx wrangler secret put BUNDLE_WEBHOOK_SECRET
+# oder im Dashboard unter Settings → Variables and Secrets → Type: Secret.
+# BUNDLE_WEBHOOK_SECRET vergibt der Anbieter erst, nachdem die Webhook-Adresse
+# https://nikkimedia.co/api/webhooks/bundle-social dort eingetragen wurde.
+
+# ---------------------------------------------------------------------------
+# Die echte Domain. nikkimedia.co liegt als aktive Zone in genau diesem
+# Account (Zone 4676b503ea8f0e5da2eb163df8b1fd5b), deshalb ist sie hier fest
+# eingetragen. `custom_domain = true` heißt: Wrangler legt bei jedem Deploy
+# den passenden DNS-Eintrag an bzw. hält ihn aktuell und stellt das
+# Zertifikat aus. Nicht auskommentieren — sonst ist die Seite offline.
+# ---------------------------------------------------------------------------
+[[routes]]
+pattern = "nikkimedia.co"
+custom_domain = true
+
+[[routes]]
+pattern = "www.nikkimedia.co"
+custom_domain = true

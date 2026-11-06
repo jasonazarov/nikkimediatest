@@ -1,0 +1,251 @@
+/* ==========================================================================
+   NIKKI MEDIA, Liquid Glass in Grün-Schwarz (November 2026)
+
+   Eine Schicht über site.css (und gold.css): lädt als LETZTES Stylesheet
+   auf /, /clipper, /creator, /brands, /agenturen, /personal-brands,
+   /investoren, /fachartikel und den Rechtsseiten.
+
+   Was sie macht:
+   1. EIN Akzent für alle Seiten. Die früheren Farbthemen (blau, violett,
+      pink, gold) zeigen jetzt alle dasselbe Grün.
+   2. Durchgehend schwarzer Grund statt heller Abschnitte.
+   3. Glasflächen: halbtransparent, unscharf hinterlegt, mit hellem
+      Lichtrand oben. Hinter dem Glas liegen ruhige grüne Lichtflecken
+      (body::before), sonst hätte das Glas nichts zu brechen.
+
+   Nur Optik. Kein Markup und kein Verhalten hängt an dieser Datei.
+   ========================================================================== */
+
+:root,
+.theme-clipper,
+.theme-creator,
+.theme-brands,
+.gold {
+  /* Akzent */
+  --brand: #2fe08c;
+  --brand-2: #5eeaa6;
+  --brand-light: #9cf6c8;
+  --brand-soft: rgba(47, 224, 140, .1);
+  --brand-rgb: 47, 224, 140;
+  --brand-2-rgb: 94, 234, 166;
+  --brand-light-rgb: 156, 246, 200;
+  --brand-hover: #22c97c;
+  --brand-deep: #0f8a52;
+  --brand-ring: rgba(47, 224, 140, .35);
+
+  /* Flächen: Schwarz mit einem Hauch Grün */
+  --ink: #000;
+  --ink-deep: #000;
+  --ink-2: #020604;
+  --panel: rgba(255, 255, 255, .045);
+  --panel-2: rgba(255, 255, 255, .06);
+  --panel-3: rgba(255, 255, 255, .08);
+  --line-dark: rgba(255, 255, 255, .1);
+  --paper: #000;
+  --surface: #020604;
+  --surface-2: rgba(255, 255, 255, .06);
+  --line: rgba(255, 255, 255, .1);
+
+  /* Text */
+  --text: #eef7f1;
+  --text-muted: #a3b8ac;
+  --text-soft: #72867b;
+  --on-dark: #eef7f1;
+  --on-dark-muted: #a3b8ac;
+  --on-dark-soft: #72867b;
+
+  --shadow-sm: 0 1px 0 rgba(255, 255, 255, .06) inset, 0 8px 24px rgba(0, 0, 0, .45);
+  --shadow-md: 0 1px 0 rgba(255, 255, 255, .08) inset, 0 18px 48px rgba(0, 0, 0, .55);
+  --shadow-lg: 0 1px 0 rgba(255, 255, 255, .1) inset, 0 30px 80px rgba(0, 0, 0, .6);
+
+  /* Glas */
+  --glass: linear-gradient(160deg, rgba(255, 255, 255, .085), rgba(255, 255, 255, .025) 42%, rgba(255, 255, 255, .04));
+  --glass-strong: linear-gradient(160deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .04) 45%, rgba(255, 255, 255, .06));
+  --glass-edge: rgba(255, 255, 255, .12);
+  --glass-blur: blur(22px) saturate(170%);
+
+  /* Gold-Seiten (gold.css) auf dieselben Werte */
+  --g-black: #000;
+  --g-1: #020604;
+  --g-2: rgba(255, 255, 255, .05);
+  --g-3: rgba(255, 255, 255, .08);
+  --g-gold: #2fe08c;
+  --g-gold-hi: #9cf6c8;
+  --g-gold-lo: #0f8a52;
+  --g-text: #eef7f1;
+  --g-mute: #a3b8ac;
+  --g-soft: #72867b;
+  --g-line: rgba(47, 224, 140, .2);
+  --g-hair: rgba(255, 255, 255, .08);
+
+  color-scheme: dark;
+}
+
+html { background: #000; }
+body { background: #000; color: var(--text); }
+::selection { background: rgba(47, 224, 140, .35); color: #fff; }
+
+/* Grüne Lichtflecken hinter dem Glas: fest am Fenster, ohne Bewegung. */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(42vw 42vw at 8% 6%, rgba(47, 224, 140, .16), transparent 70%),
+    radial-gradient(38vw 38vw at 96% 38%, rgba(16, 185, 129, .11), transparent 70%),
+    radial-gradient(46vw 40vw at 30% 104%, rgba(94, 234, 166, .09), transparent 70%),
+    #000;
+}
+body { position: relative; isolation: isolate; }
+
+/* ---------- Das Glas ---------- */
+.stepper__card, .case, .faq__i, .cpath, .cflow li, .founder__badge, .livebar,
+.igw, .iglive__frame, .chip, .coopcard, .loadscreen__card, .g-card, .g-app,
+.case__stat, .legal .note, .vs__row, .fcard, .step, .problem__card {
+  background: var(--glass) !important;
+  border: 1px solid var(--glass-edge) !important;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-md);
+}
+/* Lichtkante oben: der Moment, in dem Glas nach Glas aussieht. */
+.stepper__card, .case, .cpath, .coopcard, .g-app, .livebar, .fcard { position: relative; }
+.stepper__card::after, .case::after, .cpath::after, .coopcard::after, .g-app::after, .livebar::after, .fcard::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, 0) 26%);
+  -webkit-mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  padding: 1px;
+}
+
+/* ---------- Abschnitte: alles auf Schwarz ---------- */
+.section, .section--surface, .section--dark { background: transparent !important; color: var(--text); }
+.section--surface { border-block: 1px solid rgba(255, 255, 255, .06); }
+.section h1, .section h2, .section h3, .section h4 { color: var(--text); }
+.hero {
+  background:
+    radial-gradient(90% 60% at 50% -10%, rgba(47, 224, 140, .2), transparent 62%),
+    linear-gradient(180deg, #000 0%, rgba(0, 0, 0, .4) 100%) !important;
+}
+.hero::after { background: linear-gradient(180deg, transparent, #000) !important; }
+.hero__glow, .theme-clipper .hero__glow, .theme-creator .hero__glow, .theme-brands .hero__glow {
+  background:
+    radial-gradient(38% 42% at 26% 28%, rgba(94, 234, 166, .22), transparent 68%),
+    radial-gradient(34% 40% at 76% 20%, rgba(47, 224, 140, .18), transparent 70%),
+    radial-gradient(32% 38% at 50% 64%, rgba(16, 185, 129, .1), transparent 72%) !important;
+}
+.hero__beam, .theme-clipper .hero__beam, .theme-creator .hero__beam, .theme-brands .hero__beam {
+  background: radial-gradient(50% 52% at 50% 0%, rgba(156, 246, 200, .14), transparent 72%) !important;
+}
+.hero__stage-halo, .theme-clipper .hero__stage-halo, .theme-creator .hero__stage-halo, .theme-brands .hero__stage-halo {
+  background: radial-gradient(52% 50% at 50% 42%, rgba(47, 224, 140, .32), rgba(47, 224, 140, .08) 56%, transparent 72%) !important;
+}
+.hero h1 .grad, .theme-clipper .hero h1 .grad, .theme-creator .hero h1 .grad, .theme-brands .hero h1 .grad {
+  background-image: linear-gradient(100deg, #d6fde9 0%, #5eeaa6 46%, #2fe08c 100%) !important;
+}
+.hero .tick, .theme-clipper .hero .tick, .theme-creator .hero .tick { background: rgba(47, 224, 140, .18) !important; color: var(--brand-light); }
+
+/* ---------- Navigation: schwebende Glasleiste ---------- */
+.nav, .nav.is-stuck {
+  background: rgba(0, 0, 0, .55) !important;
+  backdrop-filter: blur(20px) saturate(170%) !important; -webkit-backdrop-filter: blur(20px) saturate(170%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, .07) !important; box-shadow: none !important; color: var(--text);
+}
+.page-home .nav:not(.is-stuck):not(:has(+ .nav__mobile.is-open)) { background: rgba(0, 0, 0, .2) !important; }
+.nav__links a:hover, .nav__links a[aria-current="page"] { background: rgba(255, 255, 255, .07) !important; color: #fff !important; }
+.nav__burger { background: rgba(255, 255, 255, .06) !important; border-color: rgba(255, 255, 255, .14) !important; }
+.nav__burger span { background: #fff !important; }
+.nav__mobile { background: rgba(0, 0, 0, .82) !important; backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); border-bottom-color: rgba(255, 255, 255, .08) !important; }
+.nav__mobile a { border-bottom-color: rgba(255, 255, 255, .07) !important; }
+.logo__mark, .g-logo__mark, .nmd-brand__mark {
+  color: #02160c !important;
+  background: linear-gradient(150deg, #b8fbd9, #2fe08c 55%, #0f8a52) !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .25) inset, 0 6px 18px rgba(47, 224, 140, .3) !important;
+}
+
+/* ---------- Knöpfe ---------- */
+.btn--primary, .theme-brands .btn--primary, .g-btn--gold, .g-act--gold {
+  color: #02160c !important;
+  background: linear-gradient(180deg, #8ff3bf 0%, #2fe08c 55%, #17a865 100%) !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .5) inset, 0 -1px 0 rgba(0, 0, 0, .15) inset, 0 10px 28px rgba(47, 224, 140, .28) !important;
+}
+.btn--primary:hover, .theme-brands .btn--primary:hover, .g-btn--gold:hover, .g-act--gold:hover {
+  background: linear-gradient(180deg, #a6f7cd 0%, #3ee696 55%, #1cb46f 100%) !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .55) inset, 0 14px 34px rgba(47, 224, 140, .38) !important;
+}
+.btn--ghost, .g-btn--line, .gold .btn--ghost {
+  color: var(--text) !important; border-color: rgba(255, 255, 255, .16) !important;
+  background: rgba(255, 255, 255, .04) !important;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.btn--ghost:hover, .g-btn--line:hover { background: rgba(255, 255, 255, .09) !important; border-color: rgba(255, 255, 255, .26) !important; }
+.btn:focus-visible, a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid #9cf6c8; outline-offset: 3px;
+}
+
+/* ---------- Kleine Bausteine ---------- */
+.eyebrow, .hero .eyebrow { background: rgba(47, 224, 140, .08) !important; color: var(--brand-light) !important; border-color: rgba(47, 224, 140, .22) !important; }
+.tick { background: rgba(47, 224, 140, .14) !important; color: var(--brand-light) !important; }
+.chip { color: var(--text) !important; }
+.chip > span:first-child, .chip i { background: linear-gradient(140deg, #5eeaa6, #17a865) !important; }
+.marquee::before { background: linear-gradient(90deg, #000, transparent) !important; }
+.marquee::after { background: linear-gradient(270deg, #000, transparent) !important; }
+.clipwall__row::before { background: linear-gradient(90deg, #000, transparent) !important; }
+.clipwall__row::after { background: linear-gradient(270deg, #000, transparent) !important; }
+.clipwall__card.is-coverless, .theme-brands .clipwall__card.is-coverless { background: linear-gradient(158deg, #17a865, #04140b 62%, #062a18) !important; }
+.livebar__bars i, .livebar__bar, .livebar .bar { background: linear-gradient(180deg, #5eeaa6, rgba(47, 224, 140, .2)) !important; }
+.live-dot::before { background: #2fe08c !important; box-shadow: 0 0 0 4px rgba(47, 224, 140, .2) !important; }
+.cpath::before { background: linear-gradient(90deg, #5eeaa6, #17a865) !important; }
+.cpath__ic, .founder__badge .ic { background: rgba(47, 224, 140, .12) !important; color: var(--brand-light) !important; }
+.cflow li::before, .theme-brands .cflow li::before, .theme-brands .cpath::before {
+  color: #02160c !important; background: linear-gradient(140deg, #8ff3bf, #17a865) !important;
+}
+.coopcard__ic { color: #02160c !important; background: linear-gradient(140deg, #b8fbd9, #17a865) !important; }
+.coopcard__code i { color: #9cf6c8 !important; border-color: rgba(47, 224, 140, .3) !important; }
+.case__tag, .case .pill { background: rgba(47, 224, 140, .1) !important; color: var(--brand-light) !important; }
+.faq__ic { background: rgba(255, 255, 255, .06) !important; color: var(--text-muted) !important; }
+.faq__i[open], .faq__i:hover { border-color: rgba(47, 224, 140, .3) !important; }
+.feedgrid .tile--real, .theme-creator .feedgrid .tile--real { background: linear-gradient(160deg, #2fe08c, #03200f) !important; }
+.footer, .site-footer { background: transparent !important; border-top: 1px solid rgba(255, 255, 255, .07); }
+
+/* Instagram-Rahmen und Clips bleiben in ihren Originalfarben: das sind echte Inhalte. */
+.igw__grid { background: rgba(255, 255, 255, .06) !important; }
+.iglive__scroller::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .2) !important; }
+
+/* ---------- Formular (Stepper) ---------- */
+.stepper__bar { background: rgba(255, 255, 255, .08) !important; }
+.stepper__bar > *, .stepper__fill { background: linear-gradient(90deg, #17a865, #5eeaa6) !important; }
+.plat__box, .opt__box, .field input, .field select, .field textarea, .phonebox, .phonebox select, .g-invest textarea {
+  background: rgba(255, 255, 255, .04) !important; border-color: rgba(255, 255, 255, .12) !important; color: var(--text) !important;
+}
+.plat__box:hover, .opt__box:hover { border-color: rgba(47, 224, 140, .4) !important; background: rgba(255, 255, 255, .06) !important; }
+.plat__tile input:checked + .plat__box, .opt input:checked + .opt__box,
+.theme-brands .plat__tile input:checked + .plat__box {
+  border-color: #2fe08c !important; background: rgba(47, 224, 140, .1) !important;
+  box-shadow: 0 0 0 3px rgba(47, 224, 140, .18) !important;
+}
+.plat__check { background: rgba(255, 255, 255, .1) !important; }
+.plat__tile input:checked + .plat__box .plat__check, .theme-brands .plat__tile input:checked + .plat__box .plat__check { color: #02160c !important; background: #2fe08c !important; }
+.plat__logo { background: #f4fbf7 !important; border-radius: 12px; box-shadow: 0 0 0 1px rgba(255, 255, 255, .2); }
+.field input::placeholder, .field textarea::placeholder { color: #5c6d64 !important; }
+.field--coop input { background: rgba(47, 224, 140, .06) !important; border-color: rgba(47, 224, 140, .45) !important; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: #2fe08c !important; box-shadow: 0 0 0 3px rgba(47, 224, 140, .2) !important; }
+option { background: #04100a; color: #eef7f1; }
+.loadscreen { background: rgba(0, 0, 0, .7) !important; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+
+/* ---------- Gold-Seiten (gold.css) ---------- */
+.gold, .gold body { background: transparent; }
+.g-nav { background: rgba(0, 0, 0, .5) !important; backdrop-filter: blur(20px) saturate(170%) !important; -webkit-backdrop-filter: blur(20px) saturate(170%) !important; }
+.g-hero::before { background: radial-gradient(50% 60% at 50% 100%, rgba(47, 224, 140, .16), transparent 70%) !important; }
+.g-sec--raise { background: rgba(255, 255, 255, .02) !important; }
+.g-sec--form { background: radial-gradient(60% 50% at 80% 0%, rgba(47, 224, 140, .1), transparent 70%) !important; }
+.g-app { border-radius: 24px !important; }
+.g-app__rail, .g-app__side { background: rgba(0, 0, 0, .28) !important; }
+.g-app__ws-btn.is-on { background: rgba(47, 224, 140, .12) !important; }
+.g-market { background: var(--glass); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border-color: var(--glass-edge) !important; }
+.g-margin__in input { background: rgba(0, 0, 0, .35) !important; }
+.gold .plat__logo { background: #f4fbf7 !important; }
+.gold .field--coop input { background: rgba(47, 224, 140, .06) !important; }
+
+@media (prefers-reduced-transparency: reduce) {
+  .stepper__card, .case, .faq__i, .cpath, .cflow li, .livebar, .g-card, .g-app, .fcard, .step { backdrop-filter: none; -webkit-backdrop-filter: none; background: #07120c !important; }
+}
+

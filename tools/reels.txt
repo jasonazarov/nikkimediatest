@@ -1,0 +1,30 @@
+# Reels, deren Vorschaubild auf der Landingpage angezeigt wird.
+# Format:  <instagram-account> <shortcode>
+# Shortcode = der Teil aus der Reel-URL:
+#   instagram.com/caspianbluecaviar/reel/DP_uoY6jFCU/  ->  DP_uoY6jFCU
+#
+# Nach dem Bearbeiten:  bash tools/fetch-instagram-thumbs.sh
+
+caspianbluecaviar    DP_uoY6jFCU
+
+max_tornow_business  DCHhYijJK4b
+max_tornow_business  C8pRTW6MinC
+max_tornow_business  C_PxECKAj61
+
+levantine_istanbul   DEUXjpeIHPR
+levantine_istanbul   DBQxgMHAw1U
+levantine_istanbul   C9406cJIC_D
+
+# ── Noch offen ────────────────────────────────────────────────────────
+# Für diese beiden Accounts fehlen die Reel-Links: Instagram gibt Profile
+# nicht mehr anonym heraus und die Accounts sind nicht über Suchmaschinen
+# auffindbar. Einfach je drei Reel-Links öffnen, den Shortcode heraus-
+# kopieren, hier eintragen und das Skript erneut laufen lassen.
+#
+# dindrop7   XXXXXXXXXXX
+# dindrop7   XXXXXXXXXXX
+# dindrop7   XXXXXXXXXXX
+#
+# panperium  XXXXXXXXXXX
+# panperium  XXXXXXXXXXX
+# panperium  XXXXXXXXXXX

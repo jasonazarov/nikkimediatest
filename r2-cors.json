@@ -1,0 +1,12 @@
+[
+  {
+    "AllowedOrigins": [
+      "https://nikkimedia.co",
+      "http://localhost:8787"
+    ],
+    "AllowedMethods": ["GET", "PUT", "HEAD"],
+    "AllowedHeaders": ["*"],
+    "ExposeHeaders": ["ETag"],
+    "MaxAgeSeconds": 3600
+  }
+]

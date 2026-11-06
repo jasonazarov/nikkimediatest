@@ -1,0 +1,16 @@
+-- Mehrere Post-IDs je Video.
+--
+-- Bis hierher ging ein Video in EINEM Aufruf an alle Accounts aller
+-- Plattformen, also gab es genau eine Post-ID. Genau dieser eine Aufruf war
+-- die Ursache des ersten echten Fehlschlags: YouTube und Instagram lassen die
+-- Plattform die Datei selbst holen und sind in Sekunden fertig, TikTok und X
+-- haben keinen solchen Weg — dort lädt der Anbieter die 145 MB herunter und
+-- schiebt sie je Account durch die Plattform-API. In einem gemeinsamen Aufruf
+-- teilen sich alle dasselbe Zeitbudget: nach 11 Minuten standen YouTube 5/5
+-- und Instagram 4/5 draußen, TikTok 0/4 und X 0/3 mit „Publishing timed out
+-- during platform API call".
+--
+-- Seitdem geht je Plattform ein eigener Aufruf raus. Das ergibt bis zu vier
+-- Post-IDs je Video; `publish_post_id` trägt weiter die erste (die Sperre
+-- gegen Doppelposts hängt daran), die vollständige Liste steht hier.
+ALTER TABLE deliverables ADD COLUMN publish_post_ids TEXT;
