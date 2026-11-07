@@ -9,6 +9,15 @@
  *
  * Gibt es eine Adresse (slug) schon, bleibt der vorhandene Artikel unberührt
  * (INSERT OR IGNORE). Ein zweiter Lauf überschreibt also keine Änderungen.
+ *
+ * Zusätze (Vorgabe des Auftraggebers, November 2026: „so wie in der Demo“):
+ *   --veroeffentlichen   Artikel sofort veröffentlichen (published = 1)
+ *   --ersetzen           vorhandene Artikel derselben Adresse durch die Fassung aus
+ *                        docs/fachartikel ersetzen (Titel, Kurzfassung, Text, Autor)
+ *
+ *   node scripts/fachartikel-import.mjs --veroeffentlichen --ersetzen   → wie in der Demo, live
+ *
+ * Live fragt das Skript vor dem Schreiben einmal nach (j/n).
  * Format der Dateien: Kopf zwischen „---“ (title, slug, excerpt, author),
  * darunter der Text im Format des Editors (## , ### , - , 1. , > , **fett**, [Text](/pfad)).
  */
@@ -21,6 +30,8 @@ import { execFileSync } from 'node:child_process'
 const root = new URL('..', import.meta.url).pathname
 const dir = join(root, 'docs/fachartikel')
 const local = process.argv.includes('--local')
+const publish = process.argv.includes('--veroeffentlichen') || process.argv.includes('--publish')
+const replace = process.argv.includes('--ersetzen') || process.argv.includes('--update')
 const LIMITS = { title: 160, excerpt: 400, body: 30_000, author: 80 }
 
 const q = (s) => `'${String(s).replace(/'/g, "''")}'`
@@ -44,8 +55,13 @@ const rows = files.map((f, i) => {
   slugs.push(meta.slug)
   // Reihenfolge der Dateien = Reihenfolge im Blog (neuester zuerst = Datei 01).
   const ts = now - i * 60
-  return `INSERT OR IGNORE INTO articles (id, slug, title, excerpt, body, source_url, author, published, published_at, created_at, updated_at)
-VALUES (${q(randomUUID())}, ${q(meta.slug)}, ${q(meta.title)}, ${q(meta.excerpt)}, ${q(body)}, NULL, ${q(meta.author || 'Jason Azarov')}, 0, ${ts}, ${ts}, ${ts});`
+  const values = `VALUES (${q(randomUUID())}, ${q(meta.slug)}, ${q(meta.title)}, ${q(meta.excerpt)}, ${q(body)}, NULL, ${q(meta.author || 'Jason Azarov')}, ${publish ? 1 : 0}, ${ts}, ${ts}, ${ts})`
+  const cols = 'INTO articles (id, slug, title, excerpt, body, source_url, author, published, published_at, created_at, updated_at)'
+  if (!replace) return `INSERT OR IGNORE ${cols}\n${values};`
+  // Ersetzen: Inhalt neu, Datum der Veröffentlichung bleibt; veröffentlicht wird nur mit --veroeffentlichen.
+  return `INSERT ${cols}\n${values}\nON CONFLICT(slug) DO UPDATE SET title = excluded.title, excerpt = excluded.excerpt, body = excluded.body, author = excluded.author, updated_at = ${ts}${
+    publish ? ', published = 1' : ''
+  };`
 })
 
 // Welche Adressen gibt es schon? Diese Artikel werden nicht angefasst, das sagen wir vorher.
@@ -59,12 +75,23 @@ try {
 } catch {
   console.log('Hinweis: vorhandene Artikel ließen sich nicht abfragen, Import läuft trotzdem (vorhandene bleiben unberührt).')
 }
-const skipped = slugs.filter((s) => existing.has(s))
+const skipped = replace ? [] : slugs.filter((s) => existing.has(s))
+const replaced = replace ? slugs.filter((s) => existing.has(s)) : []
 if (skipped.length) console.log(`Schon vorhanden, bleiben unverändert: ${skipped.join(', ')}`)
+if (replaced.length) console.log(`Schon vorhanden, werden durch die neue Fassung ersetzt: ${replaced.join(', ')}`)
 
 const sqlFile = join(mkdtempSync(join(tmpdir(), 'fachartikel-')), 'import.sql')
 writeFileSync(sqlFile, rows.join('\n') + '\n')
-console.log(`${files.length - skipped.length} neue Entwürfe → ${local ? 'lokale Vorschau' : 'LIVE (nikkimedia.co)'}, unveröffentlicht.`)
+console.log(`${files.length - skipped.length} Artikel → ${local ? 'lokale Vorschau' : 'LIVE (nikkimedia.co)'}, ${publish ? 'VERÖFFENTLICHT' : 'unveröffentlicht'}.`)
+if (!local) {
+  const { createInterface } = await import('node:readline/promises')
+  const rl = createInterface({ input: process.stdin, output: process.stdout })
+  const a = (await rl.question('Weiter? (j/n) ')).trim().toLowerCase()
+  rl.close()
+  if (!['j', 'ja', 'y', 'yes'].includes(a)) { console.log('Abgebrochen, nichts geschrieben.'); process.exit(1) }
+}
 const args = ['wrangler', 'd1', 'execute', 'nikki-media', ...where, '--file', sqlFile]
 execFileSync('npx', args, { cwd: root, stdio: 'inherit', env: { ...process.env, CI: '1' } })
-console.log('\nFertig. Im Admin unter „Fachartikel“ prüfen und mit „Published“ freischalten.')
+console.log(publish
+  ? '\nFertig. Die Artikel stehen unter /fachartikel und im Admin unter „Fachartikel“.'
+  : '\nFertig. Im Admin unter „Fachartikel“ prüfen und mit „Published“ freischalten.')

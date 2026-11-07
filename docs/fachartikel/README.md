@@ -20,7 +20,8 @@ Keine langen Gedankenstriche im Text.
 - Links direkt aufs passende Formular: Kunden /#stepper, Clipper /clipper#stepper, Creator /creator#stepper,
   Agenturen /brands#stepper. /agenturen, /personal-brands und /investoren gibt es nicht mehr.
 
-**Import (unveröffentlicht, nur nach Freigabe):** `node scripts/fachartikel-import.mjs` (live) bzw. `--local` (Vorschau).
+**Import (nur nach Freigabe):** `node scripts/fachartikel-import.mjs` spielt live als unveröffentlichte Entwürfe ein (`--local` = Vorschau).
+Mit `--veroeffentlichen --ersetzen` wie in der Demo: sofort veröffentlicht, ältere Fassungen derselben Adresse ersetzt. Live fragt das Skript vorher (j/n).
 
 **Case Studies (18–22):** nur Fakten aus den Case Studies der Startseite und den vom Auftraggeber genannten
 Reel-Zahlen; keine Laufzeiten, Umsätze oder Reservierungen. Alle Zahlen „im Kampagnenzeitraum“.
