@@ -1072,7 +1072,7 @@ export function filesPage(v: FilesView & { area?: CustomerArea }): string {
             </div>
           </div>
           <div class="flex min-w-0 flex-col px-1 pb-1 lg:py-2 lg:pr-3">
-            <nav class="truncate text-xs text-slate-400">${crumbs}</nav>
+            <nav class="shrink-0 truncate text-xs text-slate-400">${crumbs}</nav>
             <div class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
               <h1 class="min-w-0 break-words font-display text-2xl font-extrabold tracking-tight sm:text-4xl">${esc(v.project.name)}</h1>
               ${area === CREATOR_CAMPAIGN_AREA ? originBadge('own') : ''}
