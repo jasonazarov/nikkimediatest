@@ -32,6 +32,7 @@ import {
   VIEWS_STEP,
   agencyPackageLabel,
   viewsShort,
+  type AgencyBookingRow,
   type Briefing,
   PRICE_RANGES,
   DEFAULT_PRICE_RANGE,
@@ -88,6 +89,7 @@ export const AGENCY_CAMPAIGN_AREA: CustomerArea = {
   projectHref: (id) => `/collaboration/meine/${id}`,
   folderHref: (id) => `/collaboration/ordner/${id}`,
   newHref: AGENCY_NEW_CAMPAIGN,
+  bookButtons: (id) => agencyBookButtons(id),
   openAfterCreate: true,
   accounts: 'project',
   text: {
@@ -101,6 +103,22 @@ export const AGENCY_CAMPAIGN_AREA: CustomerArea = {
 }
 
 /* ------------------------------------------------------------- Bausteine */
+
+/**
+ * „Creator buchen“ und „Clipper buchen“ für eine EIGENE Kampagne (Vorgabe des
+ * Auftraggebers, November 2026): führen auf die Liste, die Kampagne ist in der
+ * Maske schon vorausgewählt (`?kampagne=<id>`).
+ */
+function agencyBookButtons(projectId: string): string {
+  const q = `?kampagne=${encodeURIComponent(projectId)}`
+  const cls =
+    'inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-brand hover:text-brand'
+  // Eine Gruppe: bricht die Zeile um, rutschen beide Knöpfe zusammen in die nächste.
+  return `<span class="inline-flex flex-wrap gap-2">
+            <a href="/collaboration/creator${q}" class="${cls}" data-book-link="creator">Creator buchen</a>
+            <a href="/collaboration/clipper${q}" class="${cls}" data-book-link="clipper">Clipper buchen</a>
+          </span>`
+}
 
 const GOLD_BTN =
   'inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#9cf6c8] via-[#2fe08c] to-[#17a865] px-6 py-3 text-sm font-extrabold text-[#02160c] shadow-lg shadow-emerald-900/30 transition hover:brightness-105 disabled:opacity-40'
@@ -805,6 +823,8 @@ export interface AgencyClipper {
   availability: string | null
   campaigns: number
   clips: number
+  /** Offene Buchungsanfrage dieser Agentur für den Clipper. */
+  pending?: boolean
   /** Nur Demo-Agentur: der Demo-Clipper lässt sich direkt einer eigenen Kampagne zuweisen. */
   assignable?: boolean
 }
@@ -819,14 +839,8 @@ export interface AgencyClip {
   views: number
 }
 
-export interface AgencyBooking {
-  id: string
-  creatorName: string
-  projectName: string
-  status: string
-  message: string | null
-  createdAt: number
-}
+/** Eine Buchung der Agentur, Creator oder Clipper (`bookingsOfAgency` in lib/agency.ts). */
+export type AgencyBooking = AgencyBookingRow
 
 const campaignCardOf = (c: AgencyCampaign) =>
   campaignCard({
@@ -957,6 +971,7 @@ export function overviewPage(o: {
               Material hochladen
             </a>
             <a href="/collaboration/creator" class="nmw-camp-hero__ghost">Creator buchen</a>
+            <a href="/collaboration/clipper" class="nmw-camp-hero__ghost">Clipper buchen</a>
             <a href="${esc(AGENCY_CAMPAIGN_AREA.home)}" class="ml-auto text-sm font-semibold text-brand-2 hover:underline">Alle meine Kampagnen →</a>
           </div>
         </div>
@@ -1102,7 +1117,10 @@ export function campaignPage(o: {
           <div class="mt-4 flex flex-wrap gap-1.5">${team}</div>
           ${
             o.manageHref
-              ? `<a href="${esc(o.manageHref)}" class="mt-5 ${GOLD_BTN}">Material &amp; Ordner verwalten</a>`
+              ? `<div class="mt-5 flex flex-wrap gap-2">
+                   <a href="${esc(o.manageHref)}" class="${GOLD_BTN}">Material &amp; Ordner verwalten</a>
+                   ${agencyBookButtons(c.id)}
+                 </div>`
               : ''
           }
         </div>
@@ -1164,34 +1182,54 @@ export function campaignPage(o: {
   return agencyShell({ title: c.name, user: o.user, locked: false, active: '/collaboration/kampagnen', body, script })
 }
 
-export function creatorsPage(o: {
-  user: User
-  creators: AgencyCreator[]
-  ownCampaigns: { id: string; name: string }[]
-  page: number
-}): string {
-  const canBook = o.ownCampaigns.length > 0
-  const { items, page, pages } = pageSlice(o.creators, o.page, 48)
-  const body = `
-      ${pageTitle('Creator', 'Unser Netzwerk aus Influencern und UGC-Creatorn. Buche einen Creator für eine deiner Kampagnen. NIKKI MEDIA bestätigt die Buchung und bringt ihn in dein Team.')}
-      ${
-        o.creators.length
-          ? `<div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">${items.map((c) => creatorCard(c, canBook ? 'book' : 'needs-campaign')).join('')}</div>
-      ${pager('/collaboration/creator', page, pages)}`
-          : emptyState('Noch keine Creator', 'Sobald Creator im Netzwerk sind, stehen sie hier.')
-      }
+/** Wofür gebucht wird, je Art: Texte der Maske und des Hinweises. */
+const BOOK_TEXT = {
+  creator: {
+    title: 'Creator buchen',
+    who: 'den Creator',
+    pick: 'einen Creator',
+    placeholder: 'Was soll der Creator für dich machen?',
+    idKey: 'creatorId',
+  },
+  clipper: {
+    title: 'Clipper buchen',
+    who: 'den Clipper',
+    pick: 'einen Clipper',
+    placeholder: 'Worauf soll der Clipper beim Schneiden achten?',
+    idKey: 'clipperId',
+  },
+} as const
 
+/** Hinweis oben, wenn die Seite aus einer Kampagne heraus geöffnet wurde (`?kampagne=<id>`). */
+function bookingFor(kind: 'creator' | 'clipper', own: { id: string; name: string }[], selected: string | null): string {
+  const hit = selected ? own.find((p) => p.id === selected) : undefined
+  return hit
+    ? `<div class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl px-5 py-4 nmw-brand-glass nmw-brand-glass--soft" data-book-for>
+         <p class="text-sm"><b>Buchung für „${esc(hit.name)}“</b>: wähle ${BOOK_TEXT[kind].pick}, die Kampagne ist schon eingetragen.</p>
+         <a href="${esc(AGENCY_CAMPAIGN_AREA.projectHref(hit.id))}" class="text-sm font-semibold text-brand-2 hover:underline">Zurück zur Kampagne</a>
+       </div>`
+    : ''
+}
+
+/**
+ * Buchungsmaske für Creator oder Clipper. Ein Knopf mit `data-book` öffnet sie;
+ * gebucht wird über POST /api/collaboration/bookings. `selected` wählt die
+ * Kampagne vor, aus der die Agentur kommt.
+ */
+function bookingModal(kind: 'creator' | 'clipper', own: { id: string; name: string }[], selected: string | null): string {
+  const t = BOOK_TEXT[kind]
+  return `
       <div class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 p-4" data-book-modal>
         <form class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl" data-book-form>
-          <h2 class="font-display text-xl font-extrabold">Creator buchen</h2>
-          <p class="mt-1 text-sm text-slate-500"><b data-book-name></b> für eine deiner Kampagnen. NIKKI MEDIA bestätigt die Buchung und bringt den Creator in dein Team.</p>
+          <h2 class="font-display text-xl font-extrabold">${t.title}</h2>
+          <p class="mt-1 text-sm text-slate-500"><b data-book-name></b> für eine deiner Kampagnen. NIKKI MEDIA bestätigt die Buchung und bringt ${t.who} in dein Team.</p>
           <label class="mt-5 block text-sm font-semibold">Kampagne
             <select name="projectId" class="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-brand">
-              ${o.ownCampaigns.map((p) => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('')}
+              ${own.map((p) => `<option value="${esc(p.id)}"${p.id === selected ? ' selected' : ''}>${esc(p.name)}</option>`).join('')}
             </select>
           </label>
           <label class="mt-4 block text-sm font-semibold">Nachricht <span class="font-normal text-slate-400">(optional)</span>
-            <textarea name="message" rows="3" maxlength="1000" placeholder="Was soll der Creator für dich machen?" class="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-brand"></textarea>
+            <textarea name="message" rows="3" maxlength="1000" placeholder="${t.placeholder}" class="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-brand"></textarea>
           </label>
           <p class="mt-3 hidden text-sm font-semibold text-red-700" data-book-error></p>
           <div class="mt-5 flex justify-end gap-2">
@@ -1200,17 +1238,19 @@ export function creatorsPage(o: {
           </div>
         </form>
       </div>`
+}
 
-  const script = `
+const bookingScript = (kind: 'creator' | 'clipper') => `
 (function () {
   var modal = document.querySelector('[data-book-modal]');
+  if (!modal) return;
   var form = modal.querySelector('[data-book-form]');
   var err = form.querySelector('[data-book-error]');
-  var creatorId = '';
+  var personId = '';
   function close() { modal.classList.add('hidden'); modal.classList.remove('flex'); }
   document.querySelectorAll('[data-book]').forEach(function (b) {
     b.addEventListener('click', function () {
-      creatorId = b.getAttribute('data-book');
+      personId = b.getAttribute('data-book');
       form.querySelector('[data-book-name]').textContent = b.getAttribute('data-name');
       err.classList.add('hidden');
       modal.classList.remove('hidden'); modal.classList.add('flex');
@@ -1222,31 +1262,66 @@ export function creatorsPage(o: {
     e.preventDefault();
     var btn = form.querySelector('button:not([type])');
     btn.disabled = true;
+    var payload = { projectId: form.projectId.value, message: form.message.value };
+    payload[${JSON.stringify(BOOK_TEXT[kind].idKey)}] = personId;
     fetch('/api/collaboration/bookings', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ creatorId: creatorId, projectId: form.projectId.value, message: form.message.value })
+      body: JSON.stringify(payload)
     }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
       .then(function (res) {
         if (!res.ok) throw new Error(res.d.error || 'Das hat nicht geklappt.');
-        window.location.href = '/collaboration/buchungen?neu=' + (res.d.confirmed ? 'bestaetigt' : '1');
+        window.location.href = '/collaboration/buchungen?neu=' + (res.d.confirmed ? 'bestaetigt' : '1') + '&art=${kind}';
       })
       .catch(function (e2) { btn.disabled = false; err.textContent = e2.message; err.classList.remove('hidden'); });
   });
 })();`
 
-  return agencyShell({ title: 'Creator', user: o.user, locked: false, active: '/collaboration/creator', body, script })
+export function creatorsPage(o: {
+  user: User
+  creators: AgencyCreator[]
+  ownCampaigns: { id: string; name: string }[]
+  /** Aus einer Kampagne heraus geöffnet: diese Kampagne ist in der Maske vorausgewählt. */
+  selected?: string | null
+  page: number
+}): string {
+  const canBook = o.ownCampaigns.length > 0
+  const { items, page, pages } = pageSlice(o.creators, o.page, 48)
+  const body = `
+      ${bookingFor('creator', o.ownCampaigns, o.selected ?? null)}
+      ${pageTitle('Creator', 'Unser Netzwerk aus Influencern und UGC-Creatorn. Buche einen Creator für eine deiner Kampagnen. NIKKI MEDIA bestätigt die Buchung und bringt ihn in dein Team.')}
+      ${
+        o.creators.length
+          ? `<div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">${items.map((c) => creatorCard(c, canBook ? 'book' : 'needs-campaign')).join('')}</div>
+      ${pager('/collaboration/creator', page, pages)}`
+          : emptyState('Noch keine Creator', 'Sobald Creator im Netzwerk sind, stehen sie hier.')
+      }
+      ${bookingModal('creator', o.ownCampaigns, o.selected ?? null)}`
+
+  return agencyShell({ title: 'Creator', user: o.user, locked: false, active: '/collaboration/creator', body, script: bookingScript('creator') })
 }
 
 export function clippersPage(o: {
   user: User
   clippers: AgencyClipper[]
-  /** Eigene Kampagnen, für die Zuweisung des Demo-Clippers (nur Demo-Agentur). */
+  /** Eigene Kampagnen: wofür gebucht wird (und beim Demo-Clipper zugewiesen). */
   ownCampaigns: { id: string; name: string }[]
+  /** Aus einer Kampagne heraus geöffnet: diese Kampagne ist in der Maske vorausgewählt. */
+  selected?: string | null
   page: number
 }): string {
   const { items, page, pages } = pageSlice(o.clippers, o.page, 50)
   const canAssign = o.ownCampaigns.length > 0
+  const selected = o.selected ?? null
+  // Gebucht wird wie bei den Creatorn; nur den Demo-Clipper holt die Demo-Agentur direkt ins Team.
+  const action = (c: AgencyClipper) =>
+    !canAssign
+      ? `<a href="${esc(AGENCY_NEW_CAMPAIGN)}" class="mt-3 inline-flex rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:border-slate-400">Erst eigene Kampagne anlegen</a>`
+      : c.pending
+        ? `<span class="mt-3 inline-flex rounded-xl bg-amber-50 px-4 py-2 text-sm font-bold text-amber-800 ring-1 ring-inset ring-amber-200">Buchung angefragt</span>`
+        : c.assignable
+          ? `<button type="button" data-assign="${esc(c.id)}" data-name="${esc(c.name)}" class="${GOLD_BTN} mt-3 !py-2">Clipper buchen</button>`
+          : `<button type="button" data-book="${esc(c.id)}" data-name="${esc(c.name)}" class="${GOLD_BTN} mt-3 !py-2">Clipper buchen</button>`
   const rows = items
     .map(
       (c) => `
@@ -1273,19 +1348,15 @@ export function clippersPage(o: {
               `${formatViews(c.clips)} ${c.clips === 1 ? 'Clip' : 'Clips'}`,
             ]
               .filter(Boolean)
-              .join(' · ')}</p>${
-              c.assignable
-                ? canAssign
-                  ? `<button type="button" data-assign="${esc(c.id)}" data-name="${esc(c.name)}" class="${GOLD_BTN} mt-3 !py-2">Clipper zuweisen</button>`
-                  : `<a href="${esc(AGENCY_NEW_CAMPAIGN)}" class="mt-3 inline-flex rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:border-slate-400">Erst eigene Kampagne anlegen</a>`
-                : ''
-            }
+              .join(' · ')}</p>
+            ${action(c)}
           </div>
         </article>`,
     )
     .join('')
   const body = `
-      ${pageTitle('Clipper', 'Die Clipping-Armee von NIKKI MEDIA, wer schneidet und auf welchen Plattformen. Zugeordnet wird von NIKKI MEDIA.')}
+      ${bookingFor('clipper', o.ownCampaigns, selected)}
+      ${pageTitle('Clipper', 'Die Clipping-Armee von NIKKI MEDIA: wer schneidet und auf welchen Plattformen. Buche einen Clipper für eine deiner Kampagnen. NIKKI MEDIA bestätigt die Buchung und bringt ihn in dein Team.')}
       ${o.clippers.length ? kpiBar([{ label: 'Clipper im Netzwerk', value: formatViews(o.clippers.length) }], 'mb-5') : ''}
       ${
         o.clippers.length
@@ -1297,11 +1368,11 @@ export function clippersPage(o: {
         canAssign
           ? `<div class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 p-4" data-assign-modal>
         <form class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl" data-assign-form>
-          <h2 class="font-display text-xl font-extrabold">Clipper zuweisen</h2>
+          <h2 class="font-display text-xl font-extrabold">Clipper buchen</h2>
           <p class="mt-1 text-sm text-slate-500"><b data-assign-name></b> kommt sofort ins Team der Kampagne und sieht sie in seinem Dashboard.</p>
           <label class="mt-5 block text-sm font-semibold">Kampagne
             <select name="projectId" class="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-brand">
-              ${o.ownCampaigns.map((p) => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('')}
+              ${o.ownCampaigns.map((p) => `<option value="${esc(p.id)}"${p.id === selected ? ' selected' : ''}>${esc(p.name)}</option>`).join('')}
             </select>
           </label>
           <p class="mt-3 hidden text-sm font-semibold text-red-700" data-assign-error></p>
@@ -1310,7 +1381,8 @@ export function clippersPage(o: {
             <button class="${GOLD_BTN} !py-2.5">Zuweisen</button>
           </div>
         </form>
-      </div>`
+      </div>
+      ${bookingModal('clipper', o.ownCampaigns, selected)}`
           : ''
       }`
   const script = canAssign
@@ -1346,7 +1418,7 @@ export function clippersPage(o: {
       })
       .catch(function (e2) { btn.disabled = false; err.textContent = e2.message; err.classList.remove('hidden'); });
   });
-})();`
+})();${bookingScript('clipper')}`
     : undefined
   return agencyShell({ title: 'Clipper', user: o.user, locked: false, active: '/collaboration/clipper', body, script })
 }
@@ -1356,19 +1428,22 @@ export function bookingsPage(o: {
   bookings: AgencyBooking[]
   /** Gerade gebucht: angefragt (echte Agentur) oder sofort bestätigt (Demo-Agentur). */
   justBooked: 'requested' | 'confirmed' | null
+  /** Was gerade gebucht wurde (`?art=clipper`), für den Satz oben. */
+  bookedKind?: 'creator' | 'clipper'
 }): string {
+  const who = o.bookedKind === 'clipper' ? 'Der Clipper' : 'Der Creator'
   const tone = (s: string) => (s === 'bestaetigt' ? 'green' : s === 'abgelehnt' ? 'red' : 'amber') as 'green' | 'red' | 'amber'
   const body = `
       ${
         o.justBooked
           ? `<div class="mb-6 rounded-2xl bg-emerald-50 px-5 py-4 text-sm font-semibold text-emerald-900 ring-1 ring-inset ring-emerald-200">${
               o.justBooked === 'confirmed'
-                ? 'Deine Buchung ist bestätigt. Der Creator ist im Team der Kampagne und sieht sie in seinem Dashboard.'
+                ? `Deine Buchung ist bestätigt. ${who} ist im Team der Kampagne und sieht sie in seinem Dashboard.`
                 : 'Deine Buchung ist angefragt. NIKKI MEDIA bestätigt sie und meldet sich bei dir.'
             }</div>`
           : ''
       }
-      ${pageTitle('Buchungen', 'Deine Creator-Buchungen und ihr Stand.')}
+      ${pageTitle('Buchungen', 'Deine Creator- und Clipper-Buchungen und ihr Stand.')}
       ${
         o.bookings.length
           ? card(
@@ -1376,7 +1451,9 @@ export function bookingsPage(o: {
                 .map(
                   (b) => `<li class="flex flex-wrap items-center justify-between gap-3 py-3">
                     <div class="min-w-0">
-                      <p class="font-semibold">${esc(b.creatorName)} <span class="font-normal text-slate-400">für</span> ${esc(b.projectName)}</p>
+                      <p class="font-semibold"><span class="mr-1.5 inline-flex rounded-full px-2 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wider ring-1 ring-inset ${
+                        b.kind === 'creator' ? 'bg-pink-50 text-pink-700 ring-pink-200' : 'bg-violet-50 text-violet-700 ring-violet-200'
+                      }">${b.kind === 'creator' ? 'Creator' : 'Clipper'}</span>${esc(b.name)} <span class="font-normal text-slate-400">für</span> ${esc(b.projectName)}</p>
                       <p class="text-xs text-slate-500">${dateDE(b.createdAt)}${b.message ? ` · ${esc(b.message)}` : ''}</p>
                     </div>
                     ${badge(BOOKING_STATUS_LABEL[b.status] ?? b.status, tone(b.status))}
@@ -1386,8 +1463,8 @@ export function bookingsPage(o: {
             )
           : emptyState(
               'Noch keine Buchungen',
-              'Unter „Creator“ buchst du Creator für deine Kampagnen.',
-              `<a href="/collaboration/creator" class="mt-5 ${GOLD_BTN}">Creator ansehen</a>`,
+              'Unter „Creator“ und „Clipper“ buchst du sie für deine Kampagnen.',
+              `<div class="mt-5 flex flex-wrap justify-center gap-2"><a href="/collaboration/creator" class="${GOLD_BTN}">Creator ansehen</a><a href="/collaboration/clipper" class="${GOLD_BTN}">Clipper ansehen</a></div>`,
             )
       }`
   return agencyShell({ title: 'Buchungen', user: o.user, locked: false, active: '/collaboration/buchungen', body })

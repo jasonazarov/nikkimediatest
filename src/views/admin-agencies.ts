@@ -42,9 +42,12 @@ export interface CodeRow {
 
 export interface BookingRow {
   id: string
+  /** Creator- oder Clipper-Buchung (Migration 0028). */
+  kind: 'creator' | 'clipper'
   status: string
   message: string | null
   createdAt: number
+  /** Name und Id des Creators bzw. Clippers. */
   creatorName: string
   creatorId: string
   projectId: string
@@ -150,7 +153,9 @@ function bookingList(rows: BookingRow[], showAgency: boolean): string {
     .map(
       (b) => `<li class="flex flex-wrap items-center justify-between gap-3 py-3" data-booking-row="${esc(b.id)}">
         <div class="min-w-0">
-          <p class="font-semibold"><a href="/admin/creator/${esc(b.creatorId)}" class="hover:text-brand">${esc(b.creatorName)}</a>
+          <p class="font-semibold"><span class="mr-1.5 inline-flex rounded-full px-2 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wider ring-1 ring-inset ${
+            b.kind === 'creator' ? 'bg-pink-50 text-pink-700 ring-pink-200' : 'bg-violet-50 text-violet-700 ring-violet-200'
+          }">${b.kind === 'creator' ? 'Creator' : 'Clipper'}</span><a href="/admin/${b.kind === 'creator' ? 'creator' : 'clipper'}/${esc(b.creatorId)}" class="hover:text-brand">${esc(b.creatorName)}</a>
             <span class="font-normal text-slate-400">for</span> <a href="/admin/projekte/${esc(b.projectId)}" class="hover:text-brand">${esc(b.projectName)}</a>
             ${
               showAgency
@@ -293,7 +298,7 @@ export function agenciesPage(o: {
 
       ${
         pending.length
-          ? `${sectionHead('Creator bookings to confirm')}${card(bookingList(pending, true))}`
+          ? `${sectionHead('Bookings to confirm (creators & clippers)')}${card(bookingList(pending, true))}`
           : ''
       }
 
@@ -488,7 +493,7 @@ export function agencyDetailPage(o: {
 
       ${l.customerId ? pushPopupSection(l.customerId, o.pushPopupDays ?? null, 'agency') : ''}
 
-      ${sectionHead('Creator bookings')}
+      ${sectionHead('Bookings (creators & clippers)')}
       ${card(bookingList(o.bookings, false))}`
 
   return shell({

@@ -1783,36 +1783,65 @@ async function agencyRows(env: Env, leadId?: string): Promise<AgencyRow[]> {
 async function bookingRows(env: Env, agencyUserId?: string): Promise<BookingRow[]> {
   const creatorUser = alias(schema.users, 'creator_user')
   const agencyUser = alias(schema.users, 'agency_user')
-  const rows = await getDb(env)
-    .select({
-      b: schema.creatorBookings,
-      creatorName: creatorUser.fullName,
-      projectName: schema.projects.name,
-      agencyName: agencyUser.fullName,
-      company: schema.agencyLeads.company,
-      agencyLeadId: schema.agencyLeads.id,
+  const db = getDb(env)
+  const [creators, clippers] = await Promise.all([
+    db
+      .select({
+        b: schema.creatorBookings,
+        personName: creatorUser.fullName,
+        personId: schema.creatorBookings.creatorId,
+        projectName: schema.projects.name,
+        agencyName: agencyUser.fullName,
+        company: schema.agencyLeads.company,
+        agencyLeadId: schema.agencyLeads.id,
+      })
+      .from(schema.creatorBookings)
+      .innerJoin(schema.creators, eq(schema.creators.id, schema.creatorBookings.creatorId))
+      .innerJoin(creatorUser, eq(creatorUser.id, schema.creators.userId))
+      .innerJoin(schema.projects, eq(schema.projects.id, schema.creatorBookings.projectId))
+      .innerJoin(agencyUser, eq(agencyUser.id, schema.creatorBookings.agencyUserId))
+      .leftJoin(schema.agencyLeads, eq(schema.agencyLeads.userId, schema.creatorBookings.agencyUserId))
+      .where(agencyUserId ? eq(schema.creatorBookings.agencyUserId, agencyUserId) : undefined)
+      .orderBy(desc(schema.creatorBookings.createdAt))
+      .limit(300),
+    // Clipper-Buchungen (Migration 0028), gleich aufgebaut.
+    db
+      .select({
+        b: schema.clipperBookings,
+        personName: schema.clippers.displayName,
+        personId: schema.clipperBookings.clipperId,
+        projectName: schema.projects.name,
+        agencyName: agencyUser.fullName,
+        company: schema.agencyLeads.company,
+        agencyLeadId: schema.agencyLeads.id,
+      })
+      .from(schema.clipperBookings)
+      .innerJoin(schema.clippers, eq(schema.clippers.id, schema.clipperBookings.clipperId))
+      .innerJoin(schema.projects, eq(schema.projects.id, schema.clipperBookings.projectId))
+      .innerJoin(agencyUser, eq(agencyUser.id, schema.clipperBookings.agencyUserId))
+      .leftJoin(schema.agencyLeads, eq(schema.agencyLeads.userId, schema.clipperBookings.agencyUserId))
+      .where(agencyUserId ? eq(schema.clipperBookings.agencyUserId, agencyUserId) : undefined)
+      .orderBy(desc(schema.clipperBookings.createdAt))
+      .limit(300),
+  ])
+  const row =
+    (kind: 'creator' | 'clipper') =>
+    (r: (typeof creators)[number] | (typeof clippers)[number]): BookingRow => ({
+      id: r.b.id,
+      kind,
+      status: r.b.status,
+      message: r.b.message,
+      createdAt: r.b.createdAt,
+      creatorName: r.personName,
+      creatorId: r.personId,
+      projectId: r.b.projectId,
+      projectName: r.projectName,
+      agencyName: r.company || r.agencyName,
+      agencyLeadId: r.agencyLeadId,
     })
-    .from(schema.creatorBookings)
-    .innerJoin(schema.creators, eq(schema.creators.id, schema.creatorBookings.creatorId))
-    .innerJoin(creatorUser, eq(creatorUser.id, schema.creators.userId))
-    .innerJoin(schema.projects, eq(schema.projects.id, schema.creatorBookings.projectId))
-    .innerJoin(agencyUser, eq(agencyUser.id, schema.creatorBookings.agencyUserId))
-    .leftJoin(schema.agencyLeads, eq(schema.agencyLeads.userId, schema.creatorBookings.agencyUserId))
-    .where(agencyUserId ? eq(schema.creatorBookings.agencyUserId, agencyUserId) : undefined)
-    .orderBy(desc(schema.creatorBookings.createdAt))
-    .limit(300)
-  return rows.map((r) => ({
-    id: r.b.id,
-    status: r.b.status,
-    message: r.b.message,
-    createdAt: r.b.createdAt,
-    creatorName: r.creatorName,
-    creatorId: r.b.creatorId,
-    projectId: r.b.projectId,
-    projectName: r.projectName,
-    agencyName: r.company || r.agencyName,
-    agencyLeadId: r.agencyLeadId,
-  }))
+  return [...creators.map(row('creator')), ...clippers.map(row('clipper'))]
+    .sort((a, b) => b.createdAt - a.createdAt)
+    .slice(0, 300)
 }
 
 adminRoutes.get('/agenturen', async (c) => {

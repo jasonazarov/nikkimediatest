@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull } from 'drizzle-orm'
+import { and, eq, isNull } from 'drizzle-orm'
 import { getDb, nowSec, uid, schema } from './db'
 import { INDUSTRIES, addToTeam, customerForUser, deleteCustomerAccount } from './domain'
 import type { Env } from './types'
@@ -428,11 +428,12 @@ export const BOOKING_STATUS_LABEL: Record<string, string> = {
 
 /**
  * Entscheidet über eine Buchungsanfrage — die Aktion im Admin-Bereich.
+ * Gilt für Creator- UND Clipper-Buchungen (dieselbe Id-Art, zwei Tabellen).
  *
- * Bestätigt heißt: der Creator kommt ins Team der Kampagne, und zwar über
- * `addToTeam`, denselben Weg wie jede Zuordnung im Admin-Bereich. Die
- * Verbreitung über Creator wird dabei eingeschaltet — wer einen Creator
- * bucht, will, dass er die Clips auf seinen Kanälen ausspielt.
+ * Bestätigt heißt: der Creator bzw. Clipper kommt ins Team der Kampagne, und
+ * zwar über `addToTeam`, denselben Weg wie jede Zuordnung im Admin-Bereich.
+ * Beim Creator wird die Verbreitung über Creator eingeschaltet — wer einen
+ * Creator bucht, will, dass er die Clips auf seinen Kanälen ausspielt.
  */
 export async function decideBooking(
   env: Env,
@@ -445,7 +446,7 @@ export async function decideBooking(
     .from(schema.creatorBookings)
     .where(eq(schema.creatorBookings.id, bookingId))
     .limit(1)
-  if (!booking) return { ok: false, error: 'Booking not found.' }
+  if (!booking) return decideClipperBooking(env, bookingId, accept)
 
   if (accept) {
     const [creator] = await db
@@ -469,20 +470,77 @@ export async function decideBooking(
   return { ok: true }
 }
 
-/** Die Buchungsanfragen einer Agentur, neueste zuerst. */
-export async function bookingsOfAgency(env: Env, userId: string) {
-  return getDb(env)
-    .select({
-      booking: schema.creatorBookings,
-      creatorName: schema.users.fullName,
-      projectName: schema.projects.name,
-    })
-    .from(schema.creatorBookings)
-    .innerJoin(schema.creators, eq(schema.creators.id, schema.creatorBookings.creatorId))
-    .innerJoin(schema.users, eq(schema.users.id, schema.creators.userId))
-    .innerJoin(schema.projects, eq(schema.projects.id, schema.creatorBookings.projectId))
-    .where(eq(schema.creatorBookings.agencyUserId, userId))
-    .orderBy(desc(schema.creatorBookings.createdAt))
+/** Clipper-Buchung: bestätigt heißt, der Clipper schneidet für die Kampagne (`addToTeam`). */
+async function decideClipperBooking(
+  env: Env,
+  bookingId: string,
+  accept: boolean,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const db = getDb(env)
+  const [booking] = await db
+    .select()
+    .from(schema.clipperBookings)
+    .where(eq(schema.clipperBookings.id, bookingId))
+    .limit(1)
+  if (!booking) return { ok: false, error: 'Booking not found.' }
+
+  if (accept) {
+    const [clipper] = await db
+      .select({ userId: schema.clippers.userId })
+      .from(schema.clippers)
+      .where(eq(schema.clippers.id, booking.clipperId))
+      .limit(1)
+    if (!clipper) return { ok: false, error: 'Clipper not found.' }
+    const added = await addToTeam(env, booking.projectId, clipper.userId)
+    if (!added.ok) return added
+  }
+
+  await db
+    .update(schema.clipperBookings)
+    .set({ status: accept ? 'bestaetigt' : 'abgelehnt', decidedAt: nowSec() })
+    .where(eq(schema.clipperBookings.id, bookingId))
+  return { ok: true }
+}
+
+export interface AgencyBookingRow {
+  id: string
+  kind: 'creator' | 'clipper'
+  /** Name des Creators bzw. Clippers. */
+  name: string
+  projectName: string
+  status: string
+  message: string | null
+  createdAt: number
+}
+
+/** Die Buchungsanfragen einer Agentur (Creator und Clipper), neueste zuerst. */
+export async function bookingsOfAgency(env: Env, userId: string): Promise<AgencyBookingRow[]> {
+  const db = getDb(env)
+  const [creators, clippers] = await Promise.all([
+    db
+      .select({ booking: schema.creatorBookings, name: schema.users.fullName, projectName: schema.projects.name })
+      .from(schema.creatorBookings)
+      .innerJoin(schema.creators, eq(schema.creators.id, schema.creatorBookings.creatorId))
+      .innerJoin(schema.users, eq(schema.users.id, schema.creators.userId))
+      .innerJoin(schema.projects, eq(schema.projects.id, schema.creatorBookings.projectId))
+      .where(eq(schema.creatorBookings.agencyUserId, userId)),
+    db
+      .select({ booking: schema.clipperBookings, name: schema.clippers.displayName, projectName: schema.projects.name })
+      .from(schema.clipperBookings)
+      .innerJoin(schema.clippers, eq(schema.clippers.id, schema.clipperBookings.clipperId))
+      .innerJoin(schema.projects, eq(schema.projects.id, schema.clipperBookings.projectId))
+      .where(eq(schema.clipperBookings.agencyUserId, userId)),
+  ])
+  const row = (kind: 'creator' | 'clipper') => (r: (typeof creators)[number] | (typeof clippers)[number]): AgencyBookingRow => ({
+    id: r.booking.id,
+    kind,
+    name: r.name,
+    projectName: r.projectName,
+    status: r.booking.status,
+    message: r.booking.message,
+    createdAt: r.booking.createdAt,
+  })
+  return [...creators.map(row('creator')), ...clippers.map(row('clipper'))].sort((a, b) => b.createdAt - a.createdAt)
 }
 
 /* ------------------------------------------------------------- Löschen */

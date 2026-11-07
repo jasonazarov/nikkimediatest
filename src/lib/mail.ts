@@ -925,7 +925,7 @@ export function mailAgencyUnlocked(env: Env, o: { email: string; fullName: strin
       'Zugang freigeschaltet',
       h1(`Hallo ${o.fullName.split(' ')[0]},`) +
         p(
-          'dein Collaboration-Dashboard ist freigeschaltet. Ab sofort siehst du alle Kampagnen, Creator und Clipper von NIKKI MEDIA, lädst dein Material hoch und buchst Creator für deine Kampagnen.',
+          'dein Collaboration-Dashboard ist freigeschaltet. Ab sofort siehst du alle Kampagnen, Creator und Clipper von NIKKI MEDIA, lädst dein Material hoch und buchst Creator und Clipper für deine Kampagnen.',
         ) +
         button(`${env.APP_URL}/collaboration`, 'Zum Collaboration-Dashboard'),
     ),
@@ -949,6 +949,31 @@ export function mailCreatorBookingAdmin(
         dl([
           ['Agentur', o.agency],
           ['Creator', o.creator],
+          ['Kampagne', o.campaign],
+          ['Nachricht', o.message || '–'],
+        ]) +
+        button(`${env.APP_URL}/admin/agenturen/${o.leadId}`, 'Buchung ansehen'),
+    ),
+  })
+}
+
+/** 6f — Agentur möchte einen Clipper buchen → Jason */
+export function mailClipperBookingAdmin(
+  env: Env,
+  o: { leadId: string; agency: string; email: string; clipper: string; campaign: string; message: string | null },
+) {
+  return send(env, {
+    to: env.ADMIN_EMAIL,
+    replyTo: o.email,
+    subject: `Clipper-Buchung: ${o.clipper} für ${o.agency}`,
+    html: layout(
+      env,
+      'Clipper-Buchung',
+      h1('Eine Agentur möchte einen Clipper buchen') +
+        p('Mit deiner Bestätigung kommt der Clipper ins Team der Kampagne und schneidet für sie.') +
+        dl([
+          ['Agentur', o.agency],
+          ['Clipper', o.clipper],
           ['Kampagne', o.campaign],
           ['Nachricht', o.message || '–'],
         ]) +

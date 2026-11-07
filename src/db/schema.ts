@@ -906,6 +906,32 @@ export const creatorBookings = sqliteTable(
   ],
 )
 
+/** Clipper-Buchungen von Agenturen (Migration 0028): wie `creatorBookings`, nur eine Anfrage bis zur Bestätigung im Admin. */
+export const clipperBookings = sqliteTable(
+  'clipper_bookings',
+  {
+    id: text('id').primaryKey(),
+    agencyUserId: text('agency_user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    clipperId: text('clipper_id')
+      .notNull()
+      .references(() => clippers.id, { onDelete: 'cascade' }),
+    projectId: text('project_id')
+      .notNull()
+      .references(() => projects.id, { onDelete: 'cascade' }),
+    message: text('message'),
+    /** angefragt | bestaetigt | abgelehnt */
+    status: text('status').notNull().default('angefragt'),
+    createdAt: integer('created_at').notNull().$defaultFn(now),
+    decidedAt: integer('decided_at'),
+  },
+  (t) => [
+    index('clipper_bookings_agency_idx').on(t.agencyUserId, t.createdAt),
+    index('clipper_bookings_status_idx').on(t.status, t.createdAt),
+  ],
+)
+
 export type CooperationCode = typeof cooperationCodes.$inferSelect
 export type AgencyLead = typeof agencyLeads.$inferSelect
 export type CreatorBooking = typeof creatorBookings.$inferSelect

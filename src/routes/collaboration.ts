@@ -37,7 +37,7 @@ import {
   teamsByProject,
   views30dLabel,
 } from '../lib/domain'
-import { mailAgencyBriefingAdmin, mailAgencyCampaignAdmin, mailCreatorBookingAdmin } from '../lib/mail'
+import { mailAgencyBriefingAdmin, mailAgencyCampaignAdmin, mailClipperBookingAdmin, mailCreatorBookingAdmin } from '../lib/mail'
 import { totalsForDeliverables, totalsForProjects } from '../lib/metrics'
 import { presignGet, r2Ready } from '../lib/r2'
 import { campaignThumbs } from '../lib/thumbs'
@@ -209,10 +209,13 @@ async function allCreators(env: Env, pendingFor: string, demoAccounts = false): 
   }))
 }
 
-/** Alle Clipper (ohne Creator) — Name, Plattformen, Erfahrung; keine Kontaktdaten. `demoAccounts` wie bei den Creatorn. */
-async function allClippers(env: Env, demoAccounts = false): Promise<AgencyClipper[]> {
+/**
+ * Alle Clipper (ohne Creator) — Name, Plattformen, Erfahrung; keine Kontaktdaten.
+ * `pendingFor` markiert offene Buchungen dieser Agentur, `demoAccounts` wie bei den Creatorn.
+ */
+async function allClippers(env: Env, pendingFor: string, demoAccounts = false): Promise<AgencyClipper[]> {
   const db = getDb(env)
-  const [rows, apps, work, clips] = await Promise.all([
+  const [rows, apps, work, clips, pending] = await Promise.all([
     db
       .select({ id: schema.clippers.id, name: schema.clippers.displayName })
       .from(schema.clippers)
@@ -229,7 +232,12 @@ async function allClippers(env: Env, demoAccounts = false): Promise<AgencyClippe
       .from(schema.deliverables)
       .where(eq(schema.deliverables.uploadStatus, 'complete'))
       .groupBy(schema.deliverables.clipperId),
+    db
+      .select({ clipperId: schema.clipperBookings.clipperId })
+      .from(schema.clipperBookings)
+      .where(and(eq(schema.clipperBookings.agencyUserId, pendingFor), eq(schema.clipperBookings.status, 'angefragt'))),
   ])
+  const open = new Set(pending.map((r) => r.clipperId))
   const latest = new Map<string, (typeof apps)[number]>()
   for (const a of apps) if (!latest.has(a.clipperId)) latest.set(a.clipperId, a)
   const workCount = new Map(work.map((r) => [r.clipperId, Number(r.n)]))
@@ -251,6 +259,7 @@ async function allClippers(env: Env, demoAccounts = false): Promise<AgencyClippe
       availability: app ? (CLIPPER_AVAILABILITY.find((o) => o.value === app.availability)?.labelDe ?? app.availability) : null,
       campaigns: workCount.get(r.id) ?? 0,
       clips: clipCount.get(r.id) ?? 0,
+      pending: open.has(r.id),
       // Den Demo-Clipper holt die Demo-Agentur direkt ins Team (POST /assign-clipper).
       assignable: demoAccounts,
     }
@@ -265,7 +274,7 @@ async function demoNetwork(env: Env, ctx: AgencyCtx, userId: string) {
   const [own, creators, clippers] = await Promise.all([
     allCampaigns(env, ctx.customer?.id ?? null, { onlyOwn: true }),
     allCreators(env, userId, true),
-    allClippers(env, true),
+    allClippers(env, userId, true),
   ])
   // Die Use Cases von der Startseite stehen direkt hinter den eigenen (lib/showcase.ts).
   const showcase = showcaseCampaigns()
@@ -277,13 +286,30 @@ async function demoNetwork(env: Env, ctx: AgencyCtx, userId: string) {
   }
 }
 
-/** Offene Buchungsanfragen einer Agentur. */
+/** Offene Buchungsanfragen einer Agentur (Creator und Clipper). */
 async function pendingBookings(env: Env, userId: string): Promise<number> {
-  const [row] = await getDb(env)
-    .select({ n: sql<number>`COUNT(*)` })
-    .from(schema.creatorBookings)
-    .where(and(eq(schema.creatorBookings.agencyUserId, userId), eq(schema.creatorBookings.status, 'angefragt')))
-  return Number(row?.n ?? 0)
+  const db = getDb(env)
+  const [[creators], [clippers]] = await Promise.all([
+    db
+      .select({ n: sql<number>`COUNT(*)` })
+      .from(schema.creatorBookings)
+      .where(and(eq(schema.creatorBookings.agencyUserId, userId), eq(schema.creatorBookings.status, 'angefragt'))),
+    db
+      .select({ n: sql<number>`COUNT(*)` })
+      .from(schema.clipperBookings)
+      .where(and(eq(schema.clipperBookings.agencyUserId, userId), eq(schema.clipperBookings.status, 'angefragt'))),
+  ])
+  return Number(creators?.n ?? 0) + Number(clippers?.n ?? 0)
+}
+
+/** Eigene Kampagnen einer Agentur (für die Wahl beim Buchen), neueste zuerst. */
+async function ownCampaignsOf(env: Env, ctx: AgencyCtx): Promise<{ id: string; name: string }[]> {
+  if (!ctx.customer) return []
+  return getDb(env)
+    .select({ id: schema.projects.id, name: schema.projects.name })
+    .from(schema.projects)
+    .where(eq(schema.projects.customerId, ctx.customer.id))
+    .orderBy(desc(schema.projects.createdAt))
 }
 
 /* ------------------------------------------------------------- Zugang */
@@ -344,7 +370,7 @@ collaborationRoutes.get('/', async (c) => {
   const [campaigns, creators, clippers, pending] = await Promise.all([
     allCampaigns(c.env, ctx.customer?.id ?? null),
     allCreators(c.env, user.id),
-    allClippers(c.env),
+    allClippers(c.env, user.id),
     pendingBookings(c.env, user.id),
   ])
   return c.html(
@@ -507,21 +533,15 @@ collaborationRoutes.get('/creator', async (c) => {
         user: c.get('user'),
         creators: net.creators,
         ownCampaigns: net.own.map((x) => ({ id: x.id, name: x.name })),
+        selected: c.req.query('kampagne') ?? null,
         page: pageOf(c),
       }),
     )
   }
-  const [creators, own] = await Promise.all([
-    allCreators(c.env, c.get('user').id),
-    ctx.customer
-      ? getDb(c.env)
-          .select({ id: schema.projects.id, name: schema.projects.name })
-          .from(schema.projects)
-          .where(eq(schema.projects.customerId, ctx.customer.id))
-          .orderBy(desc(schema.projects.createdAt))
-      : Promise.resolve([]),
-  ])
-  return c.html(creatorsPage({ user: c.get('user'), creators, ownCampaigns: own, page: pageOf(c) }))
+  const [creators, own] = await Promise.all([allCreators(c.env, c.get('user').id), ownCampaignsOf(c.env, ctx)])
+  return c.html(
+    creatorsPage({ user: c.get('user'), creators, ownCampaigns: own, selected: c.req.query('kampagne') ?? null, page: pageOf(c) }),
+  )
 })
 
 collaborationRoutes.get('/clipper', async (c) => {
@@ -534,11 +554,15 @@ collaborationRoutes.get('/clipper', async (c) => {
         user: c.get('user'),
         clippers: net.clippers,
         ownCampaigns: net.own.map((x) => ({ id: x.id, name: x.name })),
+        selected: c.req.query('kampagne') ?? null,
         page: pageOf(c),
       }),
     )
   }
-  return c.html(clippersPage({ user: c.get('user'), clippers: await allClippers(c.env), ownCampaigns: [], page: pageOf(c) }))
+  const [clippers, own] = await Promise.all([allClippers(c.env, c.get('user').id), ownCampaignsOf(c.env, ctx)])
+  return c.html(
+    clippersPage({ user: c.get('user'), clippers, ownCampaigns: own, selected: c.req.query('kampagne') ?? null, page: pageOf(c) }),
+  )
 })
 
 collaborationRoutes.get('/buchungen', async (c) => {
@@ -550,14 +574,8 @@ collaborationRoutes.get('/buchungen', async (c) => {
     bookingsPage({
       user: c.get('user'),
       justBooked: neu === 'bestaetigt' ? 'confirmed' : neu === '1' ? 'requested' : null,
-      bookings: rows.map((r) => ({
-        id: r.booking.id,
-        creatorName: r.creatorName,
-        projectName: r.projectName,
-        status: r.booking.status,
-        message: r.booking.message,
-        createdAt: r.booking.createdAt,
-      })),
+      bookedKind: c.req.query('art') === 'clipper' ? 'clipper' : 'creator',
+      bookings: rows,
     }),
   )
 })
@@ -855,13 +873,75 @@ collaborationApi.post('/bookings', async (c) => {
 
   const body = await c.req.json().catch(() => ({}))
   const creatorId = str(body.creatorId, 60)
+  const clipperId = str(body.clipperId, 60)
   const projectId = str(body.projectId, 60)
   const message = str(body.message, 1000) || null
 
-  if (creatorId.startsWith('demo-creator-')) return c.json({ error: DEMO_EXAMPLE }, 403)
+  if (creatorId.startsWith('demo-creator-') || clipperId.startsWith('demo-clipper-')) return c.json({ error: DEMO_EXAMPLE }, 403)
   const project = await projectOfCustomer(c.env, customer.id, projectId)
   if (!project) return c.json({ error: 'Bitte wähle eine deiner Kampagnen.' }, 400)
   const db = getDb(c.env)
+
+  /* Clipper buchen (Migration 0028): derselbe Weg, eigene Tabelle. */
+  if (clipperId) {
+    const [clipper] = await db
+      .select({ id: schema.clippers.id, name: schema.clippers.displayName, demo: schema.users.demo })
+      .from(schema.clippers)
+      .innerJoin(schema.users, eq(schema.users.id, schema.clippers.userId))
+      .where(and(eq(schema.clippers.id, clipperId), eq(schema.users.role, 'clipper')))
+      .limit(1)
+    // Demo-Clipper gibt es nur für die Demo-Agentur, echte Clipper nur für echte Agenturen.
+    if (!clipper || Boolean(clipper.demo) !== Boolean(lead.demo)) return c.json({ error: 'Clipper nicht gefunden.' }, 404)
+    const [taken] = await db
+      .select({ id: schema.clipperBookings.id })
+      .from(schema.clipperBookings)
+      .where(
+        and(
+          eq(schema.clipperBookings.agencyUserId, user.id),
+          eq(schema.clipperBookings.clipperId, clipperId),
+          eq(schema.clipperBookings.projectId, projectId),
+          inArray(schema.clipperBookings.status, ['angefragt', 'bestaetigt']),
+        ),
+      )
+      .limit(1)
+    if (taken) return c.json({ error: 'Diesen Clipper hast du für diese Kampagne schon gebucht.' }, 409)
+    const [inTeam] = await db
+      .select({ id: schema.projectWorkers.clipperId })
+      .from(schema.projectWorkers)
+      .where(and(eq(schema.projectWorkers.projectId, projectId), eq(schema.projectWorkers.clipperId, clipperId)))
+      .limit(1)
+    if (inTeam) return c.json({ error: 'Dieser Clipper ist schon im Team dieser Kampagne.' }, 409)
+    if (!(await consumeRateLimit(c.env, `booking:${user.id}`, 30, 3600))) {
+      return c.json({ error: 'Zu viele Buchungen in kurzer Zeit. Bitte versuche es später erneut.' }, 429)
+    }
+    const id = uid()
+    await db.insert(schema.clipperBookings).values({
+      id,
+      agencyUserId: user.id,
+      clipperId,
+      projectId,
+      message,
+      status: 'angefragt',
+      createdAt: nowSec(),
+    })
+    await audit(c.env, { actorId: user.id, action: 'agency.clipper_booking_requested', entity: 'booking', entityId: id, payload: { clipperId, projectId } })
+    if (lead.demo) {
+      const decided = await decideBooking(c.env, id, true)
+      if (!decided.ok) return c.json({ error: decided.error }, 400)
+      return c.json({ ok: true, id, confirmed: true })
+    }
+    c.executionCtx.waitUntil(
+      mailClipperBookingAdmin(c.env, {
+        leadId: lead.id,
+        agency: lead.company || user.fullName,
+        email: user.email,
+        clipper: clipper.name,
+        campaign: project.name,
+        message,
+      }),
+    )
+    return c.json({ ok: true, id })
+  }
   const [creator] = await db
     .select({ id: schema.creators.id, name: schema.users.fullName, demo: schema.users.demo })
     .from(schema.creators)
@@ -937,7 +1017,8 @@ collaborationApi.post('/assign-clipper', async (c) => {
   const project = await projectOfCustomer(c.env, customer.id, str(body.projectId, 60))
   if (!project) return c.json({ error: 'Bitte wähle eine deiner Kampagnen.' }, 400)
 
-  const [clipper] = await getDb(c.env)
+  const db = getDb(c.env)
+  const [clipper] = await db
     .select({ userId: schema.clippers.userId, name: schema.clippers.displayName })
     .from(schema.clippers)
     .innerJoin(schema.users, eq(schema.users.id, schema.clippers.userId))
@@ -947,6 +1028,32 @@ collaborationApi.post('/assign-clipper', async (c) => {
 
   const added = await addToTeam(c.env, project.id, clipper.userId)
   if (!added.ok) return c.json({ error: added.error }, 400)
+  // Wie eine sofort bestätigte Buchung festhalten, damit sie unter „Buchungen“ steht (wie beim Demo-Creator).
+  const [booked] = await db
+    .select({ id: schema.clipperBookings.id })
+    .from(schema.clipperBookings)
+    .where(
+      and(
+        eq(schema.clipperBookings.agencyUserId, user.id),
+        eq(schema.clipperBookings.clipperId, clipperId),
+        eq(schema.clipperBookings.projectId, project.id),
+        eq(schema.clipperBookings.status, 'bestaetigt'),
+      ),
+    )
+    .limit(1)
+  if (!booked) {
+    const ts = nowSec()
+    await db.insert(schema.clipperBookings).values({
+      id: uid(),
+      agencyUserId: user.id,
+      clipperId,
+      projectId: project.id,
+      message: null,
+      status: 'bestaetigt',
+      createdAt: ts,
+      decidedAt: ts,
+    })
+  }
   await audit(c.env, { actorId: user.id, action: 'agency.demo_clipper_assigned', entity: 'project', entityId: project.id, payload: { clipperId } })
   return c.json({ ok: true, redirect: `/collaboration/kampagne/${project.id}` })
 })

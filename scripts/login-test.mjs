@@ -820,6 +820,40 @@ try {
   const echteZuweisung = await agenturHole('/api/collaboration/assign-clipper', warmCookie, { clipperId: demoClipperId, projectId: zweiteBody.id })
   pruefe('Echte Agenturen weisen keine Clipper zu', echteZuweisung.status === 403, `HTTP ${echteZuweisung.status}`)
 
+  // Clipper buchen (Migration 0028): wie Creator nur eine Anfrage; ins Team erst mit der Bestätigung im Admin.
+  const clipperBuchung = await agenturHole('/api/collaboration/bookings', warmCookie, { clipperId: 'c-1', projectId: zweiteBody.id, message: 'Hooks zuerst' })
+  const clipperBuchungBody = await clipperBuchung.json().catch(() => ({}))
+  const clipperBuchungId = String(clipperBuchungBody.id ?? '').replace(/'/g, '')
+  pruefe(
+    'Echte Agentur bucht einen Clipper: Anfrage, noch nicht im Team',
+    clipperBuchung.status === 200 && !clipperBuchungBody.confirmed &&
+      zaehle(`SELECT count(*) AS n FROM clipper_bookings WHERE id='${clipperBuchungId}' AND status='angefragt' AND clipper_id='c-1';`) === 1 &&
+      zaehle(`SELECT count(*) AS n FROM project_workers WHERE project_id='${zweiteBody.id}' AND clipper_id='c-1';`) === 0,
+    `HTTP ${clipperBuchung.status} → ${JSON.stringify(clipperBuchungBody)}`,
+  )
+  const clipperDoppelt = await agenturHole('/api/collaboration/bookings', warmCookie, { clipperId: 'c-1', projectId: zweiteBody.id })
+  pruefe('Denselben Clipper nicht zweimal für dieselbe Kampagne buchen', clipperDoppelt.status === 409, `HTTP ${clipperDoppelt.status}`)
+  const demoClipperEcht = await agenturHole('/api/collaboration/bookings', warmCookie, { clipperId: demoClipperId, projectId: zweiteBody.id })
+  pruefe('Echte Agentur bucht keine Demo-Clipper', demoClipperEcht.status === 404, `HTTP ${demoClipperEcht.status}`)
+  const fiktiverClipper = await agenturHole('/api/collaboration/bookings', demoCookie, { clipperId: 'demo-clipper-0', projectId: demoProjekt })
+  pruefe('Demo: erfundene Clipper lassen sich nicht buchen', fiktiverClipper.status === 403, `HTTP ${fiktiverClipper.status}`)
+  d1(`DELETE FROM rate_limits;`)
+  const adminBuchung = ((await post('/login/admin', { email: ADMIN, password: ADMIN_PW })).headers.get('set-cookie') ?? '').split(';')[0]
+  const clipperBestaetigt = await hole(`/api/admin/bookings/${clipperBuchungId}`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', cookie: adminBuchung },
+    body: JSON.stringify({ accept: true }),
+  })
+  pruefe(
+    'Admin bestätigt die Clipper-Buchung, der Clipper ist im Team',
+    clipperBestaetigt.status === 200 &&
+      zaehle(`SELECT count(*) AS n FROM clipper_bookings WHERE id='${clipperBuchungId}' AND status='bestaetigt';`) === 1 &&
+      zaehle(`SELECT count(*) AS n FROM project_workers WHERE project_id='${zweiteBody.id}' AND clipper_id='c-1';`) === 1,
+    `HTTP ${clipperBestaetigt.status}`,
+  )
+  const buchungsSeite = await (await agenturHole('/collaboration/buchungen', warmCookie)).text()
+  pruefe('Buchungen der Agentur zeigen die Clipper-Buchung', buchungsSeite.includes('Test Clipper') && buchungsSeite.includes('Bestätigt'))
+
   const creatorLogin = await post('/login/demo', { email: DEMO_CREATOR_EMAIL, password: DEMO_PW })
   const demoCreatorCookie = sitzungFuer(creatorLogin, 'creator')
   const creatorSeite = await (await hole('/kampagnen/finden', { headers: { cookie: demoCreatorCookie } })).text()

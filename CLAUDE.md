@@ -345,10 +345,10 @@ wer freigegeben ist (`access_at`) UND das Briefing abgeschickt hat: warm
 sofort, kalt erst nach Freigabe durch den Admin — bis dahin Schloss im Menü
 und „NIKKI MEDIA meldet sich bei dir.“ Freigeschaltet heißt: alle Kampagnen
 mit fertigen Clips (ansehen, herunterladen), alle Creator und Clipper, eigene
-Kampagnen mit Upload, Creator buchen. NIE: Rohmaterial und Cloud-Links
+Kampagnen mit Upload, Creator und Clipper buchen. NIE: Rohmaterial und Cloud-Links
 fremder Kampagnen, Kundennamen, Kontaktdaten, Kampagnen ANDERER Agenturen.
-Eine Creator-Buchung ist nur eine Anfrage — ins Team kommt der Creator erst
-mit der Bestätigung im Admin (`decideBooking` → `addToTeam`). Admin bekommt
+Eine Creator- oder Clipper-Buchung ist nur eine Anfrage — ins Team kommt er
+erst mit der Bestätigung im Admin (`decideBooking` → `addToTeam`). Admin bekommt
 bei Eintrag, Briefing und Buchung immer eine Mail. Die Menüpunkte „Agenturen“
 und „+ Cooperation-Code erstellen“ sind auf Wunsch deutsch, der Rest der
 Seite englisch wie der ganze Admin.
@@ -652,5 +652,15 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
 - **Büro Wien** (Vorgabe des Auftraggebers, November 2026): Firmensitz laut Impressum bleibt Dubai, darunter steht
   „Büro Wien, Darwingasse 6, 1020 Wien, Österreich“. Dieselbe Adresse wie im Google-Unternehmensprofil steht als
   `address` in `ORGANIZATION` (`seo.ts`) und in `/llms.txt`. Schreibweise überall gleich halten (Google vergleicht sie).
+- **Clipper buchen wie Creator buchen** (Vorgabe des Auftraggebers, November 2026; Migration 0028
+  `clipper_bookings`): Agenturen buchen Clipper für eine EIGENE Kampagne über `POST /api/collaboration/bookings`
+  mit `clipperId` (statt `creatorId`). Nur eine Anfrage: Mail an `ADMIN_EMAIL` (`mailClipperBookingAdmin`),
+  bestätigt wird im Admin unter „Agenturen“ wie bei Creatorn (`/api/admin/bookings/:id`, `decideBooking` findet
+  beide Arten) → `addToTeam`. Abgewiesen: doppelt, schon im Team, fremde Kampagne, Demo-Clipper für echte
+  Agenturen. Knöpfe „Creator buchen“ und „Clipper buchen“: Übersicht (Kampagnen-Kasten oben), Clipper-Seite
+  (jede Karte), und in jeder eigenen Kampagne (`/collaboration/meine/:id` über `bookButtons` des Bereichs und
+  `/collaboration/kampagne/:id`) mit `?kampagne=<id>`, die Kampagne ist dann in der Maske vorausgewählt.
+  „Buchungen“ zeigt beide Arten mit Etikett. Demo-Agentur: den Demo-Clipper holt weiter `/assign-clipper` sofort
+  ins Team, festgehalten als bestätigte Buchung.
 - **Lokale Demo auf dem eigenen Rechner:** `bash scripts/demo-lokal.sh` (Testdatenbank, Fachartikel nur dort
   veröffentlicht, nichts live) → http://localhost:8080 und http://localhost:8080/__vorschau.

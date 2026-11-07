@@ -121,6 +121,8 @@ export interface CustomerArea {
    * Budget und Auftrag an (Vorgabe des Auftraggebers).
    */
   newHref?: string
+  /** Nur Agenturen: Knöpfe „Creator buchen“ und „Clipper buchen“ für diese Kampagne (HTML). */
+  bookButtons?: (projectId: string) => string
   /**
    * Nach dem Anlegen direkt hinein? Kunden bleiben auf der Liste (so war es
    * immer), ein Creator landet gleich in der neuen Kampagne — dort fragt sie
@@ -1085,6 +1087,7 @@ export function filesPage(v: FilesView & { area?: CustomerArea }): string {
             <div class="mt-5 flex flex-wrap gap-2 lg:mt-auto lg:pt-5">
               ${newFolderButton}
               ${addLinkButton}
+              ${area.bookButtons ? area.bookButtons(v.project.id) : ''}
             </div>
           </div>
         </div>
