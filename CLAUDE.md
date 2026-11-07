@@ -636,9 +636,14 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   Dasselbe im Kasten am Ende jedes Artikels (`articleCta` in `gold-articles.ts`). Inhaltliche Vorgaben für alle
   Fachartikel stehen in `docs/fachartikel/README.md` (Preis nur „~5 € pro 1.000 Views“, Aufwärmen der Accounts
   7 Tage, keine Vorerfahrung nötig, Clipper-Preis je nach Resultat und Zuverlässigkeit).
-- **Fachartikel live einspielen:** am Ende von `scripts/live-bringen.sh` (eigene Frage j/n) oder einzeln mit
-  `node scripts/fachartikel-import.mjs --veroeffentlichen --ersetzen` (Freigabe des Auftraggebers,
-  November 2026: „so wie in der Demo“). Ohne Zusätze nur als unveröffentlichte Entwürfe und ohne Vorhandenes anzufassen.
+- **Fachartikel live einspielen:** am Ende von `scripts/live-bringen.sh` per **Abgleich**
+  (`node scripts/fachartikel-import.mjs --abgleich`; Vorgabe des Auftraggebers, November 2026: nicht bei jedem
+  Livegang erneut fragen, nichts kaputt machen). Jeder Artikel aus `docs/fachartikel` wird mit der Live-Fassung
+  verglichen: neu → veröffentlicht; live steht eine ÄLTERE Fassung aus der Git-Historie der Datei → Text ersetzt,
+  Sichtbarkeit bleibt; live identisch → nichts; live ein Text, den es in der Historie nie gab (im Admin bearbeitet)
+  → bleibt unangetastet, ebenso im Admin Ausgeblendetes. Gefragt (j/n) wird NUR, wenn es Neues gibt.
+  Hand-Lauf ohne Rücksicht auf Admin-Änderungen: `--veroeffentlichen --ersetzen`. Ohne Zusätze nur als
+  unveröffentlichte Entwürfe und ohne Vorhandenes anzufassen.
 - **Agentur-Übersicht: Kampagnen ganz oben** (Vorgabe des Auftraggebers, per Vorschau freigegeben, November 2026):
   „Deine Kampagne“ (groß, Etikett „Briefing“, Views und Budget, Material hochladen, Creator buchen, Alle meine
   Kampagnen) und „Neue Kampagne erstellen“ (ganze Karte klickbar) direkt unter der Begrüßung, beide `nmw-brand-glass`

@@ -21,7 +21,8 @@ Keine langen Gedankenstriche im Text.
   Agenturen /brands#stepper. /agenturen, /personal-brands und /investoren gibt es nicht mehr.
 
 **Import (nur nach Freigabe):** `node scripts/fachartikel-import.mjs` spielt live als unveröffentlichte Entwürfe ein (`--local` = Vorschau).
-Mit `--veroeffentlichen --ersetzen` wie in der Demo: sofort veröffentlicht, ältere Fassungen derselben Adresse ersetzt. Live fragt das Skript vorher (j/n).
+Beim Livegang (`scripts/live-bringen.sh`) läuft `--abgleich`: neue Artikel und neue Fassungen kommen live, im Admin bearbeitete oder ausgeblendete Artikel bleiben unangetastet, und gefragt wird nur, wenn es etwas Neues gibt.
+Mit `--veroeffentlichen --ersetzen` (Hand-Lauf): sofort veröffentlicht, Fassungen derselben Adresse ersetzt, auch im Admin bearbeitete. Live fragt das Skript vorher (j/n).
 
 **Case Studies (18–22):** nur Fakten aus den Case Studies der Startseite und den vom Auftraggeber genannten
 Reel-Zahlen; keine Laufzeiten, Umsätze oder Reservierungen. Alle Zahlen „im Kampagnenzeitraum“.
