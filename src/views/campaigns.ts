@@ -19,7 +19,8 @@ import {
   type Kpi,
   type PayTierView,
   type ThumbView,
-  quickActions,
+  ASSIGN_HEADLINE,
+  campHero,
 } from './layout'
 import { CREATOR_CAMPAIGN_AREA } from './app'
 import { campaignHero, countHead, glyph, kpiLine, reachKpis, reachStamp, statusBadge, viewsMeta } from './work'
@@ -469,16 +470,76 @@ export function overviewPage(o: {
         </div>
       </div>`
 
+  /* Kampagnen-Kopf im Aufbau der Agentur (Vorgabe des Auftraggebers, November 2026),
+     unter der Preisstaffelung, die ganz oben bleiben muss. Links die wichtigste
+     Kampagne mit ihren Knöpfen, rechts „Neue Kampagne erstellen“. */
+  const newSide = {
+    attrs: 'data-new-campaign',
+    title: 'Neue Kampagne erstellen',
+    text: 'Name eingeben, Rohmaterial hochladen. Clipper und Creator machen daraus Clips für deine Kanäle.',
+    cta: 'Kampagne anlegen',
+    icon: 'plus' as const,
+  }
+  const accountsBtn = { href: '/kampagnen/accounts', label: 'Meine Accounts' }
+  const viewsStat = (...list: (MetricTotals | undefined)[]) => {
+    const filled = list.filter(hasNumbers)
+    return filled.length ? [{ value: formatCompact(filled.reduce((n, t) => n + t.views, 0), 'de'), label: 'Views', valueFirst: true }] : []
+  }
+  const a = o.active[0]
+  const mine = o.own[0]
+  const hero = a
+    ? campHero({
+        eyebrow: 'Zugewiesene Kampagne',
+        chip: a.cuts && a.distributes ? 'Schneiden & Verbreiten' : a.cuts ? 'Schneiden' : 'Verbreiten',
+        title: a.name,
+        stats: [
+          ...(a.cuts ? [{ value: String(a.delivered), label: a.delivered === 1 ? 'Clip geliefert' : 'Clips geliefert', valueFirst: true }] : []),
+          ...(a.distributes ? [{ value: String(a.readyClips), label: a.readyClips === 1 ? 'Clip zum Verbreiten' : 'Clips zum Verbreiten', valueFirst: true }] : []),
+          ...viewsStat(a.cutMetrics, a.distMetrics),
+        ],
+        primary: a.cuts
+          ? { href: `/kampagnen/upload?projekt=${encodeURIComponent(a.id)}`, label: 'Clips hochladen', icon: 'upload' }
+          : { href: distHref(a.id), label: 'Clips verbreiten' },
+        ghosts: [
+          ...(a.cuts && a.distributes ? [{ href: distHref(a.id), label: 'Verbreiten' }] : []),
+          { href: a.cuts ? cutHref(a.id) : distHref(a.id), label: 'Kampagne öffnen' },
+          accountsBtn,
+        ],
+        more: { href: '/kampagnen/finden', label: o.active.length > 1 ? `Alle ${o.active.length} zugewiesenen →` : 'Alle zugewiesenen →' },
+        side: newSide,
+      })
+    : mine
+      ? campHero({
+          eyebrow: 'Deine Kampagne',
+          chip: 'Eigene Kampagne',
+          title: mine.name,
+          stats: viewsStat(mine.metrics),
+          primary: { href: CREATOR_CAMPAIGN_AREA.projectHref(mine.id), label: 'Material hochladen', icon: 'upload' },
+          ghosts: [accountsBtn],
+          more: { href: CREATOR_CAMPAIGN_AREA.home, label: 'Alle meine Kampagnen →' },
+          side: newSide,
+        })
+      : banner
+        ? campHero({
+            eyebrow: 'Deine Kampagne',
+            title: ASSIGN_HEADLINE,
+            text: 'Du bekommst eine E-Mail, sobald eine Kampagne für dich bereitsteht. Bis dahin: verbinde deine Kanäle, damit fertige Clips automatisch rausgehen.',
+            ghosts: [accountsBtn],
+            mainAttrs: 'data-assign-headline',
+            side: newSide,
+          })
+        : campHero({
+            eyebrow: 'Deine Kampagne',
+            title: 'Starte deine erste Kampagne',
+            text: 'Leg eine Kampagne an und lade dein Rohmaterial hoch. Clipper und Creator machen daraus Clips.',
+            ghosts: [accountsBtn],
+            side: newSide,
+          })
+
   const body =
     pageTitle('Dein Kampagnen-Dashboard', SUBTITLE[p.goal] ?? SUBTITLE.beides) +
     payTierTable(o.tiers, 'mb-8') +
-    quickActions([
-      { label: 'Clips hochladen', href: '/kampagnen/upload', icon: 'upload', primary: true },
-      { label: 'Verbreiten', href: '/kampagnen/verbreiten', icon: 'film' },
-      { label: 'Zugewiesene Kampagnen', href: '/kampagnen/finden', icon: 'inbox' },
-      { label: 'Meine Accounts', href: '/kampagnen/accounts', icon: 'link' },
-    ]) +
-    banner +
+    hero +
     active +
     kpis +
     `

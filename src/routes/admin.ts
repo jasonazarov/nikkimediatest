@@ -607,9 +607,16 @@ adminRoutes.get('/', async (c) => {
     .filter((x) => x.status === 'aktiv' && !x.team.length)
     .sort((a, b) => hasMaterial(b) - hasMaterial(a) || b.createdAt - a.createdAt)
 
+  // Offene Buchungsanfragen von Agenturen (Creator und Clipper) für den Kopf der Übersicht.
+  const [[openCreatorBookings], [openClipperBookings]] = await Promise.all([
+    getDb(c.env).select({ n: sql<number>`COUNT(*)` }).from(schema.creatorBookings).where(eq(schema.creatorBookings.status, 'angefragt')),
+    getDb(c.env).select({ n: sql<number>`COUNT(*)` }).from(schema.clipperBookings).where(eq(schema.clipperBookings.status, 'angefragt')),
+  ])
+
   return c.html(
     overviewPage({
       user: c.get('user'),
+      pendingBookings: Number(openCreatorBookings?.n ?? 0) + Number(openClipperBookings?.n ?? 0),
       newLeads: Number(newLeads?.n ?? 0),
       customers: Number(customerCount?.n ?? 0),
       activeCampaigns: Number(activeProjects?.n ?? 0),

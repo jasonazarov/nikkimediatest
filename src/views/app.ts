@@ -18,12 +18,15 @@ import {
   type Kpi,
   type NavItem,
   type ThumbView,
-  quickActions,
   howItWorks,
   upsellSection,
   PUSH_MARK,
+  TOP_MARK,
+  campHero,
+  pageTitle,
   type PushArea,
 } from './layout'
+import { campaignWindow } from '../lib/upsell'
 import { formatBytes } from '../lib/r2'
 import { DEFAULT_DIAL, dialOptions, splitPhone } from '../lib/phone'
 import { linkHost } from '../lib/domain'
@@ -377,6 +380,57 @@ function sumMetric(list: (MetricTotals | undefined)[], key: 'views' | 'likes'): 
   return filled.length ? filled.reduce((s, t) => s + t[key], 0) : null
 }
 
+const STATUS_DE: Record<string, string> = { aktiv: 'Aktiv', pausiert: 'Pausiert', beendet: 'Beendet' }
+
+/**
+ * Kampagnen-Kopf des Kunden: die wichtigste Kampagne (aktiv vor pausiert
+ * vor beendet, dann die neueste) mit Material, fertigen Videos und Push,
+ * rechts „Neue Kampagne erstellen“. Ohne Kampagne die Einladung zur ersten.
+ */
+function customerHero(projects: ProjectCard[]): string {
+  const area = CUSTOMER_AREA
+  const newCard = {
+    href: area.newHref ?? '/app/neu',
+    title: 'Neue Kampagne erstellen',
+    text: 'Name, Laufzeit und Reichweite wählen. In zwei Minuten angelegt.',
+    cta: 'Kampagne starten',
+    icon: 'plus' as const,
+  }
+  if (!projects.length) {
+    return campHero({
+      eyebrow: 'Deine Kampagne',
+      title: 'Starte deine erste Kampagne',
+      text: 'Lege eine Kampagne an und lade dein Rohmaterial hoch, als Datei oder als Link zu deiner Cloud. Unsere Clipper machen daraus kurze Clips und verbreiten sie.',
+      side: newCard,
+    })
+  }
+  const order = (s: string) => (s === 'aktiv' ? 0 : s === 'pausiert' ? 1 : 2)
+  const main = [...projects].sort((a, b) => order(a.status) - order(b.status) || b.createdAt - a.createdAt)[0]
+  const reached = main.metrics && main.metrics.posts > 0 ? main.metrics.views : null
+  const stats: { label: string; value: string; valueFirst?: boolean }[] = []
+  if (reached !== null) stats.push({ value: formatCompact(reached, 'de'), label: 'Views', valueFirst: true })
+  if (main.briefingViews) stats.push({ label: 'Ziel', value: `${formatCompact(main.briefingViews, 'de')} Views` })
+  // Restlaufzeit nur, wo der Kunde eine Laufzeit gewählt hat — sonst wäre sie geraten.
+  if (main.briefingDurationDays && main.status === 'aktiv') {
+    const left = campaignWindow(main.createdAt, main.briefingDurationDays).daysLeft
+    stats.push({ label: 'Laufzeit', value: left ? `noch ${left} ${left === 1 ? 'Tag' : 'Tage'}` : 'abgelaufen' })
+  }
+  stats.push({ value: String(main.fileCount + main.linkCount), label: main.fileCount + main.linkCount === 1 ? 'Datei' : 'Dateien', valueFirst: true })
+  return campHero({
+    eyebrow: 'Deine Kampagne',
+    chip: STATUS_DE[main.status] ?? main.status,
+    title: main.name,
+    stats,
+    primary: { href: area.projectHref(main.id), label: 'Material hochladen', icon: 'upload' },
+    ghosts: [
+      ...(area.videosHref ? [{ href: area.videosHref, label: 'Fertige Videos' }] : []),
+      { href: '#mehr-reichweite', label: 'Kampagne pushen', attrs: 'data-push-link' },
+    ],
+    more: { href: '#meine-kampagnen', label: projects.length > 1 ? `Alle ${projects.length} Kampagnen ↓` : 'Zur Kampagne ↓' },
+    side: newCard,
+  })
+}
+
 export function projectsPage(o: {
   user: User
   projects: ProjectCard[]
@@ -456,21 +510,27 @@ export function projectsPage(o: {
   )
   if (views !== null) kpis.push({ value: formatCompact(views, 'de'), label: 'Views' })
 
-  const body = `
-      <header class="mb-5 flex flex-wrap items-end justify-between gap-4">
+  /* Kunden-Übersicht im Aufbau der Agentur (Vorgabe des Auftraggebers, November 2026):
+     Begrüßung, Kampagnen-Kopf, dann Views-Grafik und Virale Clips (TOP_MARK), danach die Liste. */
+  const home = area === CUSTOMER_AREA
+  const listHead = `
+      <header class="mb-5 flex flex-wrap items-end justify-between gap-4"${home ? ' id="meine-kampagnen"' : ''}>
         <div class="min-w-0">
-          <h1 class="font-display text-2xl font-extrabold tracking-tight sm:text-3xl">${t.listTitle}</h1>
+          ${
+            home
+              ? `<h2 class="font-display text-xl font-extrabold tracking-tight sm:text-2xl">${t.listTitle}</h2>`
+              : `<h1 class="font-display text-2xl font-extrabold tracking-tight sm:text-3xl">${t.listTitle}</h1>`
+          }
           <p class="mt-1.5 max-w-2xl text-slate-500">${t.listIntro}</p>
         </div>
         ${opener(`${BTN_PRIMARY} px-5`, `${svg(PLUS)} ${t.newItem}`, 'new-project')}
-      </header>
+      </header>`
+
+  const body = `
+      ${home ? `${pageTitle(`Hallo ${o.user.fullName.split(' ')[0]}`, 'Deine Kampagnen, fertigen Videos und Reichweite auf einen Blick.')}${customerHero(o.projects)}${TOP_MARK}` : ''}
+      ${listHead}
 
       ${o.projects.length ? kpiBar(kpis, 'mb-6') : ''}
-      ${area.home === '/app' ? quickActions([
-        ...(area.videosHref ? [{ label: 'Fertige Videos', href: area.videosHref, icon: 'film', primary: true }] : []),
-        { label: 'Mehr Reichweite', href: '#mehr-reichweite', icon: 'trend' },
-        { label: 'Einstellungen', href: '/app/einstellungen', icon: 'cog' },
-      ]) : ''}
       ${pausedNote ? `<div class="mb-5">${pausedNote}</div>` : ''}
 
       ${

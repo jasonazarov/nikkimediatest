@@ -177,6 +177,111 @@ export const PUSH_MARK = '<!--nm:push-->'
 /** Setzt eine Seite diese Marke, kommen Views-Grafik, Virale Clips und Push erst DORT (statt direkt unter dem Titel). */
 export const TOP_MARK = '<!--nm:top-->'
 
+/* ---------------------------------------------------------- Kampagnen-Kopf
+   Der Kopf der Agentur-Übersicht für ALLE Dashboards (Vorgabe des
+   Auftraggebers, November 2026: „das Agentur-Dashboard sieht am besten aus,
+   für alle übernehmen, aber nur mit den Funktionen der jeweiligen Rolle“).
+   Links die große Kachel mit der wichtigsten Kampagne und ihren Knöpfen,
+   rechts eine ganz klickbare Kachel für die eine Hauptaktion der Rolle.
+   Beide Markengrün in Liquid Glass (nmw-brand-glass), Styles in
+   dash-whop.css („Agentur-Übersicht: Kampagnen ganz oben“). */
+
+const HERO_BTN =
+  'inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-[#9cf6c8] via-[#2fe08c] to-[#17a865] px-6 py-3 text-sm font-extrabold text-[#02160c] shadow-lg shadow-emerald-900/30 transition hover:brightness-105 disabled:opacity-40'
+
+const HERO_ICON = {
+  upload: '<path d="M12 16V4M6 10l6-6 6 6M5 20h14"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  users: '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6"/><path d="M16 5.2a3 3 0 0 1 0 5.6M18 14.6c1.4.6 2.3 2 2.6 4.4"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+} as const
+type HeroIcon = keyof typeof HERO_ICON
+
+const heroSvg = (icon: HeroIcon, cls: string, width = '2.4') =>
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round" class="${cls}" aria-hidden="true">${HERO_ICON[icon]}</svg>`
+
+export interface HeroLink {
+  href?: string
+  label: string
+  /** Statt eines Links ein Knopf mit diesen Attributen (öffnet z. B. ein Fenster auf der Seite). */
+  attrs?: string
+  icon?: HeroIcon
+}
+
+export interface CampHero {
+  /** Kleine Zeile oben, z. B. „Deine Kampagne“. */
+  eyebrow: string
+  /** Etikett daneben mit Leuchtpunkt — nur Wahres (Status, Rolle). */
+  chip?: string
+  /** Große Zeile: der Kampagnenname oder eine Aussage. Wird escaped. */
+  title: string
+  /** Optionale Zeile darunter. Wird escaped. */
+  text?: string
+  /** Kennzahlen als Pillen; `value` fett. `valueFirst`: „2 Mio. Views“ statt „Budget 10.000 €“. */
+  stats?: { label: string; value: string; valueFirst?: boolean }[]
+  primary?: HeroLink
+  ghosts?: HeroLink[]
+  /** Link ganz rechts in der Knopfzeile, z. B. „Alle meine Kampagnen →“. */
+  more?: { href: string; label: string }
+  /** Zusätzliche Attribute der großen Kachel (z. B. data-assign-headline). */
+  mainAttrs?: string
+  /** Die ganz klickbare Kachel rechts; fehlt sie, nimmt die große Kachel die volle Breite. */
+  side?: { href?: string; attrs?: string; title: string; text: string; cta: string; icon: HeroIcon }
+}
+
+const heroButton = (l: HeroLink, cls: string) => {
+  const inner = `${l.icon ? heroSvg(l.icon, 'h-4 w-4') : ''}${esc(l.label)}`
+  return l.href ? `<a href="${esc(l.href)}" class="${cls}"${l.attrs ? ` ${l.attrs}` : ''}>${inner}</a>` : `<button type="button" class="${cls}"${l.attrs ? ` ${l.attrs}` : ''}>${inner}</button>`
+}
+
+/** Der Kampagnen-Kopf (siehe oben). Danach setzt die Seite meist `TOP_MARK`. */
+export function campHero(o: CampHero): string {
+  const stats = (o.stats ?? [])
+    .map((s) =>
+      s.valueFirst
+        ? `<span class="nmw-camp-hero__stat"><b>${esc(s.value)}</b> ${esc(s.label)}</span>`
+        : `<span class="nmw-camp-hero__stat">${esc(s.label)} <b>${esc(s.value)}</b></span>`,
+    )
+    .join('\n              ')
+  const buttons = [
+    o.primary ? heroButton(o.primary, HERO_BTN) : '',
+    ...(o.ghosts ?? []).map((g) => heroButton(g, 'nmw-camp-hero__ghost')),
+    o.more ? `<a href="${esc(o.more.href)}" class="ml-auto text-sm font-semibold text-brand-2 hover:underline">${esc(o.more.label)}</a>` : '',
+  ].filter(Boolean)
+  const side = o.side
+  const sideInner = side
+    ? `
+          <span class="nmw-camp-hero__plus" aria-hidden="true">${heroSvg(side.icon, 'h-6 w-6', '2.6')}</span>
+          <span>
+            <span class="block font-display text-xl font-extrabold">${esc(side.title)}</span>
+            <span class="mt-1 block text-sm text-white/70">${esc(side.text)}</span>
+          </span>
+          <span class="nmw-camp-hero__cta">${esc(side.cta)} <span aria-hidden="true">→</span></span>`
+    : ''
+  const sideCls = 'nmw-brand-glass nmw-camp-hero__new group flex flex-col justify-between gap-6 rounded-3xl p-6 text-left sm:p-7'
+  return `
+      <section class="nmw-camp-hero mb-8 grid gap-4 lg:grid-cols-3" data-campaign-ctas>
+        <div class="nmw-brand-glass nmw-camp-hero__main flex flex-col justify-between gap-6 rounded-3xl p-6 sm:p-7 ${side ? 'lg:col-span-2' : 'lg:col-span-3'}"${o.mainAttrs ? ` ${o.mainAttrs}` : ''}>
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs font-bold uppercase tracking-[.16em] text-brand-2">${esc(o.eyebrow)}</span>
+              ${o.chip ? `<span class="nmw-camp-hero__live"><i aria-hidden="true"></i>${esc(o.chip)}</span>` : ''}
+            </div>
+            <p class="mt-2 font-display text-2xl font-extrabold leading-tight sm:text-3xl">${esc(o.title)}</p>
+            ${o.text ? `<p class="mt-2 max-w-2xl text-sm text-white/70">${esc(o.text)}</p>` : ''}
+            ${stats ? `<div class="mt-4 flex flex-wrap gap-2">\n              ${stats}\n            </div>` : ''}
+          </div>
+          ${buttons.length ? `<div class="flex flex-wrap items-center gap-3">\n            ${buttons.join('\n            ')}\n          </div>` : ''}
+        </div>${
+          side
+            ? side.href
+              ? `\n        <a href="${esc(side.href)}" class="${sideCls}"${side.attrs ? ` ${side.attrs}` : ''}>${sideInner}\n        </a>`
+              : `\n        <button type="button" class="${sideCls}"${side.attrs ? ` ${side.attrs}` : ''}>${sideInner}\n        </button>`
+            : ''
+        }
+      </section>`
+}
+
 export const upsellSection = (area: PushArea, projectId?: string) => `
       <section class="nmu nmu--push" ${projectId ? 'id="kampagne-pushen"' : 'id="mehr-reichweite"'} data-upsell data-area="${area}"${
         projectId ? ` data-project="${esc(projectId)}"` : ''

@@ -25,7 +25,8 @@ import {
   type Kpi,
   type PayTierView,
   type ThumbView,
-  quickActions,
+  TOP_MARK,
+  campHero,
 } from './layout'
 import { formatBytes } from '../lib/r2'
 import { dialOptions, formatPhone, splitPhone, telHref } from '../lib/phone'
@@ -679,6 +680,8 @@ const clipGrid = (clips: ProjectReel[]) =>
 
 export function overviewPage(o: {
   user: User
+  /** Offene Buchungsanfragen von Agenturen (Creator und Clipper). */
+  pendingBookings: number
   newLeads: number
   customers: number
   activeCampaigns: number
@@ -733,14 +736,45 @@ export function overviewPage(o: {
   const waitingIds = new Set(o.waiting.slice(0, 6).map((c) => c.id))
   const latest = o.latest.filter((c) => !waitingIds.has(c.id)).slice(0, 6)
 
+  /* Kampagnen-Kopf im Aufbau der Agentur (Vorgabe des Auftraggebers, November 2026): links was
+     heute zu tun ist (Teams, Buchungen, Leads), rechts „New campaign“. Dann Views-Grafik und Virale
+     Clips (TOP_MARK), danach der Rest der Übersicht. */
+  const todo = o.waiting.length
+  const hero = campHero({
+    eyebrow: 'Today',
+    chip: todo || o.pendingBookings ? 'To do' : 'All set',
+    title: todo
+      ? `${todo} active ${todo === 1 ? 'campaign needs' : 'campaigns need'} a team`
+      : o.pendingBookings
+        ? `${o.pendingBookings} ${o.pendingBookings === 1 ? 'booking' : 'bookings'} to confirm`
+        : 'Every active campaign has a team',
+    stats: [
+      { value: String(o.activeCampaigns), label: 'active campaigns', valueFirst: true },
+      { value: String(o.pendingBookings), label: o.pendingBookings === 1 ? 'booking to confirm' : 'bookings to confirm', valueFirst: true },
+      { value: String(o.newLeads), label: 'new leads (7 days)', valueFirst: true },
+    ],
+    primary: todo
+      ? { href: '/admin/projekte?team=none', label: 'Assign teams', icon: 'users' }
+      : { href: '/admin/projekte', label: 'Campaigns' },
+    ghosts: [
+      ...(o.pendingBookings ? [{ href: '/admin/agenturen', label: 'Confirm bookings' }] : []),
+      { href: '/admin/leads', label: 'Leads' },
+      { href: '/admin/fachartikel/neu', label: 'New article' },
+    ],
+    more: { href: '/admin/agenturen#codes', label: 'Cooperation codes →' },
+    side: {
+      href: '/admin/projekte#neu',
+      title: 'New campaign',
+      text: 'For a customer, agency or creator. Assign a team whenever you are ready.',
+      cta: 'Create campaign',
+      icon: 'plus',
+    },
+  })
+
   const body =
     pageTitle('Overview', 'The current state at a glance.') +
-    quickActions([
-      { label: 'Campaigns', href: '/admin/projekte', icon: 'film', primary: true },
-      { label: 'Leads', href: '/admin/leads', icon: 'inbox' },
-      { label: 'New article', href: '/admin/fachartikel/neu', icon: 'doc' },
-      { label: 'Cooperation codes', href: '/admin/agenturen#codes', icon: 'briefcase' },
-    ]) +
+    hero +
+    TOP_MARK +
     `<h2 class="nmw-section-title mb-3">Marketplace</h2>` +
     kpis(numbers) +
     `<p class="mt-1.5 px-1 text-[11px] text-slate-400">${signupHint(o.clipperSignups)} (clippers) · ${signupHint(
@@ -1498,6 +1532,8 @@ const NEW_CAMPAIGN_JS = `
     modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !modal.classList.contains('hidden')) close(); });
     name.addEventListener('keydown', function (e) { if (e.key === 'Enter') document.getElementById('np-save').click(); });
+    // Aus dem Kopf der Übersicht („New campaign“): /admin/projekte#neu öffnet den Dialog gleich.
+    if (location.hash === '#neu') { var first = document.querySelector('[data-newcampaign]'); if (first) first.click(); }
     document.getElementById('np-save').addEventListener('click', function () {
       var btn = this;
       function fail(text) { err.textContent = text; err.classList.remove('hidden'); }

@@ -211,9 +211,15 @@
       var all = (d && d.campaigns) || [];
       var marginPct = (d && d.marginPct) || 0;
       var mine = only ? all.filter(function (k) { return k.id === only; }) : all;
-      if (!mine.length) { box.remove(); return; }
+      if (!mine.length) { gone(); return; }
       panel(box.querySelector('[data-upsell-body]'), { campaigns: mine, marginPct: marginPct, current: 0 });
       maybePopup(all, marginPct, d && d.popupDays != null ? d.popupDays : 7);
     })
-    .catch(function () { box.remove(); });
+    .catch(gone);
+
+  // Ohne Angebot verschwinden mit dem Abschnitt auch die Knöpfe, die dorthin führen (Kampagnen-Kopf).
+  function gone() {
+    box.remove();
+    document.querySelectorAll('[data-push-link]').forEach(function (a) { a.remove(); });
+  }
 })();

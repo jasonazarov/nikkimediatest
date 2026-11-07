@@ -16,4 +16,4 @@ Nach der Freigabe wird die Änderung richtig eingespielt und die Datei hier gel�
 
 | Vorschau | Inhalt |
 |---|---|
-| `dashboards` | Alle Dashboards im Aufbau der Agentur-Übersicht: oben zwei Glas-Kacheln in Markengrün, je Rolle nur die passenden Knöpfe (Kunde, Creator, Clipper, Admin). |
+| (keine offene Vorschau) | `dashboards` wurde am 07.11.2026 freigegeben und ist eingespielt. |

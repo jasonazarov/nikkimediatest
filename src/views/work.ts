@@ -21,7 +21,8 @@ import {
   type NavItem,
   type PayTierView,
   type ThumbView,
-  quickActions,
+  ASSIGN_HEADLINE,
+  campHero,
   howItWorks,
 } from './layout'
 import { formatBytes } from '../lib/r2'
@@ -573,17 +574,47 @@ export function projectsPage(
       )
     : ''
 
+  /* Clipper: Kampagnen-Kopf im Aufbau der Agentur (Vorgabe des Auftraggebers, November 2026),
+     unter der Preisstaffelung. Links die Kampagne, an der er arbeitet, rechts seine Hauptaktion:
+     ein fertiges Video hochladen. Neue Kampagnen legt ein Clipper nicht an, die ordnet NIKKI MEDIA zu. */
+  const STATUS: Record<string, string> = { aktiv: 'Aktiv', pausiert: 'Pausiert', beendet: 'Beendet' }
+  const main = projects[0]
+  const hero =
+    area.kind !== 'clipper'
+      ? ''
+      : main
+        ? campHero({
+            eyebrow: 'Deine Kampagne',
+            chip: STATUS[main.status] ?? main.status,
+            title: main.name,
+            stats: [
+              { value: String(main.clips), label: main.clips === 1 ? 'Clip geliefert' : 'Clips geliefert', valueFirst: true },
+              ...(hasNumbers(main.metrics) ? [{ value: formatCompact(main.metrics.views, 'de'), label: 'Views deiner Clips', valueFirst: true }] : []),
+              { label: 'Rohmaterial', value: main.files || main.links ? [main.files ? plural(main.files, t.file) : '', main.links ? plural(main.links, t.link) : ''].filter(Boolean).join(', ') : 'folgt' },
+            ],
+            primary: { href: area.projectHref(main.id), label: 'Rohmaterial ansehen' },
+            more: projects.length > 1 ? { href: '#meine-kampagnen', label: `Alle ${projects.length} Kampagnen ↓` } : undefined,
+            side: {
+              href: `${area.uploadHref}?projekt=${encodeURIComponent(main.id)}`,
+              title: t.uploadFinished,
+              text: 'Clip schneiden, hochladen, fertig. NIKKI MEDIA prüft ihn und bringt ihn online.',
+              cta: 'Video hochladen',
+              icon: 'upload',
+            },
+          })
+        : campHero({
+            eyebrow: 'Deine Kampagne',
+            title: ASSIGN_HEADLINE,
+            text: 'Du bekommst eine E-Mail, sobald das Rohmaterial für dich bereitsteht. Wie du mit Clips verdienst, steht weiter unten.',
+            mainAttrs: 'data-assign-headline',
+          })
+
   const body =
     pageTitle(t.homeTitle, t.homeSubtitle) +
     payTierTable(o.tiers, 'mb-8') +
-    (area.kind === 'clipper'
-      ? quickActions([
-          { label: t.uploadFinished, href: area.uploadHref, icon: 'upload', primary: true },
-          { label: 'Meine Kampagnen', href: area.active, icon: 'folder' },
-        ])
-      : '') +
-    (assigned ? '' : assignBanner()) +
-    list +
+    hero +
+    (assigned || area.kind === 'clipper' ? '' : assignBanner()) +
+    (list ? `<div id="meine-kampagnen">${list}</div>` : '') +
     reach +
     (area.kind === 'clipper' && !assigned
       ? howItWorks('Clipping Area', 'So verdienst du mit Clips', [

@@ -667,6 +667,17 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   `favicon-48/96/192/512.png`, `apple-touch-icon.png`. Alle Seitenköpfe verlinken `/favicon.ico`, `/favicon.svg`,
   `/favicon-96.png` und `/apple-touch-icon.png` (Google zeigt ein Favicon erst ab 48 px und holt es neu, wenn die
   Seite neu gecrawlt wird).
+- **Kampagnen-Kopf in allen Dashboards** (Vorgabe des Auftraggebers, per lokaler Demo freigegeben, November 2026:
+  „das Agentur-Dashboard sieht am besten aus, für alle übernehmen, nur mit den Funktionen der jeweiligen Rolle“):
+  `campHero()` in `layout.ts` baut den Kopf der Agentur-Übersicht (zwei Kacheln `nmw-brand-glass`, links die wichtigste
+  Kampagne mit Status, Kennzahlen und Knöpfen, rechts eine ganz klickbare Hauptaktion). Danach `TOP_MARK`.
+  Kunde (`customerHero` in `app.ts`): aktive Kampagne, Views, Ziel, Restlaufzeit NUR bei gewählter Laufzeit, Material
+  hochladen, Fertige Videos, Kampagne pushen (`data-push-link`, verschwindet ohne Push-Angebot über `upsell.js`);
+  rechts Neue Kampagne. Creator (`campaigns.ts`, unter der Preisstaffel): zugewiesene Kampagne (Schneiden/Verbreiten),
+  sonst eigene, sonst `ASSIGN_HEADLINE`; rechts Neue Kampagne (`data-new-campaign`). Clipper (`work.ts`, unter der
+  Preisstaffel): seine Kampagne, Rohmaterial ansehen; rechts Fertiges Video hochladen; ohne Zuweisung nur
+  `ASSIGN_HEADLINE` (`data-assign-headline`). Admin (englisch): Teams, offene Buchungen, Leads; rechts New campaign
+  (`/admin/projekte#neu` öffnet den Dialog). Die früheren Schnellzugriff-Leisten stecken jetzt in den Kacheln.
 - **Vorschauen vor der Freigabe** (`docs/vorschau/<name>.patch`, siehe `docs/vorschau/LIESMICH.md`): eine
   Änderung, die der Auftraggeber erst lokal sehen will, liegt als Patch bei und ist NICHT im Code.
   `bash scripts/demo-lokal.sh <name>` spielt sie nur in eine Kopie unter `~/.nikki-vorschau/<name>` ein
