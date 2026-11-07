@@ -33,12 +33,12 @@ npm install --silent --no-audit --no-fund
 if [ -n "$VORSCHAU" ]; then
   PATCH="$(pwd)/docs/vorschau/$VORSCHAU.patch"
   if [ ! -f "$PATCH" ]; then
-    echo "✘ Die Vorschau „$VORSCHAU“ gibt es nicht. Vorhanden:"
+    echo "✘ Die Vorschau „${VORSCHAU}“ gibt es nicht. Vorhanden:"
     ls docs/vorschau/*.patch 2>/dev/null | sed 's#.*/##; s#\.patch$##; s#^#   #' || echo "   (keine)"
     exit 1
   fi
   KOPIE="$HOME/.nikki-vorschau/$VORSCHAU"
-  echo "▸ Vorschau „$VORSCHAU“ in eigener Kopie: $KOPIE"
+  echo "▸ Vorschau „${VORSCHAU}“ in eigener Kopie: $KOPIE"
   git worktree remove --force "$KOPIE" >/dev/null 2>&1 || true
   rm -rf "$KOPIE"
   git worktree prune
