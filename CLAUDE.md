@@ -639,5 +639,10 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
 - **Fachartikel live einspielen:** am Ende von `scripts/live-bringen.sh` (eigene Frage j/n) oder einzeln mit
   `node scripts/fachartikel-import.mjs --veroeffentlichen --ersetzen` (Freigabe des Auftraggebers,
   November 2026: „so wie in der Demo“). Ohne Zusätze nur als unveröffentlichte Entwürfe und ohne Vorhandenes anzufassen.
+- **Agentur-Übersicht: Kampagnen ganz oben** (Vorgabe des Auftraggebers, per Vorschau freigegeben, November 2026):
+  „Deine Kampagne“ (groß, Etikett „Briefing“, Views und Budget, Material hochladen, Creator buchen, Alle meine
+  Kampagnen) und „Neue Kampagne erstellen“ (ganze Karte klickbar) direkt unter der Begrüßung, beide `nmw-brand-glass`
+  (Styles `dash-whop.css`, „Agentur-Übersicht: Kampagnen ganz oben“). Views-Grafik, Virale Clips und Push folgen
+  erst danach: Die Seite setzt `TOP_MARK` (`layout.ts`), `withTopSections` fügt die oberen Bereiche dort ein.
 - **Lokale Demo auf dem eigenen Rechner:** `bash scripts/demo-lokal.sh` (Testdatenbank, Fachartikel nur dort
   veröffentlicht, nichts live) → http://localhost:8080 und http://localhost:8080/__vorschau.

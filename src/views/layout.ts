@@ -174,6 +174,8 @@ export type PushArea = 'customer' | 'agency' | 'creator'
  */
 /** Marke im Seiteninhalt: hier statt oben steht „Kampagne pushen“ (siehe shell). */
 export const PUSH_MARK = '<!--nm:push-->'
+/** Setzt eine Seite diese Marke, kommen Views-Grafik, Virale Clips und Push erst DORT (statt direkt unter dem Titel). */
+export const TOP_MARK = '<!--nm:top-->'
 
 export const upsellSection = (area: PushArea, projectId?: string) => `
       <section class="nmu nmu--push" ${projectId ? 'id="kampagne-pushen"' : 'id="mehr-reichweite"'} data-upsell data-area="${area}"${
@@ -219,6 +221,7 @@ const viralSection = (role: Role, lang: Lang) => `
  * sie direkt darunter, sonst ganz nach oben.
  */
 function withTopSections(body: string, top: string): string {
+  if (body.includes(TOP_MARK)) return body.replace(TOP_MARK, top)
   if (!top) return body
   const head = body.match(/^\s*<header class="mb-7">[\s\S]*?<\/header>/)
   return head ? head[0] + top + body.slice(head[0].length) : top + body

@@ -18,6 +18,7 @@ import {
   shell,
   type NavItem,
   type ThumbView,
+  TOP_MARK,
 } from './layout'
 import { CUSTOMER_AREA, briefingStrip, type CustomerArea } from './app'
 import { stationsBar, viewsControl } from './form-window'
@@ -935,6 +936,43 @@ export function overviewPage(o: {
       }
       ${pageTitle(`Hallo ${first}`, 'Alle Kampagnen, Creator und Clipper von NIKKI MEDIA, und deine eigenen Kampagnen.')}
 
+      <!-- Deine Kampagne + Neue Kampagne ganz oben (Vorgabe des Auftraggebers, November 2026):
+           beide in Markengrün als Liquid Glass. Views-Grafik, Virale Clips und Push folgen danach (TOP_MARK). -->
+      <section class="nmw-camp-hero mb-8 grid gap-4 lg:grid-cols-3" data-campaign-ctas>
+        <div class="nmw-brand-glass nmw-camp-hero__main flex flex-col justify-between gap-6 rounded-3xl p-6 sm:p-7 lg:col-span-2">
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs font-bold uppercase tracking-[.16em] text-brand-2">Deine Kampagne</span>
+              <span class="nmw-camp-hero__live"><i aria-hidden="true"></i>Briefing</span>
+            </div>
+            <p class="mt-2 font-display text-2xl font-extrabold leading-tight sm:text-3xl">${esc(agencyPackageLabel(o.lead.package))}</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="nmw-camp-hero__stat"><b>${esc(viewsShort(o.lead.viewsTarget))}</b> Views</span>
+              <span class="nmw-camp-hero__stat">Budget <b>${esc(o.lead.budgetCents ? formatEuro(o.lead.budgetCents) : '–')}</b></span>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <a href="/collaboration/meine" class="${GOLD_BTN}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M12 16V4M6 10l6-6 6 6M5 20h14"/></svg>
+              Material hochladen
+            </a>
+            <a href="/collaboration/creator" class="nmw-camp-hero__ghost">Creator buchen</a>
+            <a href="${esc(AGENCY_CAMPAIGN_AREA.home)}" class="ml-auto text-sm font-semibold text-brand-2 hover:underline">Alle meine Kampagnen →</a>
+          </div>
+        </div>
+        <a href="${esc(AGENCY_NEW_CAMPAIGN)}" class="nmw-brand-glass nmw-camp-hero__new group flex flex-col justify-between gap-6 rounded-3xl p-6 sm:p-7">
+          <span class="nmw-camp-hero__plus" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" class="h-6 w-6"><path d="M12 5v14M5 12h14"/></svg>
+          </span>
+          <span>
+            <span class="block font-display text-xl font-extrabold">Neue Kampagne erstellen</span>
+            <span class="mt-1 block text-sm text-white/70">Views wählen, Preis sehen, starten. In zwei Minuten angelegt.</span>
+          </span>
+          <span class="nmw-camp-hero__cta">Kampagne starten <span aria-hidden="true">→</span></span>
+        </a>
+      </section>
+      ${TOP_MARK}
+
       ${kpiBar(
         [
           { label: 'Kampagnen', value: formatViews(o.campaigns.length) },
@@ -947,34 +985,6 @@ export function overviewPage(o: {
         ],
         'mb-6',
       )}
-
-      <section class="mb-4 flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white px-6 py-5 shadow-sm lg:flex-row lg:items-center lg:justify-between" data-campaign-ctas>
-        <div>
-          <p class="font-display text-lg font-extrabold">Deine Kampagnen</p>
-          <p class="mt-0.5 text-sm text-slate-500">Starte eine neue Kampagne oder öffne alle, die du schon angelegt hast.</p>
-        </div>
-        <div class="flex flex-col gap-3 sm:flex-row">
-          <a href="${esc(AGENCY_NEW_CAMPAIGN)}" class="${GOLD_BTN}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" class="h-4 w-4"><path d="M12 5v14M5 12h14"/></svg>
-            Neue Kampagne erstellen
-          </a>
-          <a href="${esc(AGENCY_CAMPAIGN_AREA.home)}" class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-bold text-slate-800 transition hover:border-slate-400">Alle meine Kampagnen</a>
-        </div>
-      </section>
-
-      <section class="flex flex-col gap-5 rounded-2xl bg-gradient-to-r from-[#010302] via-[#041a0f] to-[#0a4527] ring-1 ring-inset ring-[#2fe08c]/25 px-6 py-6 text-white shadow-sm lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <p class="text-xs font-bold uppercase tracking-[.16em] text-brand-2">Deine Kampagne</p>
-          <p class="mt-1 font-display text-xl font-extrabold">${esc(agencyPackageLabel(o.lead.package))}</p>
-          <p class="mt-1 text-sm text-white/70">${esc(viewsShort(o.lead.viewsTarget))} Views · Budget ${esc(
-            o.lead.budgetCents ? formatEuro(o.lead.budgetCents) : '–',
-          )}</p>
-        </div>
-        <div class="flex flex-wrap gap-3">
-          <a href="/collaboration/meine" class="${GOLD_BTN}">Material hochladen</a>
-          <a href="/collaboration/creator" class="inline-flex items-center rounded-xl bg-white/10 px-5 py-3 text-sm font-bold text-white ring-1 ring-inset ring-white/20 hover:bg-white/15">Creator buchen</a>
-        </div>
-      </section>
 
       ${sectionHead('Neueste Kampagnen', `<a href="/collaboration/kampagnen" class="text-sm font-semibold text-brand hover:underline">Alle Kampagnen →</a>`)}
       ${

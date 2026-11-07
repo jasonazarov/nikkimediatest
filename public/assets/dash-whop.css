@@ -555,3 +555,38 @@ input:focus-visible + .nmg-choice { outline: 2px solid #9cf6c8; outline-offset: 
 .nmu-pop__later:hover { color: #fff; }
 @media (max-width: 640px) { .nmu-pop__card.nmu { padding: 22px 16px 16px; } .nmu-pop__t { font-size: 1.25rem; } }
 @media (prefers-reduced-motion: reduce) { .nmu-pop, .nmu-pop__card.nmu { animation: none; } }
+
+/* ---------- Agentur-Übersicht: Kampagnen ganz oben (Vorgabe des Auftraggebers, November 2026) ----------
+   „Deine Kampagne“ und „Neue Kampagne erstellen“ direkt unter der Begrüßung, beide Markengrün in
+   Liquid Glass (nmw-brand-glass). Markup in views/collaboration.ts (agencyOverviewPage). */
+html.nmd .nmw-camp-hero__main { position: relative; overflow: hidden; min-height: 210px; }
+html.nmd .nmw-camp-hero__main::after {
+  content: ""; position: absolute; right: -80px; top: -80px; width: 280px; height: 280px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(156, 246, 200, .28), transparent 65%);
+}
+.nmw-camp-hero__live {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px;
+  font-size: .72rem; font-weight: 700; color: #d6fde9; background: rgba(47, 224, 140, .16); box-shadow: inset 0 0 0 1px rgba(47, 224, 140, .45);
+}
+.nmw-camp-hero__live i { width: 7px; height: 7px; border-radius: 50%; background: #2fe08c; box-shadow: 0 0 10px #2fe08c; }
+.nmw-camp-hero__stat {
+  display: inline-flex; align-items: baseline; gap: 5px; padding: 7px 12px; border-radius: 12px; font-size: .85rem; color: rgba(255, 255, 255, .75);
+  background: rgba(255, 255, 255, .06); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12);
+}
+.nmw-camp-hero__stat b { color: #fff; font-weight: 800; }
+.nmw-camp-hero__ghost {
+  display: inline-flex; align-items: center; padding: 12px 20px; border-radius: 12px; font-size: .875rem; font-weight: 700; color: #fff;
+  background: rgba(255, 255, 255, .08); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22), inset 0 1px 0 rgba(255, 255, 255, .18);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: background .15s ease;
+}
+.nmw-camp-hero__ghost:hover { background: rgba(255, 255, 255, .14); }
+html.nmd .nmw-camp-hero__new { color: #fff; text-decoration: none; transition: transform .18s ease, box-shadow .18s ease; min-height: 210px; }
+html.nmd .nmw-camp-hero__new:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 1px rgba(47, 224, 140, .75), inset 0 1px 0 rgba(255, 255, 255, .26), 0 22px 48px rgba(47, 224, 140, .2) !important; }
+.nmw-camp-hero__plus {
+  display: grid; place-items: center; width: 48px; height: 48px; border-radius: 16px; color: #02160c;
+  background: radial-gradient(circle at 35% 30%, #d6fde9, #2fe08c 60%, #17a865); box-shadow: 0 0 0 6px rgba(47, 224, 140, .14), 0 10px 26px rgba(47, 224, 140, .35);
+}
+.nmw-camp-hero__cta { display: inline-flex; align-items: center; gap: 6px; font-size: .9rem; font-weight: 800; color: #9cf6c8; }
+.nmw-camp-hero__new:hover .nmw-camp-hero__cta span { transform: translateX(3px); }
+.nmw-camp-hero__cta span { transition: transform .15s ease; }
+@media (prefers-reduced-motion: reduce) { html.nmd .nmw-camp-hero__new, .nmw-camp-hero__cta span { transition: none; } }
