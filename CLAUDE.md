@@ -636,7 +636,8 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   Dasselbe im Kasten am Ende jedes Artikels (`articleCta` in `gold-articles.ts`). Inhaltliche Vorgaben für alle
   Fachartikel stehen in `docs/fachartikel/README.md` (Preis nur „~5 € pro 1.000 Views“, Aufwärmen der Accounts
   7 Tage, keine Vorerfahrung nötig, Clipper-Preis je nach Resultat und Zuverlässigkeit).
-- **Fachartikel live einspielen:** `node scripts/fachartikel-import.mjs --veroeffentlichen --ersetzen` (Freigabe des Auftraggebers,
+- **Fachartikel live einspielen:** am Ende von `scripts/live-bringen.sh` (eigene Frage j/n) oder einzeln mit
+  `node scripts/fachartikel-import.mjs --veroeffentlichen --ersetzen` (Freigabe des Auftraggebers,
   November 2026: „so wie in der Demo“). Ohne Zusätze nur als unveröffentlichte Entwürfe und ohne Vorhandenes anzufassen.
 - **Lokale Demo auf dem eigenen Rechner:** `bash scripts/demo-lokal.sh` (Testdatenbank, Fachartikel nur dort
   veröffentlicht, nichts live) → http://localhost:8080 und http://localhost:8080/__vorschau.

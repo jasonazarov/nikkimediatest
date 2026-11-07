@@ -17,7 +17,7 @@
  *
  *   node scripts/fachartikel-import.mjs --veroeffentlichen --ersetzen   → wie in der Demo, live
  *
- * Live fragt das Skript vor dem Schreiben einmal nach (j/n).
+ * Live fragt das Skript vor dem Schreiben einmal nach (j/n); --ja überspringt das (live-bringen.sh fragt selbst).
  * Format der Dateien: Kopf zwischen „---“ (title, slug, excerpt, author),
  * darunter der Text im Format des Editors (## , ### , - , 1. , > , **fett**, [Text](/pfad)).
  */
@@ -83,7 +83,7 @@ if (replaced.length) console.log(`Schon vorhanden, werden durch die neue Fassung
 const sqlFile = join(mkdtempSync(join(tmpdir(), 'fachartikel-')), 'import.sql')
 writeFileSync(sqlFile, rows.join('\n') + '\n')
 console.log(`${files.length - skipped.length} Artikel → ${local ? 'lokale Vorschau' : 'LIVE (nikkimedia.co)'}, ${publish ? 'VERÖFFENTLICHT' : 'unveröffentlicht'}.`)
-if (!local) {
+if (!local && !process.argv.includes('--ja')) {
   const { createInterface } = await import('node:readline/promises')
   const rl = createInterface({ input: process.stdin, output: process.stdout })
   const a = (await rl.question('Weiter? (j/n) ')).trim().toLowerCase()

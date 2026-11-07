@@ -105,4 +105,17 @@ printf 'Hinweis: eine rote Zeile „Authentication error [code: 10000]“ ist ha
 # Was ship selbst neu baut (Tailwind-CSS), wird dabei mit gesichert, statt den Livegang anzuhalten.
 npm run ship -- "Livegang: neu gebaute Dateien (Stand $NEW)" || fail "Der Deploy hat angehalten (siehe oben). Die Live-Seite ist dann noch auf dem alten Stand."
 
+# ------------------------------------------------------------- Fachartikel
+# Die Fachartikel stehen in der Datenbank, nicht im Code. Auf Wunsch kommen die Entwürfe aus
+# docs/fachartikel hier gleich mit: veröffentlicht, ältere Fassungen derselben Adresse ersetzt.
+N_ART="$(ls docs/fachartikel/[0-9]*.md 2>/dev/null | wc -l | tr -d ' ')"
+if [ "$N_ART" != "0" ]; then
+  printf '\n%sFachartikel: %s Artikel aus docs/fachartikel jetzt live veröffentlichen (vorhandene Fassungen werden ersetzt)?%s\n' "$Y" "$N_ART" "$O"
+  printf 'Fachartikel einspielen? (j/n) '; read -r fa
+  case "$fa" in
+    j|J|y|Y|ja|Ja) node scripts/fachartikel-import.mjs --veroeffentlichen --ersetzen --ja || fail "Fachartikel ließen sich nicht einspielen. Die Seite selbst ist live." ; ok "Fachartikel veröffentlicht: https://nikkimedia.co/fachartikel" ;;
+    *) ok "Fachartikel nicht angefasst." ;;
+  esac
+fi
+
 printf '\n%s✓ Fertig. https://nikkimedia.co zeigt den neuen Stand (im Browser Cmd+Shift+R).%s\n' "$G$B" "$O"
