@@ -662,5 +662,10 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   `/collaboration/kampagne/:id`) mit `?kampagne=<id>`, die Kampagne ist dann in der Maske vorausgewählt.
   „Buchungen“ zeigt beide Arten mit Etikett. Demo-Agentur: den Demo-Clipper holt weiter `/assign-clipper` sofort
   ins Team, festgehalten als bestätigte Buchung.
+- **Favicon** (Vorgabe des Auftraggebers, November 2026: dunkler Hintergrund in den Markenfarben, kein Weiß):
+  randlos Schwarz mit grünem Licht und grünem „NM“. Dateien in `public/`: `favicon.ico` (16/32/48), `favicon.svg`,
+  `favicon-48/96/192/512.png`, `apple-touch-icon.png`. Alle Seitenköpfe verlinken `/favicon.ico`, `/favicon.svg`,
+  `/favicon-96.png` und `/apple-touch-icon.png` (Google zeigt ein Favicon erst ab 48 px und holt es neu, wenn die
+  Seite neu gecrawlt wird).
 - **Lokale Demo auf dem eigenen Rechner:** `bash scripts/demo-lokal.sh` (Testdatenbank, Fachartikel nur dort
   veröffentlicht, nichts live) → http://localhost:8080 und http://localhost:8080/__vorschau.

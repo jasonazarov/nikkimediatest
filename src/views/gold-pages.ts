@@ -263,7 +263,10 @@ export const goldHeadLinks = () => `<link rel="preconnect" href="https://fonts.g
 <link rel="stylesheet" href="/assets/site.css">
 <link rel="stylesheet" href="/assets/gold.css">
 <link rel="stylesheet" href="/assets/glass.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23000'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='14' font-weight='bold' fill='%232fe08c' text-anchor='middle'%3ENM%3C/text%3E%3C/svg%3E">`
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">`
 
 /** Kopfzeile. `active` markiert den Menüpunkt, `cta` ist der goldene Knopf rechts. */
 export const goldNav = (active: string | null, cta: string, ctaHref = '#start') => `<a class="g-skip" href="${ctaHref}">Zum Inhalt springen</a>
