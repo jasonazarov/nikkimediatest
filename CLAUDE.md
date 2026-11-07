@@ -614,6 +614,10 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   Abschnitt „Push popup“ im Admin beim Kunden (`/admin/kunden/:id`) und bei der Agentur (`/admin/agenturen/:id`),
   `PUT /api/admin/customers/:id/push-popup`. NULL = Standard 7 Tage, 0 = aus, sonst 1 bis 90. `GET /api/upsell`
   liefert `popupDays`; der Cookie speichert den Zeitpunkt der letzten Anzeige, eine Änderung greift deshalb sofort.
+  **Auch für Leads** (noch nicht bestätigte Kunden; Vorgabe des Auftraggebers): derselbe Abschnitt auf der Lead-Seite
+  (`/admin/leads/:id`) und beim unbestätigten Kunden. Für Leads ist NULL = AUS (nicht 7 Tage): Push-Angebote und Popup
+  bekommt ein Lead nur, wenn der Admin es für ihn einschaltet (`push_popup_days > 0`, `upsellCampaigns`). Wird der Lead
+  später zum Kunden erklärt und war nichts eingestellt, gilt der Kunden-Standard von 7 Tagen.
 - **Weniger Schritte in den Formularen /creator und /brands** (Vorgabe des Auftraggebers, November 2026):
   `/creator` hat 7 statt 10 Schritte: „Reichweite“ fasst Follower, Views insgesamt und Views 30 Tage in EINEM
   Schritt zusammen (`data-require="followers viewsTotal views30d"`, Antworten als Pillen `.opts--pills`, passt ohne

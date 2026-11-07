@@ -774,7 +774,8 @@ adminRoutes.get('/leads/:id', async (c) => {
       ).filter((l) => l.id !== lead.id)
     : []
 
-  return c.html(leadDetailPage({ user: c.get('user'), lead, customer, others }))
+  const pushPopupDays = customer ? await pushPopupSetting(c.env, customer.id) : null
+  return c.html(leadDetailPage({ user: c.get('user'), lead, customer, others, pushPopupDays }))
 })
 
 /* ------------------------------------------------------------------ Kunden */

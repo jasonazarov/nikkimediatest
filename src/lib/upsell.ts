@@ -193,8 +193,11 @@ export async function upsellCampaigns(env: Env, user: User, now = nowSec()): Pro
   if (user.role !== 'customer' && user.role !== 'agency' && user.role !== 'creator') return { marginPct: 0, campaigns: [], popupDays: 0 }
   const customer = await customerOf(env, user.id)
   if (!customer) return { marginPct: 0, campaigns: [], popupDays: 0 }
-  // Leads ohne Auftrag bekommen kein Upsell — erst, wenn der Admin sie zum Kunden erklärt hat.
-  if (user.role === 'customer' && !customer.converted_at) return { marginPct: 0, campaigns: [], popupDays: 0 }
+  // Leads ohne Auftrag bekommen kein Upsell, außer der Admin hat es für genau diesen Lead
+  // eingeschaltet (Abschnitt „Push popup“ beim Lead, push_popup_days > 0; Vorgabe des
+  // Auftraggebers, November 2026). NULL heißt bei Leads also „aus“, bei Kunden „7 Tage“.
+  const leadOptIn = Number(customer.push_popup_days) > 0
+  if (user.role === 'customer' && !customer.converted_at && !leadOptIn) return { marginPct: 0, campaigns: [], popupDays: 0 }
   const marginPct = user.role === 'agency' ? Number(customer.margin_pct) || 0 : 0
 
   const { results } = await env.DB.prepare(

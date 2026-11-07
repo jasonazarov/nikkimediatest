@@ -42,4 +42,17 @@ x(`INSERT INTO projects (id,customer_id,name,status,created_at,briefing_duration
   assert.deepEqual(await setPushPopupDays(env, 'cc', null), { days: null })
   assert.equal((await upsellCampaigns(env, cust, now)).popupDays, 7)
   console.log('✓ Popup-Abstand je Kunde: Standard 7, 0 = aus, 1 bis 90, ungültig abgewiesen')
+
+  // Leads (noch nicht bestätigt): standardmäßig KEIN Push, nur wenn der Admin es einschaltet.
+  x(`INSERT INTO users (id,email,role,full_name,created_at) VALUES ('ul','l@x.de','customer','Lead',1)`)
+  x(`INSERT INTO customers (id,user_id,storage_bytes,created_at) VALUES ('cl','ul',0,1)`)
+  x(`INSERT INTO projects (id,customer_id,name,status,created_at,briefing_duration_days) VALUES ('pl','cl','Lead-Kampagne','aktiv',?,30)`, now - 2 * DAY)
+  const lead: any = { id: 'ul', role: 'customer' }
+  assert.deepEqual(await upsellCampaigns(env, lead, now), { marginPct: 0, campaigns: [], popupDays: 0 })
+  await setPushPopupDays(env, 'cl', 5)
+  const on = await upsellCampaigns(env, lead, now)
+  assert.equal(on.popupDays, 5); assert.equal(on.campaigns.length, 1); assert.equal(on.campaigns[0].daysLeft, 28)
+  await setPushPopupDays(env, 'cl', 0)
+  assert.equal((await upsellCampaigns(env, lead, now)).campaigns.length, 0)
+  console.log('✓ Leads: ohne Einstellung kein Push, eingeschaltet mit eigenem Abstand, 0 = wieder aus')
 })().catch((e) => { console.error('✗', e); process.exit(1) })

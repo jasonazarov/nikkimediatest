@@ -1152,6 +1152,8 @@ export function leadDetailPage(o: {
     | null
   /** Weitere Anfragen derselben Adresse — derselbe Zugang. */
   others: Lead[]
+  /** „Kampagne pushen“-Popup dieses Zugangs (customers.push_popup_days), NULL = nicht eingestellt. */
+  pushPopupDays?: number | null
 }): string {
   const platforms: string[] = JSON.parse(o.lead.platforms || '[]')
   const row = (label: string, value: string) => `
@@ -1315,7 +1317,8 @@ export function leadDetailPage(o: {
     user: o.user,
     nav: ADMIN_NAV,
     active: '/admin/leads',
-    body,
+    // Push-Popup auch für Leads einstellbar (Vorgabe des Auftraggebers): bei Leads standardmäßig aus.
+    body: body + (o.customer ? pushPopupSection(o.customer.id, o.pushPopupDays ?? null, o.customer.converted ? 'customer' : 'lead') : ''),
     script: `
 (function () {${LEAD_DELETE_JS}
 
@@ -1799,7 +1802,7 @@ export function customerDetailPage(o: {
       ? campaignGrid(cards)
       : emptyState('No campaign yet', creator ? 'This creator has not created a campaign yet.' : 'This customer has not created a campaign yet, you can create one for them.')) +
     crmTimeline(o.timeline ?? []) +
-    (creator ? '' : pushPopupSection(o.customer.customerId, o.pushPopupDays ?? null, 'customer')) +
+    (creator ? '' : pushPopupSection(o.customer.customerId, o.pushPopupDays ?? null, o.customer.convertedAt ? 'customer' : 'lead')) +
     contactBlock +
     `<div class="mb-3 mt-9">
        <h2 class="font-display text-lg font-bold">Raw footage</h2>

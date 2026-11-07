@@ -10,8 +10,10 @@ import { esc, jsonScript } from './layout'
 
 const PRESETS = [1, 3, 7, 14, 30]
 
-export function pushPopupSection(customerId: string, stored: number | null, who: 'customer' | 'agency'): string {
-  const days = popupDaysOf(stored)
+export function pushPopupSection(customerId: string, stored: number | null, who: 'customer' | 'agency' | 'lead'): string {
+  // Leads (noch nicht bestätigte Kunden): ohne Einstellung AUS, nicht 7 Tage.
+  const lead = who === 'lead'
+  const days = lead && stored === null ? 0 : popupDaysOf(stored)
   const on = days > 0
   const shown = on ? days : PUSH_POPUP_DEFAULT_DAYS
   const chips = PRESETS.map(
@@ -24,7 +26,9 @@ export function pushPopupSection(customerId: string, stored: number | null, who:
           <div class="flex flex-wrap items-start justify-between gap-3">
             <div>
               <h2 class="font-display text-lg font-bold">Push popup</h2>
-              <p class="text-sm text-slate-500">How often ${who === 'agency' ? 'this agency' : 'this customer'} sees the “Kampagne pushen” popup on their overview: the three push offers and the days left until the discount expires. It only appears while a campaign is running.</p>
+              <p class="text-sm text-slate-500">How often ${who === 'agency' ? 'this agency' : who === 'lead' ? 'this lead' : 'this customer'} sees the “Kampagne pushen” popup on their overview: the three push offers and the days left until the discount expires. It only appears while a campaign is running.${
+                lead ? ' <b>Leads are not confirmed customers yet: push offers and the popup are off until you switch them on here.</b>' : ''
+              }</p>
             </div>
             <label class="inline-flex shrink-0 cursor-pointer items-center gap-2 text-sm font-semibold">
               <input type="checkbox" data-pp-on class="h-4 w-4 accent-emerald-500"${on ? ' checked' : ''}> Show popup
@@ -51,7 +55,8 @@ export function pushPopupSection(customerId: string, stored: number | null, who:
   var on = box.querySelector('[data-pp-on]'), input = box.querySelector('[data-pp-days]');
   var msg = box.querySelector('[data-pp-msg]'), state = box.querySelector('[data-pp-state]');
   var DEF = ${jsonScript(PUSH_POPUP_DEFAULT_DAYS)}, MAX = ${jsonScript(PUSH_POPUP_MAX_DAYS)};
-  function label(d) { return d === 0 ? 'Currently: off' : 'Currently: every ' + (d === 1 ? 'day' : d + ' days') + (d === DEF ? ' (default)' : ''); }
+  var LEAD = ${jsonScript(lead)};
+  function label(d) { return d === 0 ? 'Currently: off' + (LEAD ? ' (default for leads)' : '') : 'Currently: every ' + (d === 1 ? 'day' : d + ' days') + (d === DEF && !LEAD ? ' (default)' : ''); }
   function paint() {
     box.querySelector('[data-pp-controls]').style.opacity = on.checked ? '' : '.45';
     input.disabled = !on.checked;
@@ -77,7 +82,7 @@ export function pushPopupSection(customerId: string, stored: number | null, who:
     }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (res) {
         if (!res.ok) throw new Error(res.j.error || 'Could not save.');
-        state.textContent = label(res.j.days === null ? DEF : res.j.days);
+        state.textContent = label(res.j.days === null ? (LEAD ? 0 : DEF) : res.j.days);
         msg.textContent = 'Saved'; msg.style.color = '#2fe08c';
       })
       .catch(function (e) { msg.textContent = e.message; msg.style.color = '#f87171'; });
