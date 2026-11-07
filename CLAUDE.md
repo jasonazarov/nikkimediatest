@@ -678,6 +678,13 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   Preisstaffel): seine Kampagne, Rohmaterial ansehen; rechts Fertiges Video hochladen; ohne Zuweisung nur
   `ASSIGN_HEADLINE` (`data-assign-headline`). Admin (englisch): Teams, offene Buchungen, Leads; rechts New campaign
   (`/admin/projekte#neu` öffnet den Dialog). Die früheren Schnellzugriff-Leisten stecken jetzt in den Kacheln.
+- **Preisvergleich auf der Startseite** (Entscheidung des Auftraggebers, November 2026, per Screenshot freigegeben):
+  Basis sind Videoaufrufe, nicht Werbeeinblendungen. Preisgrafik (Karte „01“ in „Warum Clipping“): Meta Ads 30–50 €
+  pro 1.000 Aufrufe ab 15 Sekunden, TikTok Ads 15–30 € pro 1.000 Videoaufrufe, NIKKI MEDIA ca. 5 €; Kasten
+  „6- bis 10-mal günstiger als Meta Ads“. Rechenbeispiel in „Das Problem“: Videoaufrufe für 1.000 € (Meta ≈ 20.000–33.000,
+  TikTok ≈ 33.000–67.000, Nikki Media ≈ 200.000). Die Werte entsprechen den Angaben des Wettbewerbers Ombrie; als
+  Quellen stehen auf der Seite bewusst die unabhängigen Spannen von Dynamoi (Meta, Kosten pro ThruPlay) und MB Adv
+  (TikTok, Kosten pro Videoaufruf), in denen sie liegen. Ombrie wird nicht genannt. Nicht „bis 50× günstiger“ schreiben.
 - **Vorschauen vor der Freigabe** (`docs/vorschau/<name>.patch`, siehe `docs/vorschau/LIESMICH.md`): eine
   Änderung, die der Auftraggeber erst lokal sehen will, liegt als Patch bei und ist NICHT im Code.
   `bash scripts/demo-lokal.sh <name>` spielt sie nur in eine Kopie unter `~/.nikki-vorschau/<name>` ein

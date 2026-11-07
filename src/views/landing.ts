@@ -428,37 +428,35 @@ ${AURORA}
 
       <div class="rv" data-rv-delay="100">
         <p style="font-size:.78rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--on-dark-soft);margin-bottom:16px">
-          Werbeeinblendungen pro 1.000 US-Dollar · Rechenbeispiel
+          Videoaufrufe für 1.000 € · Rechenbeispiel
         </p>
         <div class="vs" data-bars>
           <div class="vs__row">
             <b>Meta Ads</b>
-            <span class="vs__bar"><i data-bar="58.85" data-bar-axis="x"></i></span>
-            <span class="vs__val">≈ 122.100</span>
+            <span class="vs__bar"><i data-bar="16.67" data-bar-axis="x"></i></span>
+            <span class="vs__val">≈ 20.000–33.000</span>
           </div>
           <div class="vs__row">
             <b>TikTok Ads</b>
-            <span class="vs__bar"><i data-bar="100" data-bar-axis="x"></i></span>
-            <span class="vs__val">≈ 207.500</span>
+            <span class="vs__bar"><i data-bar="33.33" data-bar-axis="x"></i></span>
+            <span class="vs__val">≈ 33.000–67.000</span>
           </div>
           <div class="vs__row">
             <b>Influencer-Deal</b>
-            <span class="vs__bar"><i data-bar="31" data-bar-axis="x"></i></span>
+            <span class="vs__bar"><i data-bar="10" data-bar-axis="x"></i></span>
             <span class="vs__val">Individuell*</span>
           </div>
           <div class="vs__row vs__row--win">
             <b>Nikki Media</b>
             <span class="vs__bar"><i data-bar="100" data-bar-axis="x"></i></span>
-            <span class="vs__val">Individuell*</span>
+            <span class="vs__val">≈ 200.000</span>
           </div>
         </div>
         <p class="muted" style="font-size:.76rem;margin-top:14px">
-          Beispielwerte auf Basis veröffentlichter CPM-Benchmarks von Meta und Co. Unser Ziel: günstigere Reichweite mit besseren Resultaten als marktübliche Ads.
-          Deinen konkreten CPM legen wir vor Kampagnenstart gemeinsam fest.
-          Meta/TikTok: berechnet aus den internationalen 2025-Benchmarks von
-          <a href="https://www.guptamedia.com/social-media-ads-cost" target="_blank" rel="noopener">Gupta Media (Stand Oktober 2025)</a>,
-          keine aktuellen DACH-Preise. Werbeeinblendungen sind keine organischen Video-Views.
-          *Influencer und Nikki Media: individuell vereinbart; diese Balken sind schematisch und zeigen keine gemessene Reichweite.
+          Rechenbeispiel mit den Werten der Preisgrafik weiter unten: Meta 30 bis 50 € pro 1.000 Aufrufe ab 15 Sekunden,
+          TikTok 15 bis 30 € pro 1.000 Videoaufrufe, Nikki Media ca. 5 € pro 1.000 organische Views.
+          Werbepreise entstehen in Auktionen und schwanken. Deinen genauen Preis legen wir vor Kampagnenstart gemeinsam fest.
+          *Influencer: individuell vereinbart, dieser Balken ist schematisch.
         </p>
       </div>
     </div>
@@ -495,19 +493,20 @@ ${AURORA}
           </div>
           <div class="fcard__viz">
             <div class="cpm" data-bars>
-              <p class="cpm__legend"><b>CPM</b> = Kosten pro 1.000 Werbeeinblendungen · internationale Benchmarks in US-Dollar</p>
+              <p class="cpm__legend"><b>Kosten pro 1.000 Videoaufrufe</b> · DACH-Raum, in Euro · heller Bereich = Spanne</p>
               <div class="cpm__chart">
-                <div class="cpm__axis"><span>12 $</span><span>9 $</span><span>6 $</span><span>3 $</span><span>0 $</span></div>
+                <div class="cpm__axis"><span>60 €</span><span>45 €</span><span>30 €</span><span>15 €</span><span>0 €</span></div>
                 <div class="cpm__bars" data-bars>
-                  <div class="cpm__bar"><span>8,19 $</span><i data-bar="68.25"></i></div>
-                  <div class="cpm__bar"><span>4,82 $</span><i data-bar="40.17"></i></div>
-                  <div class="cpm__bar cpm__bar--win"><span>Tonnenweise günstiger*</span><i data-bar="10"></i></div>
+                  <div class="cpm__bar"><span>30–50 €</span><i data-bar="83.33" style="--range:40%"></i></div>
+                  <div class="cpm__bar"><span>15–30 €</span><i data-bar="50" style="--range:50%"></i></div>
+                  <div class="cpm__bar cpm__bar--win"><span>ca. 5 €</span><i data-bar="8.33"></i></div>
                 </div>
               </div>
               <div class="cpm__labels">
-                <div>Meta</div><div>TikTok</div><div class="is-win">NIKKI MEDIA</div>
+                <div>Meta Ads<small>Aufrufe ab 15 Sek.</small></div><div>TikTok Ads<small>Videoaufrufe</small></div><div class="is-win">NIKKI MEDIA<small>organische Views</small></div>
               </div>
-              <p class="cpm__legend">Quelle: <a href="https://www.guptamedia.com/social-media-ads-cost" target="_blank" rel="noopener">Gupta Media</a>, 2025-Durchschnitt, Stand Oktober 2025; keine festen Tarife oder aktuellen DACH-Preise. Kosten variieren nach Zielgruppe, Kampagnenziel und Zeitraum. *Unser Anspruch; Preis pro 1.000 organische Views individuell vereinbart. Nikki-Media-Balken schematisch, kein gemessener CPM-Vergleich.</p>
+              <p class="cpm__note"><b>6- bis 10-mal günstiger als Meta Ads.</b> Für 1.000 Videoaufrufe zahlst du bei Meta 30 bis 50 €, bei TikTok 15 bis 30 €, bei uns ca. 5 €.</p>
+              <p class="cpm__legend">Werte für 2026, in Euro umgerechnet. Meta: Kosten pro ThruPlay (Aufruf ab 15 Sekunden) in Märkten wie Deutschland, laut <a href="https://dynamoi.com/learn/instagram-ads/meta-ads-manager-metrics-music-campaigns" target="_blank" rel="noopener">Dynamoi</a>. TikTok: Kosten pro Videoaufruf laut <a href="https://www.mbadv.agency/tiktok-ads/metrics-and-costs" target="_blank" rel="noopener">MB Adv</a>. Werbepreise entstehen in Auktionen und schwanken nach Branche, Zielgruppe und Zeitraum. NIKKI MEDIA: Richtwert, deinen genauen Preis legen wir vor der Kampagne fest.</p>
             </div>
           </div>
         </div>

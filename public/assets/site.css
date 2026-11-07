@@ -700,9 +700,14 @@ ul { margin: 0; padding: 0; list-style: none; }
 .cpm__bar i { display: block; width: 100%; border-radius: 7px 7px 0 0; background: linear-gradient(180deg, #42514a, #2a342f); height: 0; transition: height 1.2s cubic-bezier(.2, .7, .2, 1); }
 .cpm__bar--win i { background: linear-gradient(180deg, var(--brand-2), var(--brand) 70%, #20aa67); box-shadow: 0 0 30px rgba(var(--brand-rgb), .45); }
 .cpm__bar--win span { color: var(--brand-light); }
+.cpm__bar i[style*="--range"] { background: linear-gradient(180deg, rgba(255, 255, 255, .2) 0 var(--range), #42514a var(--range), #2a342f); }
+.cpm__note b { color: var(--brand-light); }
 .cpm__labels { display: flex; gap: 22px; margin-top: 11px; padding-left: 52px; }
 .cpm__labels div { flex: 1; text-align: center; font-size: .78rem; color: var(--on-dark-muted); font-weight: 600; }
 .cpm__labels div.is-win { color: #fff; }
+.cpm__labels small { display: block; margin-top: 2px; font-size: .68rem; font-weight: 500; color: var(--on-dark-soft); }
+.cpm__labels div.is-win small { color: var(--brand-light); }
+.cpm__note { margin: 18px 0 12px; padding: 12px 14px; border-radius: 12px; font-size: .84rem; line-height: 1.45; color: #fff; background: rgba(var(--brand-rgb), .1); box-shadow: inset 0 0 0 1px rgba(var(--brand-rgb), .35); }
 
 /* --- viz 02: DACH map --- */
 .dachmap { position: relative; width: 100%; max-width: 480px; margin-inline: auto; }
