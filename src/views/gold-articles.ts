@@ -405,6 +405,7 @@ export function llmsTxt(articles: Article[]): string {
 - Netzwerk: über 5.000 Clipper (Stand Oktober 2026)
 - Plattformen: TikTok, Instagram Reels, YouTube Shorts, Facebook
 - Markt: DACH-Raum, Sprache Deutsch
+- Büro: Darwingasse 6, 1020 Wien, Österreich
 - Gründer: Jason Azarov
 - Ablauf: Kampagne anlegen, Rohmaterial im eigenen Dashboard hochladen, Nikki Media ordnet Clipper und Creator zu, Clips werden veröffentlicht, Views werden gezählt
 

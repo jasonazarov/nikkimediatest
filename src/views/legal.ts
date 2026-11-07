@@ -75,6 +75,11 @@ export const impressumPage = () =>
         Dubai, United Arab Emirates
       </p>
       <p>
+        <strong>Büro Wien</strong><br>
+        Darwingasse 6<br>
+        1020 Wien, Österreich
+      </p>
+      <p>
         Telefon: <a href="tel:+436765990071">+43 676 5990071</a><br>
         Web: <a href="https://nikkimedia.co/">nikkimedia.co</a>
       </p>

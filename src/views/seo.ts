@@ -69,6 +69,15 @@ export const ORGANIZATION = {
   knowsLanguage: 'de',
   founder: { '@type': 'Person', '@id': `${SITE}/#jason-azarov`, name: 'Jason Azarov', jobTitle: 'Gründer' },
   telephone: '+43 676 5990071',
+  // Büro Wien, genau wie im Google-Unternehmensprofil und im Impressum (Vorgabe des Auftraggebers,
+  // November 2026). Der Firmensitz laut Impressum ist Dubai; Kunden betreut das Büro in Wien.
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Darwingasse 6',
+    postalCode: '1020',
+    addressLocality: 'Wien',
+    addressCountry: 'AT',
+  },
   priceRange: '€€',
   knowsAbout: [
     'Clipping',
