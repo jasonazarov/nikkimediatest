@@ -120,12 +120,13 @@ body { position: relative; isolation: isolate; }
 .section, .section--surface, .section--dark { background: transparent !important; color: var(--text); }
 .section--surface { border-block: 1px solid rgba(255, 255, 255, .06); }
 .section h1, .section h2, .section h3, .section h4 { color: var(--text); }
+/* Hero durchsichtig (Vorgabe des Auftraggebers, November 2026): Das bewegte Hintergrundlicht
+   soll schon ganz oben präsent sein, nicht erst beim Scrollen. Vorher deckte hier ein Verlauf
+   von Schwarz das Licht ab. Oben bleibt ein grüner Schein, unten kein Auslauf ins Schwarz. */
 .hero {
-  background:
-    radial-gradient(90% 60% at 50% -10%, rgba(47, 224, 140, .2), transparent 62%),
-    linear-gradient(180deg, #000 0%, rgba(0, 0, 0, .4) 100%) !important;
+  background: radial-gradient(90% 60% at 50% -10%, rgba(47, 224, 140, .26), transparent 64%) !important;
 }
-.hero::after { background: linear-gradient(180deg, transparent, #000) !important; }
+.hero::after { background: none !important; }
 .hero__glow, .theme-clipper .hero__glow, .theme-creator .hero__glow, .theme-brands .hero__glow {
   background:
     radial-gradient(38% 42% at 26% 28%, rgba(94, 234, 166, .22), transparent 68%),
