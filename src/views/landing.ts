@@ -1211,7 +1211,7 @@ ${AURORA}
         <div class="step__n">03</div>
         <div class="step__meta">wir übernehmen</div>
         <h3>Onboarding &amp; Setup</h3>
-        <p>Wir richten dein Projekt ein, erstellen die Fan-Accounts und wärmen sie in deiner Nische auf: 2 bis 3 Tage.</p>
+        <p>Wir richten dein Projekt ein, erstellen die Fan-Accounts und wärmen sie 7 Tage lang in deiner Nische auf.</p>
       </article>
 
       <article class="step rv" data-rv-delay="240">
@@ -1366,7 +1366,7 @@ ${articlesHtml}<section class="section section--surface" id="faq">
 
       <details class="faq__i">
         <summary class="faq__q">Wie schnell sehe ich erste Ergebnisse?<span class="faq__ic" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></summary>
-        <div class="faq__a"><p>Die Accounts gehen direkt nach dem Setup live. Die ersten Videos werden nach der 2–3-tägigen Aufwärmphase gepostet. Eine Kampagne läuft in der Regel über 30, 60 oder 90 Tage, in dieser Zeit wird kontinuierlich gepostet, ausgewertet und das Erfolgreiche hochskaliert.</p></div>
+        <div class="faq__a"><p>Die Accounts gehen direkt nach dem Setup live. Die ersten Videos werden nach der 7-tägigen Aufwärmphase gepostet: So lange dauert es, bis der Algorithmus erkennt, dass ein Mensch den Account betreibt und kein Bot. Eine Kampagne läuft in der Regel über 30, 60 oder 90 Tage, in dieser Zeit wird kontinuierlich gepostet, ausgewertet und das Erfolgreiche hochskaliert.</p></div>
       </details>
 
       <details class="faq__i">

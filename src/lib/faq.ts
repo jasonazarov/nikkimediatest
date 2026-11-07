@@ -117,7 +117,7 @@ export const FAQ: FaqEntry[] = [
   {
     id: 'tempo',
     q: 'Wie schnell sehe ich erste Ergebnisse?',
-    a: 'Die Accounts gehen direkt nach dem Setup live. Die ersten Videos werden nach der 2–3-tägigen Aufwärmphase gepostet. Eine Kampagne läuft in der Regel über 30, 60 oder 90 Tage, in dieser Zeit wird kontinuierlich gepostet, ausgewertet und das Erfolgreiche hochskaliert.',
+    a: 'Die Accounts gehen direkt nach dem Setup live. Die ersten Videos werden nach der 7-tägigen Aufwärmphase gepostet: So lange dauert es, bis der Algorithmus erkennt, dass ein Mensch den Account betreibt und kein Bot. Eine Kampagne läuft in der Regel über 30, 60 oder 90 Tage, in dieser Zeit wird kontinuierlich gepostet, ausgewertet und das Erfolgreiche hochskaliert.',
     keys: ['schnell', 'dauer', 'dauert', 'wann', 'ergebnisse', 'start', 'zeit', 'tage', 'laufzeit', 'lange'],
     on: ['kunden', 'personal-brands', 'agenturen'],
   },
