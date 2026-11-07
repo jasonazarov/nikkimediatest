@@ -1,5 +1,5 @@
 NIKKI MEDIA · FACHARTIKEL-ENTWÜRFE ZUM LESEN
-17 Entwürfe, nicht veröffentlicht. Stand: 7. November 2026.
+22 Entwürfe, nicht veröffentlicht. Stand: 7. November 2026.
 
 INHALT
   01  Was ist Clipping? Content Clipping einfach erklärt
@@ -19,11 +19,17 @@ INHALT
   15  Was ist guter Content für Clipping?
   16  Für wen ist Clipping? Ein Nebenverdienst neben dem Job
   17  Braucht man Vorerfahrung für Clipping?
+  ·· Case Studies zu den Use Cases der Startseite
+  18  Case Study DinDrop: Wie entstehen über 100 Mio. organische Views?
+  19  Case Study Max Tornow: Wie wird Coaching-Content viral?
+  20  Case Study Caspian Blue: Wie verkauft man Kaviar mit Kurzvideos?
+  21  Case Study Levantine Istanbul: Wie wächst ein Restaurant?
+  22  Case Study Panperium: Wie werden Produktvideos nicht weggewischt?
   --  Am Ende: Einschätzung SEO und GEO (Google und ChatGPT)
 
 
 ============================================================================================
-ENTWURF 01 von 17
+ENTWURF 01 von 22
 ============================================================================================
 
 WAS IST CLIPPING? CONTENT CLIPPING EINFACH ERKLÄRT
@@ -155,7 +161,7 @@ ist, starte hier deine Anfrage (nikkimedia.co/#stepper).
 
 
 ============================================================================================
-ENTWURF 02 von 17
+ENTWURF 02 von 22
 ============================================================================================
 
 ORGANISCHE REICHWEITE 2026: WIE KOMMT MAN AUF MILLIONEN VIEWS?
@@ -273,7 +279,7 @@ auf nikkimedia.co (nikkimedia.co), oder du stellst direkt eine Anfrage
 
 
 ============================================================================================
-ENTWURF 03 von 17
+ENTWURF 03 von 22
 ============================================================================================
 
 WAS IST OMNIPRÄSENZ AUF SOCIAL MEDIA UND WIE ERREICHT MAN SIE?
@@ -410,7 +416,7 @@ dich aussieht, stell hier deine Anfrage (nikkimedia.co/personal-brands).
 
 
 ============================================================================================
-ENTWURF 04 von 17
+ENTWURF 04 von 22
 ============================================================================================
 
 WAS IST EINE CLIPPING-ARMEE UND WIE ARBEITET SIE?
@@ -538,7 +544,7 @@ willst, starte deine Kampagne hier (nikkimedia.co/#stepper).
 
 
 ============================================================================================
-ENTWURF 05 von 17
+ENTWURF 05 von 22
 ============================================================================================
 
 WAS IST CPM? KOSTEN PRO 1.000 VIEWS IM CLIPPING ERKLÄRT
@@ -662,7 +668,7 @@ liegt. Wie viel Reichweite dein Budget bringt, siehst du direkt auf der Startsei
 
 
 ============================================================================================
-ENTWURF 06 von 17
+ENTWURF 06 von 22
 ============================================================================================
 
 WARUM BRAUCHT GUTER CONTENT EINE STARKE DISTRIBUTION?
@@ -795,7 +801,7 @@ verteilen). Oder du startest hier deine Kampagne (nikkimedia.co/#stepper).
 
 
 ============================================================================================
-ENTWURF 07 von 17
+ENTWURF 07 von 22
 ============================================================================================
 
 CONTENT DISTRIBUTION: WIE VERTEILT MAN VIDEOS RICHTIG?
@@ -910,7 +916,7 @@ planbare Reichweite. Wenn du die Verteilung abgeben willst, starte hier deine Ka
 
 
 ============================================================================================
-ENTWURF 08 von 17
+ENTWURF 08 von 22
 ============================================================================================
 
 DISTRIBUTION IN MASSE: WIE FUNKTIONIEREN 1.000 CLIPS IM MONAT?
@@ -1027,7 +1033,7 @@ diese Welle für dein Unternehmen willst, stell hier deine Anfrage (nikkimedia.c
 
 
 ============================================================================================
-ENTWURF 09 von 17
+ENTWURF 09 von 22
 ============================================================================================
 
 HINTER DEN KULISSEN: WIE LÄUFT EINE CLIPPING-KAMPAGNE AB?
@@ -1144,7 +1150,7 @@ mit deiner Anfrage (nikkimedia.co/#stepper).
 
 
 ============================================================================================
-ENTWURF 10 von 17
+ENTWURF 10 von 22
 ============================================================================================
 
 DIE EIGENE PROPAGANDA-MASCHINE: WAS STECKT HINTER DEM BEGRIFF?
@@ -1269,7 +1275,7 @@ du deine eigene willst, sprich mit uns (nikkimedia.co/personal-brands).
 
 
 ============================================================================================
-ENTWURF 11 von 17
+ENTWURF 11 von 22
 ============================================================================================
 
 WIE BAUT MAN EINE PR-MASCHINE MIT KURZVIDEOS AUF?
@@ -1393,7 +1399,7 @@ starten willst, stell hier deine Anfrage (nikkimedia.co/#stepper).
 
 
 ============================================================================================
-ENTWURF 12 von 17
+ENTWURF 12 von 22
 ============================================================================================
 
 WIE GEWINNT MAN ANFRAGEN DURCH OMNIPRÄSENZ?
@@ -1514,7 +1520,7 @@ dich aussehen kann, zeigen wir dir im Strategiegespräch, hier geht es zur Anfra
 
 
 ============================================================================================
-ENTWURF 13 von 17
+ENTWURF 13 von 22
 ============================================================================================
 
 WIE VERDIENT MAN ALS CLIPPER GELD? EIN EHRLICHER ÜBERBLICK
@@ -1624,7 +1630,7 @@ ein (nikkimedia.co/clipper).
 
 
 ============================================================================================
-ENTWURF 14 von 17
+ENTWURF 14 von 22
 ============================================================================================
 
 WARUM SOLLTE JEDES UNTERNEHMEN AUF CLIPPING SETZEN?
@@ -1735,7 +1741,7 @@ besetzt das Feld, bevor es andere tun. Starte hier deine Kampagne (nikkimedia.co
 
 
 ============================================================================================
-ENTWURF 15 von 17
+ENTWURF 15 von 22
 ============================================================================================
 
 WAS IST GUTER CONTENT FÜR CLIPPING?
@@ -1851,7 +1857,7 @@ Reichweite. Lass uns gemeinsam auf dein Material schauen, stell hier deine Anfra
 
 
 ============================================================================================
-ENTWURF 16 von 17
+ENTWURF 16 von 22
 ============================================================================================
 
 FÜR WEN IST CLIPPING? EIN NEBENVERDIENST NEBEN DEM JOB
@@ -1968,7 +1974,7 @@ Trag dich hier als Clipper ein (nikkimedia.co/clipper).
 
 
 ============================================================================================
-ENTWURF 17 von 17
+ENTWURF 17 von 22
 ============================================================================================
 
 BRAUCHT MAN VORERFAHRUNG FÜR CLIPPING?
@@ -2082,6 +2088,609 @@ Clipping kann jeder lernen, der Social Media versteht und zuverlässig arbeitet.
 Weitere bekommst du beim Onboarding im Briefing. Wie die Vergütung funktioniert, steht in
 Wie verdient man als Clipper Geld? (nikkimedia.co/fachartikel/geld-verdienen-als-clipper).
 Hier geht es zur Anmeldung als Clipper (nikkimedia.co/clipper).
+
+
+
+============================================================================================
+ENTWURF 18 von 22
+============================================================================================
+
+CASE STUDY DINDROP: WIE ENTSTEHEN ÜBER 100 MIO. ORGANISCHE VIEWS?
+
+Adresse:      nikkimedia.co/fachartikel/case-study-dindrop
+Kurzfassung:  DinDrop verwandelte stundenlanges Archivmaterial in tägliches Clip-Volumen.
+Wie daraus über 100 Mio. organische Views wurden und was du davon lernen kannst.
+Wörter:       639
+--------------------------------------------------------------------------------------------
+
+Kurz gesagt: DinDrop, eine Creator-Brand mit Drops und Content, hatte stundenlanges
+Rohmaterial im Archiv, aus dem nie genug herausgeholt wurde. Unsere Clipper haben daraus ein
+tägliches Volumen an Clips im Hochformat gebaut, jeder mit eigener Hook, eigenem Schnitt und
+eigenem Sound. Ergebnis im Kampagnenzeitraum: über 100 Mio. organische Views, ein einzelnes
+Reel allein mit 35,4 Mio. Views.
+
+
+DIE AUSGANGSLAGE: POTENZIAL IM ARCHIV
+-------------------------------------
+
+Viele Marken sitzen auf einem Schatz, ohne es zu wissen. Bei DinDrop lag das Potenzial in
+stundenlangen Aufnahmen, die einmal produziert und dann kaum genutzt worden waren. Gepostet
+wurde etwa einmal pro Woche. Das Material war stark, aber es erreichte nur einen Bruchteil
+der Menschen, die es hätten sehen können.
+
+Das ist ein typisches Muster: Gutes Material ist vorhanden, aber es fehlt die Kapazität, es
+in viele kurze Clips zu verwandeln und breit zu verteilen. Genau hier setzt Clipping an.
+
+
+DIE STRATEGIE: AUS EINEM DREH WERDEN HUNDERT CLIPS
+--------------------------------------------------
+
+  1. Archiv sichten: Unsere Clipper haben das vorhandene Rohmaterial nach starken Momenten
+     durchsucht.
+  2. Viele Varianten schneiden: Jeder Clip bekam eine eigene Hook, einen eigenen Schnitt und
+     einen eigenen Sound. So entstanden aus einem Dreh viele unterschiedliche Kurzvideos.
+  3. Tägliches Volumen: Statt eines Posts pro Woche liefen dutzende Clips pro Tag.
+  4. Laufend nachsteuern: Trend-Sounds und Formate wurden jede Woche angepasst, damit die
+     Clips aktuell bleiben.
+
+  »  Statt eines Posts pro Woche liefen dutzende Clips pro Tag. Das ist der Unterschied
+     zwischen Content und Distribution.
+
+
+DIE ERGEBNISSE
+--------------
+
+Alle Zahlen beziehen sich auf den Kampagnenzeitraum:
+
+  •  Über 100 Mio. organische Views insgesamt
+  •  35,4 Mio. Views auf einem einzelnen Reel
+  •  11,6 Mio. Views auf einem weiteren Reel
+  •  500.000 Views auf einem dritten Reel aus derselben Kampagne
+
+Die Zahlen zeigen ein typisches Bild im Clipping: Viele Clips erreichen solide Reichweite,
+einige wenige gehen durch die Decke. Genau deshalb braucht es Volumen. Wer nur einen Clip
+pro Woche postet, wartet sehr lange auf seinen Treffer.
+
+
+WARUM ES FUNKTIONIERT HAT
+-------------------------
+
+  •  Starkes Ausgangsmaterial: Clipping verstärkt, was im Material steckt. Bei DinDrop war
+     es reichlich vorhanden. Mehr dazu in Was ist guter Content für Clipping?
+     (nikkimedia.co/fachartikel/guter-content-fuer-clipping)
+  •  Volumen statt Einzeltreffer: Viele Versuche pro Woche erhöhen die Chance auf virale
+     Ausreißer.
+  •  Variation: Unterschiedliche Hooks und Sounds für denselben Moment zeigen schnell,
+     welche Version zündet.
+  •  Aktualität: Wöchentlich angepasste Trend-Sounds halten die Clips anschlussfähig an das,
+     was gerade läuft.
+  •  Omnipräsenz: Wer DinDrop einmal gesehen hat, sah die Marke kurz darauf wieder, in einem
+     anderen Clip, auf einem anderen Account. Mehr zur Hebelwirkung in Was ist Omnipräsenz
+     auf Social Media? (nikkimedia.co/fachartikel/omnipraesenz-social-media)
+
+
+WAS DU AUS DEM FALL DINDROP LERNEN KANNST
+-----------------------------------------
+
+  1. Schau in dein Archiv: Alte Podcasts, Interviews, Event-Aufnahmen und Behind-the-Scenes
+     enthalten oft mehr starke Momente, als du denkst.
+  2. Denk in Serien, nicht in Einzelvideos: Ein Dreh ist der Rohstoff für viele Clips.
+  3. Gib dem Algorithmus viele Chancen: Der virale Treffer lässt sich nicht vorhersagen,
+     aber die Zahl der Versuche lässt sich planen.
+  4. Steuer laufend nach: Was diese Woche funktioniert, ist nächste Woche vielleicht schon
+     wieder alt.
+
+
+HÄUFIGE FRAGEN
+--------------
+
+Funktioniert das auch mit wenig Material?
+
+Ja, solange das Material starke Momente hat. Bei DinDrop war viel Archiv vorhanden, aber
+auch aus einer einzigen Stunde Podcast oder Interview entstehen viele Clips.
+
+Was kostet so eine Kampagne?
+
+Abgerechnet wird nach erreichten Views, bei Nikki Media mit ~5 € pro 1.000 Views. Clips ohne
+Reichweite kosten nichts. Wie viel Reichweite zu deinem Budget passt, zeigt der Views-Regler
+auf der Startseite (nikkimedia.co).
+
+
+FAZIT
+-----
+
+DinDrop zeigt, was in vorhandenem Material steckt, wenn es konsequent geclippt und breit
+verteilt wird. Aus einem Archiv wurden über 100 Mio. organische Views. Alle Case Studies
+findest du auf der Startseite (nikkimedia.co/#case-studies). Wenn du wissen willst, was in
+deinem Material steckt, stell hier deine Anfrage (nikkimedia.co/#stepper).
+
+
+
+============================================================================================
+ENTWURF 19 von 22
+============================================================================================
+
+CASE STUDY MAX TORNOW: WIE WIRD COACHING-CONTENT VIRAL?
+
+Adresse:      nikkimedia.co/fachartikel/case-study-max-tornow
+Kurzfassung:  Max Tornow, Business-Mentor, erreichte über Clipping 70 Mio. organische Views
+auf zwei Accounts. Wie aus langen Interviews Statement-Clips wurden, die verkaufen.
+Wörter:       651
+--------------------------------------------------------------------------------------------
+
+Kurz gesagt: Max Tornow ist Business-Mentor im Info-Business. Sein Content lebt von
+Aussagen, nicht von Bildern. Aus langen Interviews, Calls und Trainings haben unsere Clipper
+die stärksten Passagen herausgeschnitten, untertitelt und als Reels ausgerollt. Ergebnis im
+Kampagnenzeitraum: 70 Mio. organische Views über zwei Accounts.
+
+
+DIE AUSGANGSLAGE: STARKE AUSSAGEN IN LANGEN FORMATEN
+----------------------------------------------------
+
+Coaches, Berater und Mentoren haben fast immer dasselbe Problem: Ihr bester Content steckt
+in langen Formaten. Ein Interview dauert eine Stunde, ein Training einen ganzen Nachmittag,
+ein Call mit Kunden 45 Minuten. Darin fallen Sätze, die Menschen bewegen. Aber auf Social
+Media schaut sich kaum jemand eine Stunde an.
+
+Bei Max Tornow war genau das der Fall. Das Material war voller Statements, die eine
+Business-Zielgruppe ansprechen. Es musste nur in eine Form gebracht werden, die beim
+Scrollen funktioniert.
+
+
+DIE STRATEGIE: TALKING-HEAD-CONTENT, TAUSENDFACH AUSGESPIELT
+------------------------------------------------------------
+
+  1. Long-Form verdichten: Aus langen Interviews, Calls und Trainings wurden die stärksten
+     Passagen herausgeschnitten, jede mit einem klaren Gedanken.
+  2. Untertitel und Retention-Schnitt: Jeder Clip bekam automatische Untertitel und einen
+     Schnitt, der die Zuschauer bis zum Ende hält.
+  3. Accounts vorwärmen: Die Accounts wurden vor dem ersten Post auf die Business- und
+     Online-Business-Nische aufgewärmt. So landeten die Clips bei Menschen, die sich
+     wirklich für das Thema interessieren.
+  4. Zwei Accounts: Die Clips liefen über @max_tornow_business und @max_tornow.
+
+  »  Das Ziel waren nicht irgendwelche Views, sondern genau die Clips, die eine Zielgruppe
+     anziehen, die wirklich kaufbereit ist.
+
+
+DIE ERGEBNISSE
+--------------
+
+Alle Zahlen beziehen sich auf den Kampagnenzeitraum:
+
+  •  70 Mio. organische Views über zwei Accounts
+  •  31,4 Mio. Views auf dem Account @max_tornow_business
+  •  13,1 Mio. Views auf einem einzelnen Reel
+  •  821.000 Views auf einem Reel des zweiten Accounts
+
+
+WARUM ES FUNKTIONIERT HAT
+-------------------------
+
+  •  Aussagen statt Bilder: Ein Talking-Head-Clip braucht keine aufwendige Produktion. Er
+     braucht einen Satz, der hängen bleibt. Mehr dazu in Was ist guter Content für Clipping?
+     (nikkimedia.co/fachartikel/guter-content-fuer-clipping)
+  •  Die richtige Zielgruppe: Durch das Vorwärmen der Accounts liefen die Clips in der
+     Business-Nische statt bei zufälligen Zuschauern.
+  •  Untertitel: Viele schauen ohne Ton. Ohne Untertitel wäre ein großer Teil der Wirkung
+     verloren gegangen.
+  •  Omnipräsenz: Wer sich für Business interessiert, begegnete Max Tornows Aussagen immer
+     wieder, in unterschiedlichen Clips und auf zwei Accounts. Genau so entsteht Autorität.
+     Mehr in Was ist Omnipräsenz auf Social Media? (nikkimedia.co/fachartikel/omnipraesenz-
+     social-media)
+
+
+WAS COACHES UND BERATER DARAUS LERNEN KÖNNEN
+--------------------------------------------
+
+  1. Dein Material ist schon da: Jedes Interview, jeder Podcast und jedes Training ist
+     Rohstoff für Dutzende Clips.
+  2. Ein Clip, ein Gedanke: Die stärksten Clips bringen eine einzige Aussage auf den Punkt.
+  3. Zielgruppe vor Reichweite: Lieber weniger Views von den richtigen Menschen als viele
+     Views von den falschen. Aber mit Clipping bekommst du beides.
+  4. Sichtbarkeit wird zu Anfragen: Wie das funktioniert, steht in Wie gewinnt man Anfragen
+     durch Omnipräsenz? (nikkimedia.co/fachartikel/anfragen-gewinnen-durch-omnipraesenz)
+
+
+FÜR WEN EIGNET SICH DIESE STRATEGIE?
+------------------------------------
+
+  •  Coaches und Mentoren, deren Wissen in langen Calls und Trainings steckt
+  •  Berater und Experten, die in ihrer Branche als Stimme wahrgenommen werden wollen
+  •  Speaker und Autoren mit Vorträgen, Lesungen und Interviews
+  •  Gründer, die als Gesicht ihrer Firma sichtbar werden wollen
+
+Was sie alle brauchen: klare Aussagen, die auch in 30 Sekunden funktionieren.
+
+
+HÄUFIGE FRAGEN
+--------------
+
+Muss ich dafür neue Videos aufnehmen?
+
+Meist nicht. Bei Max Tornow kam das Material aus vorhandenen Interviews, Calls und
+Trainings. Wer neu aufnimmt, sollte auf klare Aussagen und guten Ton achten.
+
+Funktioniert das auch für kleinere Personal Brands?
+
+Ja. Clipping skaliert mit dem Budget, abgerechnet wird nach erreichten Views, bei Nikki
+Media mit ~5 € pro 1.000 Views. Mehr auf Für Personal Brands (nikkimedia.co/personal-
+brands).
+
+
+FAZIT
+-----
+
+Max Tornow zeigt, wie aus langen Gesprächen eine Personal Brand mit 70 Mio. organischen
+Views wird. Entscheidend waren klare Aussagen, die richtige Zielgruppe und konsequente
+Verteilung. Alle Case Studies stehen auf der Startseite (nikkimedia.co/#case-studies). Wenn
+du als Coach oder Berater sichtbar werden willst, starte hier (nikkimedia.co/personal-
+brands).
+
+
+
+============================================================================================
+ENTWURF 20 von 22
+============================================================================================
+
+CASE STUDY CASPIAN BLUE: WIE VERKAUFT MAN KAVIAR MIT KURZVIDEOS?
+
+Adresse:      nikkimedia.co/fachartikel/case-study-caspian-blue-caviar
+Kurzfassung:  Caspian Blue Caviar erreichte über 40 Mio. organische Views. Wie aus Slow-
+Motion-Edits, Serving-Shots und Unboxing-Sequenzen Kino für die Augen wurde.
+Wörter:       622
+--------------------------------------------------------------------------------------------
+
+Kurz gesagt: Kaviar verkauft sich über Textur, Glanz und Inszenierung. Genau das lässt sich
+in Kurzvideos perfekt transportieren. Für Caspian Blue Caviar haben unsere Clipper aus dem
+vorhandenen Rohmaterial der Marke Slow-Motion-Edits, Serving-Shots und Unboxing-Sequenzen
+geschnitten und jede Hook in mehreren Varianten getestet. Ergebnis im Kampagnenzeitraum:
+über 40 Mio. organische Views.
+
+
+DIE AUSGANGSLAGE: EIN LUXUSPRODUKT, DAS NIEMAND SUCHT
+-----------------------------------------------------
+
+Kaviar ist kein Produkt, nach dem Menschen jeden Tag suchen. Kaum jemand tippt morgens
+„Kaviar kaufen“ in die Suchleiste. Für Luxus-Delikatessen heißt das: Die Nachfrage muss erst
+geweckt werden. Und dafür braucht es Bilder, die Lust machen.
+
+Caspian Blue Caviar hatte genau dieses Material: hochwertige Aufnahmen des Produkts, der
+Verpackung und des Servierens. Es fehlte die Verwandlung in Kurzvideos, die beim Scrollen
+stoppen lassen, und die Verbreitung bei den richtigen Menschen.
+
+
+DIE STRATEGIE: KAVIAR ALS KINO FÜR DIE AUGEN
+--------------------------------------------
+
+  1. ASMR und Slow Motion: Aus vorhandenem Material entstanden Edits, die Textur und Glanz
+     in Zeitlupe zeigen. Diese Clips wirken fast hypnotisch.
+  2. Serving-Shots: Der Moment, in dem der Kaviar auf den Löffel kommt, ist der Moment, in
+     dem der Zuschauer Appetit bekommt.
+  3. Unboxing-Sequenzen: Das Öffnen der Dose als kleines Ritual. Luxus lebt von
+     Inszenierung.
+  4. Hook-Testing: Jeder Clip wurde in mehreren Varianten mit unterschiedlichen Einstiegen
+     veröffentlicht. So zeigte sich schnell, welche ersten Sekunden am stärksten wirken.
+
+  »  Luxus verkauft sich nicht über Argumente, sondern über Bilder, die man nicht vergisst.
+
+
+DIE ERGEBNISSE
+--------------
+
+Alle Zahlen beziehen sich auf den Kampagnenzeitraum:
+
+  •  Über 40 Mio. organische Views insgesamt
+  •  6,4 Mio. Views auf einem einzelnen Reel
+  •  475.000 Views auf einem weiteren Reel
+
+Für eine Nische wie Luxus-Delikatessen ist das eine außergewöhnliche Reichweite.
+
+
+WARUM ES FUNKTIONIERT HAT
+-------------------------
+
+  •  Visuell starkes Material: Clipping verstärkt, was im Material steckt. Bei Caspian Blue
+     waren es Bilder mit echter Sogwirkung. Mehr in Was ist guter Content für Clipping?
+     (nikkimedia.co/fachartikel/guter-content-fuer-clipping)
+  •  Sinneseindruck statt Werbesprache: ASMR, Zeitlupe und Nahaufnahmen erzeugen ein Gefühl,
+     das ein Werbetext nie erreicht.
+  •  Systematisches Testen: Mehrere Hook-Varianten pro Clip machen aus Bauchgefühl messbares
+     Wissen.
+  •  Wiederholung: Wer einmal einen Clip gesehen hat, sah kurz darauf den nächsten. So wurde
+     aus Neugier Wiedererkennung. Mehr dazu in Was ist Omnipräsenz auf Social Media?
+     (nikkimedia.co/fachartikel/omnipraesenz-social-media)
+
+
+WAS FOOD- UND LUXUSMARKEN DARAUS LERNEN KÖNNEN
+----------------------------------------------
+
+  1. Zeig, was man fühlen soll: Textur, Glanz, Bewegung. Bei Food und Luxus ist das Bild die
+     Botschaft.
+  2. Das Ritual ist der Content: Auspacken, Anrichten, Servieren. Diese Momente sind Gold
+     für Kurzvideos.
+  3. Teste die ersten Sekunden: Derselbe Clip mit drei verschiedenen Einstiegen kann völlig
+     unterschiedlich laufen.
+  4. Wecke Nachfrage, statt auf sie zu warten: Organische Reichweite erreicht Menschen, die
+     noch gar nicht wussten, dass sie dein Produkt wollen.
+
+
+FÜR WEN EIGNET SICH DIESE STRATEGIE?
+------------------------------------
+
+  •  Luxus- und Premium-Food, etwa Delikatessen, Wein, Spirituosen oder Feinkost
+  •  Fine-Dining-Restaurants, die ihr Erlebnis zeigen wollen
+  •  Manufakturen, deren Handwerk im Detail sichtbar wird
+  •  Online-Shops mit hochwertigen Produkten, die man in Nahaufnahme zeigen kann
+
+Der gemeinsame Nenner: ein Produkt, das in Zeitlupe und Nahaufnahme noch besser aussieht.
+
+
+HÄUFIGE FRAGEN
+--------------
+
+Brauche ich dafür eine teure Produktion?
+
+Nicht zwingend. Bei Caspian Blue wurde vorhandenes Material der Marke verwendet. Wichtig
+ist, dass die Aufnahmen das Produkt in guter Qualität zeigen, vor allem in Nahaufnahme.
+
+Funktioniert das auch für andere Produkte?
+
+Ja, für alles, was sich zeigen lässt: Food, Kosmetik, Mode, Uhren, Möbel. Abgerechnet wird
+nach erreichten Views, bei Nikki Media mit ~5 € pro 1.000 Views.
+
+
+FAZIT
+-----
+
+Caspian Blue Caviar zeigt, wie ein Luxusprodukt über Kurzvideos ein Millionenpublikum
+erreicht: mit starken Bildern, getesteten Hooks und breiter Verteilung. Alle Case Studies
+stehen auf der Startseite (nikkimedia.co/#case-studies). Wenn dein Produkt gesehen werden
+soll, starte hier deine Anfrage (nikkimedia.co/#stepper).
+
+
+
+============================================================================================
+ENTWURF 21 von 22
+============================================================================================
+
+CASE STUDY LEVANTINE ISTANBUL: WIE WÄCHST EIN RESTAURANT?
+
+Adresse:      nikkimedia.co/fachartikel/case-study-levantine-istanbul
+Kurzfassung:  Die Levantine Fire Cuisine Bar wuchs mit Clipping von 0 auf 70.000 Follower
+bei 3 Mio. Views. Wie Food-Clips Appetit machen und was Gastronomen lernen.
+Wörter:       650
+--------------------------------------------------------------------------------------------
+
+Kurz gesagt: Ein Restaurant lebt davon, gesehen zu werden. Für die Levantine Fire Cuisine
+Bar in Istanbul haben unsere Clipper aus Küchen- und Grill-Aufnahmen Clips gebaut, die genau
+das auslösen, was Gastronomie braucht: Appetit. Flammen, Anschnitt, Servier-Moment, kurz
+geschnitten und über Food-Accounts breit ausgerollt. Ergebnis im Kampagnenzeitraum: von 0
+auf 70.000 Follower, insgesamt 3 Mio. Views.
+
+
+DIE AUSGANGSLAGE: EIN RESTAURANT OHNE SOCIAL-MEDIA-PRÄSENZ
+----------------------------------------------------------
+
+Die Levantine Fire Cuisine Bar startete auf Instagram bei null. Für Restaurants ist das ein
+häufiges Bild: Küche und Erlebnis sind stark, aber online ist davon kaum etwas zu sehen.
+Dabei entscheiden heute viele Gäste über Instagram und TikTok, wo sie essen gehen.
+
+Was vorhanden war: Aufnahmen aus der Küche und vom Grill. Feuer, Fleisch, Bewegung. Genau
+das Material, aus dem Food-Clips entstehen, die man nicht wegwischt.
+
+
+DIE STRATEGIE: FEUER, FLEISCH UND APPETIT
+-----------------------------------------
+
+  1. Food-Cinematics aus vorhandenem Material: Aus Küchen-Aufnahmen wurden kurze, intensive
+     Clips. Flammen, der Anschnitt, der Moment des Servierens.
+  2. Kurz und laut: Die Clips sind schnell geschnitten und leben vom Sound des Grills.
+  3. Food-Accounts: Die Clips wurden über Accounts ausgerollt, die Food-Content zeigen, also
+     genau dort, wo Menschen nach Restaurants und Gerichten suchen.
+  4. Geo-Targeting: Ein Teil der Ausspielung zielte auf Menschen in Reichweite des Lokals.
+  5. Reservierungs-Hinweis: In Caption und Profil stand klar, wie man einen Tisch
+     reserviert.
+
+  »  Ein Restaurant braucht keine Werbung, die erklärt, wie gut das Essen ist. Es braucht
+     Bilder, die Hunger machen.
+
+
+DIE ERGEBNISSE
+--------------
+
+Alle Zahlen beziehen sich auf den Kampagnenzeitraum:
+
+  •  Von 0 auf 70.000 Follower auf Instagram
+  •  3 Mio. organische Views insgesamt
+
+Für ein einzelnes Restaurant ist das eine Reichweite, die mit lokaler Werbung kaum zu
+erreichen wäre. 70.000 Menschen haben entschieden, dem Lokal zu folgen, und sehen damit
+jeden neuen Clip.
+
+
+WARUM ES FUNKTIONIERT HAT
+-------------------------
+
+  •  Starkes visuelles Material: Feuer und Grill sind von Natur aus spannend. Clipping
+     verstärkt, was im Material steckt. Mehr in Was ist guter Content für Clipping?
+     (nikkimedia.co/fachartikel/guter-content-fuer-clipping)
+  •  Emotion statt Information: Appetit entsteht nicht durch eine Speisekarte, sondern durch
+     den Moment, in dem das Fleisch angeschnitten wird.
+  •  Die richtigen Accounts: Food-Accounts erreichen Menschen, die sich für Essen
+     interessieren.
+  •  Ein klarer nächster Schritt: Der Reservierungs-Hinweis in Caption und Profil macht aus
+     Zuschauern potenzielle Gäste. Mehr dazu in Wie gewinnt man Anfragen durch Omnipräsenz?
+     (nikkimedia.co/fachartikel/anfragen-gewinnen-durch-omnipraesenz)
+
+
+WAS GASTRONOMEN DARAUS LERNEN KÖNNEN
+------------------------------------
+
+  1. Film deine Küche: Der spannendste Ort deines Restaurants ist oft der, den Gäste nie
+     sehen.
+  2. Zeig Momente, nicht Menüs: Flammen, Anschnitt, Servieren, das erste Glas.
+  3. Denk lokal: Reichweite in der Nähe deines Lokals ist mehr wert als Reichweite am
+     anderen Ende der Welt.
+  4. Mach den nächsten Schritt einfach: Reservierungslink ins Profil, kurzer Hinweis in jede
+     Caption.
+
+
+FÜR WEN EIGNET SICH DIESE STRATEGIE?
+------------------------------------
+
+  •  Restaurants, Bars und Cafés, die in ihrer Stadt bekannter werden wollen
+  •  Hotels und Event-Locations mit einem Erlebnis, das sich zeigen lässt
+  •  Food-Marken und Lieferdienste, deren Produkt im Bild überzeugt
+  •  Gastronomie-Gruppen, die mehrere Standorte gleichzeitig sichtbar machen wollen
+
+Entscheidend ist immer: Es braucht Momente, die Appetit machen. Wo sie fehlen, helfen wir
+mit Content-Vorgaben für den nächsten Dreh.
+
+
+HÄUFIGE FRAGEN
+--------------
+
+Funktioniert das auch für Restaurants im DACH-Raum?
+
+Ja. Das Prinzip ist überall dasselbe: starke Bilder aus der Küche, breite Verteilung über
+Food-Accounts, Fokus auf die Region. Für DACH-Kunden posten Clipper aus Deutschland,
+Österreich und der Schweiz.
+
+Was kostet das für ein Restaurant?
+
+Abgerechnet wird nach erreichten Views, bei Nikki Media mit ~5 € pro 1.000 Views. Wie viel
+Reichweite zu deinem Budget passt, zeigt der Views-Regler auf der Startseite
+(nikkimedia.co).
+
+
+FAZIT
+-----
+
+Levantine Istanbul zeigt, wie ein Restaurant ohne Social-Media-Präsenz in kurzer Zeit eine
+große Community aufbaut: mit Food-Cinematics, den richtigen Accounts und einem klaren Weg
+zur Reservierung. Alle Case Studies stehen auf der Startseite (nikkimedia.co/#case-studies).
+Starte hier deine Anfrage (nikkimedia.co/#stepper).
+
+
+
+============================================================================================
+ENTWURF 22 von 22
+============================================================================================
+
+CASE STUDY PANPERIUM: WIE WERDEN PRODUKTVIDEOS NICHT WEGGEWISCHT?
+
+Adresse:      nikkimedia.co/fachartikel/case-study-panperium
+Kurzfassung:  Für die Luxury-Lifestyle-Marke Panperium wurde jeder Clip auf die ersten 1,5
+Sekunden gebaut. Wie Hook-first-Schnitt und Loops rund 450.000 Views brachten.
+Wörter:       610
+--------------------------------------------------------------------------------------------
+
+Kurz gesagt: Produkte verkaufen sich in Kurzvideos über die ersten 1,5 Sekunden. Für die
+Luxury-Lifestyle- und Trading-Marke Panperium haben unsere Clipper jeden Clip auf die Hook
+hin gebaut: harter Einstieg, klarer Fokus aufs Produkt, sauberer Loop am Ende. Dazu ein Netz
+aus Accounts in derselben Nische, damit die Zielgruppe die Marke immer wieder sieht.
+Ergebnis im Kampagnenzeitraum: rund 450.000 Views.
+
+
+DIE AUSGANGSLAGE: EIN JUNGER ACCOUNT IM LUXUSSEGMENT
+----------------------------------------------------
+
+Panperium ist eine Marke im Bereich Luxury Lifestyle und Trading. Der Instagram-Account der
+Marke hatte erst wenige Reels. Für eine Marke in diesem Segment ist das eine typische
+Startsituation: Das Produkt ist da, die Positionierung ist klar, aber die Bekanntheit fehlt.
+
+Die Herausforderung bei Produktvideos: Die meisten werden innerhalb von Sekundenbruchteilen
+weggewischt. Zuschauer erkennen Werbung sofort und scrollen weiter.
+
+
+DIE STRATEGIE: HOOK FIRST
+-------------------------
+
+  1. Hook-first-Schnitt: Jeder Clip beginnt mit dem stärksten Moment. Kein Logo, keine
+     Einleitung, sofort das Produkt.
+  2. Klarer Fokus: Ein Produkt, ein Gedanke pro Clip. Nichts lenkt ab.
+  3. Loop-Endings: Das Ende des Clips geht nahtlos in den Anfang über. Viele Zuschauer
+     schauen so ein zweites Mal, ohne es zu merken. Das erhöht die Wiedergaberate. Für den
+     Algorithmus ist eine hohe Wiedergaberate ein starkes Signal, dass ein Clip sehenswert
+     ist.
+  4. Ein Netz aus Accounts in derselben Nische: Die Clips liefen über mehrere Accounts, die
+     dieselbe Zielgruppe bespielen.
+
+  »  Die ersten 1,5 Sekunden entscheiden, ob ein Produktvideo gesehen oder weggewischt wird.
+
+
+DIE ERGEBNISSE
+--------------
+
+Alle Zahlen beziehen sich auf den Kampagnenzeitraum:
+
+  •  Rund 450.000 organische Views
+  •  Ein Netz aus Accounts in derselben Nische, damit die Zielgruppe die Marke immer wieder
+     sieht
+
+Für einen Account mit wenigen eigenen Reels ist das ein solider Start. Vor allem zeigt der
+Fall, wie man Produktvideos so baut, dass sie überhaupt eine Chance haben.
+
+
+WARUM OMNIPRÄSENZ HIER DER SCHLÜSSEL WAR
+----------------------------------------
+
+Neben der Hook war die Wiederholung entscheidend. Die Zielgruppe sollte die Marke nicht
+einmal sehen, sondern immer wieder, auf verschiedenen Accounts, in verschiedenen Clips. Erst
+die Wiederholung macht aus einer unbekannten Marke eine vertraute. Wie diese Hebelwirkung
+funktioniert, erklärt Was ist Omnipräsenz auf Social Media?
+(nikkimedia.co/fachartikel/omnipraesenz-social-media)
+
+
+WAS PRODUKTMARKEN DARAUS LERNEN KÖNNEN
+--------------------------------------
+
+  1. Streich die Einleitung: Logo, Begrüßung und Erklärung kommen, wenn überhaupt, später.
+  2. Zeig das Produkt sofort: Die erste Sekunde gehört dem stärksten Bild.
+  3. Bau Loops: Ein sauberer Übergang vom Ende zum Anfang verlängert die Wiedergabezeit.
+  4. Denk in Wiederholungen: Bekanntheit entsteht durch viele Begegnungen, nicht durch einen
+     einzigen Clip.
+  5. Bleib in deiner Nische: Lieber eine klar umrissene Zielgruppe oft erreichen als viele
+     Menschen einmal.
+
+
+FÜR WEN EIGNET SICH DIESE STRATEGIE?
+------------------------------------
+
+  •  Produktmarken aus Mode, Uhren, Schmuck, Kosmetik oder Lifestyle
+  •  E-Commerce-Shops, deren Produkte im Video überzeugen
+  •  Neue Marken, die in einer Nische schnell wiedererkannt werden wollen
+  •  Agenturen, die für Produktkunden Reichweite liefern, siehe Für Agenturen
+     (nikkimedia.co/agenturen)
+
+Voraussetzung ist ein Produkt, das man gern ansieht, und Aufnahmen, die es in guter Qualität
+zeigen.
+
+
+HÄUFIGE FRAGEN
+--------------
+
+Warum hat Panperium weniger Views als andere Case Studies?
+
+Jede Kampagne hat ein eigenes Budget und einen eigenen Zeitraum. Alle Zahlen auf unserer
+Seite beziehen sich auf den jeweiligen Kampagnenzeitraum und sind deshalb nicht direkt
+vergleichbar.
+
+Lässt sich das skalieren?
+
+Ja. Die Reichweite wächst mit dem Budget. Abgerechnet wird nach erreichten Views, bei Nikki
+Media mit ~5 € pro 1.000 Views.
+
+
+FAZIT
+-----
+
+Panperium zeigt, wie man Produktvideos baut, die nicht weggewischt werden: Hook first,
+klarer Fokus, Loop am Ende und ein Netz aus Accounts für Omnipräsenz in der Nische. Alle
+Case Studies stehen auf der Startseite (nikkimedia.co/#case-studies). Wenn dein Produkt
+gesehen werden soll, starte hier deine Anfrage (nikkimedia.co/#stepper).
+
 
 
 ============================================================================================

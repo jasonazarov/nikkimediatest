@@ -1,6 +1,6 @@
 # Fachartikel: Entwürfe und Themenplan (Stand November 2026)
 
-17 Entwürfe, NICHT veröffentlicht und NICHT eingespielt. Eingespielt wird nur mit ausdrücklicher Freigabe
+22 Entwürfe (davon 5 Case Studies zu den Use Cases der Startseite), NICHT veröffentlicht und NICHT eingespielt. Eingespielt wird nur mit ausdrücklicher Freigabe
 des Auftraggebers. Jeder Entwurf besteht den SEO/GEO-Check im Admin-Editor (Titel 30–65 Zeichen als Frage,
 Kurzfassung 110–165 Zeichen, mind. 600 Wörter, mind. zwei „## “, Zahlen, interner Link, Liste/Merksatz).
 Keine langen Gedankenstriche im Text.
@@ -13,6 +13,9 @@ Keine langen Gedankenstriche im Text.
 - Clipper brauchen keine Vorerfahrung, sie werden beim Onboarding gebrieft.
 
 **Import (unveröffentlicht, nur nach Freigabe):** `node scripts/fachartikel-import.mjs` (live) bzw. `--local` (Vorschau).
+
+**Case Studies (18–22):** nur Fakten aus den Case Studies der Startseite und den vom Auftraggeber genannten
+Reel-Zahlen; keine Laufzeiten, Umsätze oder Reservierungen. Alle Zahlen „im Kampagnenzeitraum“.
 
 **Bitte vor dem Veröffentlichen prüfen:** Werbekennzeichnung (04), Steuer- und Arbeitsvertragshinweis (13, 16),
 „rund 100 Mio. Menschen im DACH-Raum“ (14), Zeitangabe „ein bis zwei Stunden am Tag“ aus Marktquellen (16, 17).
@@ -38,6 +41,11 @@ Keine langen Gedankenstriche im Text.
 | 15 | guter Content | Was ist guter Content für Clipping? | /fachartikel/guter-content-fuer-clipping |
 | 16 | Clipping Nebenverdienst | Für wen ist Clipping? Ein Nebenverdienst neben dem Job | /fachartikel/clipping-nebenverdienst-neben-dem-job |
 | 17 | Clipping ohne Erfahrung | Braucht man Vorerfahrung für Clipping? | /fachartikel/clipping-ohne-vorerfahrung |
+| 18 | Use Case DinDrop | Case Study DinDrop: Wie entstehen über 100 Mio. organische Views? | /fachartikel/case-study-dindrop |
+| 19 | Use Case Max Tornow | Case Study Max Tornow: Wie wird Coaching-Content viral? | /fachartikel/case-study-max-tornow |
+| 20 | Use Case Caspian Blue Caviar | Case Study Caspian Blue: Wie verkauft man Kaviar mit Kurzvideos? | /fachartikel/case-study-caspian-blue-caviar |
+| 21 | Use Case Levantine Istanbul | Case Study Levantine Istanbul: Wie wächst ein Restaurant? | /fachartikel/case-study-levantine-istanbul |
+| 22 | Use Case Panperium | Case Study Panperium: Wie werden Produktvideos nicht weggewischt? | /fachartikel/case-study-panperium |
 
 ## Themenplan: weitere Artikel je Leitbegriff
 
