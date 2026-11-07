@@ -180,7 +180,7 @@ export const FAQ: FaqEntry[] = [
   {
     id: 'investieren',
     q: 'Kann ich in NIKKI MEDIA investieren?',
-    a: 'Gespräche mit Investoren führt Jason Azarov persönlich. Trag dich über das Formular auf nikkimedia.co/investoren ein, dann bekommst du einen Termin. Unterlagen gibt es erst nach dem Erstgespräch und einer Vertraulichkeitsvereinbarung.',
+    a: 'Gespräche mit Investoren führt Jason Azarov persönlich. Unterlagen gibt es erst nach einem Erstgespräch und einer Vertraulichkeitsvereinbarung.',
     keys: ['investieren', 'investor', 'investoren', 'beteiligung', 'anteile', 'einsteigen', 'kapital', 'finanzierung', 'runde', 'pitch', 'deck', 'bewertung'],
     on: ['investoren'],
   },

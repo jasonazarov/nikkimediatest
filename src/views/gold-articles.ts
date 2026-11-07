@@ -211,7 +211,7 @@ ${goldHeadLinks()}
 ${ldGraph(ORGANIZATION, breadcrumbs(o.crumbs), ...o.ld)}
 </head>
 <body class="gold">
-${goldNav(null, 'Kampagne anfragen', '/personal-brands#start')}
+${goldNav(null, 'Kampagne anfragen', '/#stepper')}
 <main id="inhalt">
 ${o.body}
 </main>
@@ -242,11 +242,12 @@ const articleCta = `
     <aside class="g-cta-box" aria-label="Mit Nikki Media starten">
       <p class="g-cta-box__eyebrow">Nikki Media</p>
       <p class="g-cta-box__title">Reichweite, die du nur nach echten Views bezahlst.</p>
-      <p class="g-cta-box__text">Über 5.000 Clipper im DACH-Raum. Richtwert: 1 Mio. organische Views für 5.000 €.</p>
+      <p class="g-cta-box__text">Über 5.000 Clipper im DACH-Raum. Abgerechnet nach echten Views: ~5 € pro 1.000 Views.</p>
       <div class="g-cta-box__row">
-        <a class="g-btn g-btn--gold g-btn--sm" href="/personal-brands#start">Kampagne anfragen</a>
-        <a class="g-btn g-btn--sm g-btn--line" href="/agenturen">Für Agenturen</a>
-        <a class="g-btn g-btn--sm g-btn--line" href="/clipper">Clipper werden</a>
+        <a class="g-btn g-btn--gold g-btn--sm" href="/#stepper">Kampagne anfragen</a>
+        <a class="g-btn g-btn--sm g-btn--line" href="/brands#stepper">Für Agenturen</a>
+        <a class="g-btn g-btn--sm g-btn--line" href="/clipper#stepper">Clipper werden</a>
+        <a class="g-btn g-btn--sm g-btn--line" href="/creator#stepper">Creator werden</a>
       </div>
     </aside>`
 
@@ -410,11 +411,10 @@ export function llmsTxt(articles: Article[]): string {
 ## Marktplatz: vier Seiten
 
 - Auftraggeber und Marken buchen Reichweite: ${SITE}/
-- Agenturen bringen ihre Kunden und behalten ihre Marge: ${SITE}/agenturen
-- Personal Brands werden omnipräsent: ${SITE}/personal-brands
+- Agenturen bringen ihre Kunden und behalten ihre Marge: ${SITE}/brands
+- Personal Brands werden omnipräsent: ${SITE}/
 - Clipper verdienen pro 1.000 Views: ${SITE}/clipper
 - Creator verbreiten Kampagnen oder lassen eigenes Material clippen: ${SITE}/creator
-- Investoren: ${SITE}/investoren
 
 ## Fachartikel
 ${articles.length ? articles.map((a) => `\n- [${a.title}](${articleUrl(a)}): ${a.excerpt}`).join('') : '\n- Noch keine Fachartikel veröffentlicht.'}

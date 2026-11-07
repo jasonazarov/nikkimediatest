@@ -48,9 +48,9 @@ Alle Zahlen stehen in den [Case Studies](/#case-studies).
 
 ## Für wen sich das besonders lohnt
 
-- **Personal Brands und Experten**, die als Nummer eins ihres Themas wahrgenommen werden wollen, siehe [Für Personal Brands](/personal-brands)
+- **Personal Brands und Experten**, die als Nummer eins ihres Themas wahrgenommen werden wollen, siehe [Kampagne starten](/#stepper)
 - **Unternehmen** mit einem Produkt oder Erlebnis, das sich zeigen lässt
-- **Agenturen**, die ihren Kunden diese Position verschaffen wollen, siehe [Für Agenturen](/agenturen)
+- **Agenturen**, die ihren Kunden diese Position verschaffen wollen, siehe [Formular für Agenturen](/brands#stepper)
 
 ## Fazit
 

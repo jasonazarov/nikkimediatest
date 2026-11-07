@@ -65,4 +65,4 @@ Nein. Schnitt, Accounts und Verteilung übernimmt das Netzwerk aus über 5.000 C
 
 ## Fazit
 
-Eine Propaganda-Maschine im Marketing ist nichts anderes als konsequente Distribution deiner echten Botschaft. Richtig aufgesetzt bringt sie Sichtbarkeit, Vertrauen und Anfragen. Wenn du deine eigene willst, [sprich mit uns](/personal-brands).
+Eine Propaganda-Maschine im Marketing ist nichts anderes als konsequente Distribution deiner echten Botschaft. Richtig aufgesetzt bringt sie Sichtbarkeit, Vertrauen und Anfragen. Wenn du deine eigene willst, [sprich mit uns](/#stepper).

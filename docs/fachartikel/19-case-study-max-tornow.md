@@ -62,8 +62,8 @@ Meist nicht. Bei Max Tornow kam das Material aus vorhandenen Interviews, Calls u
 
 ### Funktioniert das auch für kleinere Personal Brands?
 
-Ja. Clipping skaliert mit dem Budget, abgerechnet wird nach erreichten Views, bei Nikki Media mit ~5 € pro 1.000 Views. Mehr auf [Für Personal Brands](/personal-brands).
+Ja. Clipping skaliert mit dem Budget, abgerechnet wird nach erreichten Views, bei Nikki Media mit ~5 € pro 1.000 Views. [Hier geht es zur Anfrage](/#stepper).
 
 ## Fazit
 
-Max Tornow zeigt, wie aus langen Gesprächen eine Personal Brand mit 70 Mio. organischen Views wird. Entscheidend waren klare Aussagen, die richtige Zielgruppe und konsequente Verteilung. Alle Case Studies stehen auf der [Startseite](/#case-studies). Wenn du als Coach oder Berater sichtbar werden willst, [starte hier](/personal-brands).
+Max Tornow zeigt, wie aus langen Gesprächen eine Personal Brand mit 70 Mio. organischen Views wird. Entscheidend waren klare Aussagen, die richtige Zielgruppe und konsequente Verteilung. Alle Case Studies stehen auf der [Startseite](/#case-studies). Wenn du als Coach oder Berater sichtbar werden willst, [starte hier](/#stepper).

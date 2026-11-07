@@ -33,7 +33,7 @@ In Branchenvergleichen werden die CPMs von Paid Social, also bezahlten Anzeigen 
 
 ## Was dein Budget bringt
 
-Bei ~5 € pro 1.000 Views wächst die Reichweite direkt mit dem Budget: doppeltes Budget, doppelte Views. Auf [nikkimedia.co](/) rechnet der Views-Regler jede Reichweite sofort durch, von 1 bis 50 Mio. Views.
+Bei ~5 € pro 1.000 Views wächst die Reichweite direkt mit dem Budget: doppeltes Budget, doppelte Views. Welche Reichweite zu deinem Budget passt, rechnen wir im Strategiegespräch mit dir durch: [Kampagne anfragen](/#stepper).
 
 ## Was im CPM enthalten sein sollte
 
@@ -53,7 +53,7 @@ Ein CPM, der weit unter dem Markt liegt, ist oft ein Warnsignal. Gekaufte Views,
 
 ## CPM für Agenturen
 
-Agenturen kaufen Reichweite bei uns zu ~5 € pro 1.000 Views ein und verkaufen sie mit eigener Marge an ihre Kunden weiter. Die Marge legt ihr selbst fest. Mehr auf [Für Agenturen](/agenturen).
+Agenturen kaufen Reichweite bei uns zu ~5 € pro 1.000 Views ein und verkaufen sie mit eigener Marge an ihre Kunden weiter. Die Marge legt ihr selbst fest. Zum [Formular für Agenturen](/brands#stepper).
 
 ## Häufige Fragen zum CPM
 
@@ -67,4 +67,4 @@ Bei Werbung bezahlst du die Plattform dafür, dass sie deine Anzeige einblendet.
 
 ## Fazit
 
-Der CPM macht Reichweite vergleichbar und planbar. Im Clipping bezahlst du für Views, die wirklich passiert sind, zu einem Preis, der deutlich unter vielen Paid-Social-Kampagnen liegt. Wie viel Reichweite dein Budget bringt, siehst du direkt auf der [Startseite](/).
+Der CPM macht Reichweite vergleichbar und planbar. Im Clipping bezahlst du für Views, die wirklich passiert sind, zu einem Preis, der deutlich unter vielen Paid-Social-Kampagnen liegt. Wie viel Reichweite dein Budget bringt, rechnen wir im Strategiegespräch mit dir durch: [Kampagne anfragen](/#stepper).

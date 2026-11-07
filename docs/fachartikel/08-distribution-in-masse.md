@@ -57,7 +57,7 @@ Unsere größten Ergebnisse sind durch Masse entstanden: DinDrop über 100 Mio. 
 - **Personal Brands**, die schnell Bekanntheit in ihrer Nische wollen
 - **Unternehmen** mit Produkten, die gezeigt werden können
 - **Musik, Podcasts und Events** mit viel Material
-- **Agenturen**, die ihren Kunden große Reichweite liefern wollen, siehe [Für Agenturen](/agenturen)
+- **Agenturen**, die ihren Kunden große Reichweite liefern wollen, siehe [Formular für Agenturen](/brands#stepper)
 
 ## Fazit
 

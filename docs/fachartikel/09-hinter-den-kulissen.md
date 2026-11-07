@@ -28,7 +28,7 @@ Jetzt beginnt die Arbeit, die du als Kunde kaum siehst:
 
 1. **Team zuordnen:** Unser Team wählt aus dem Netzwerk von über 5.000 Cuttern und Creatorn die passenden Clipper für deine Nische aus.
 2. **Briefing:** Die Clipper bekommen deine Vorgaben zu Tonalität, Themen und Tabus.
-3. **Accounts aufwärmen:** Jeder neue Account wird vor dem ersten Post zwei bis drei Tage in deiner Nische aufgewärmt. Die Clipper schauen, liken und folgen gezielt Inhalten deiner Zielgruppe, bis ihre For-You-Page so aussieht wie die deiner Wunschkunden. Wir nennen das Algorithmus-Triggering.
+3. **Accounts aufwärmen:** Jeder neue Account wird vor dem ersten Post sieben Tage lang in deiner Nische aufgewärmt. Das ist nötig, damit der Algorithmus erkennt, dass ein Mensch den Account betreibt und kein Bot. Die Clipper schauen, liken und folgen gezielt Inhalten deiner Zielgruppe, bis ihre For-You-Page so aussieht wie die deiner Wunschkunden. Wir nennen das Algorithmus-Triggering.
 4. **Rohmaterial sichten:** Aus deinem Material werden die stärksten Momente ausgewählt.
 
 > Das Aufwärmen ist der Schritt, den die meisten auslassen, und der Grund, warum ihre Clips in der falschen Zielgruppe landen.

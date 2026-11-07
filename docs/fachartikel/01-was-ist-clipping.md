@@ -19,7 +19,7 @@ Wichtig für die Suche: **Content Clipping** hat nichts mit Presse-Clipping zu t
 
 1. **Rohmaterial:** Du lieferst vorhandenes Material, zum Beispiel einen Podcast, ein YouTube-Video oder Aufnahmen von einem Event. Ein Cloud-Link reicht.
 2. **Schnitt:** Clipper schneiden daraus Kurzvideos im 9:16-Format, mit Hook, Untertiteln und Tempo, wie es auf TikTok und Reels funktioniert.
-3. **Aufwärmen:** Neue Accounts werden vor dem ersten Post in deiner Nische aufgewärmt, bis ihre For-You-Page so aussieht wie die deiner Wunschkunden.
+3. **Aufwärmen:** Neue Accounts werden vor dem ersten Post sieben Tage lang in deiner Nische aufgewärmt. So sieht ihre For-You-Page aus wie die deiner Wunschkunden, und der Algorithmus erkennt, dass ein Mensch den Account betreibt und kein Bot.
 4. **Posten:** Die Clips gehen über viele Accounts parallel raus, auf Instagram, TikTok, YouTube Shorts und Facebook Reels.
 5. **Messen und skalieren:** Was funktioniert, wird öfter variiert. Was nicht funktioniert, fliegt raus. Bezahlt wird nur echte Reichweite.
 
@@ -33,9 +33,9 @@ Clipping bringt nicht nur Views. Weil deine Clips über viele Accounts gleichzei
 
 Clipping funktioniert überall dort, wo eine Person, ein Produkt oder eine Idee Aufmerksamkeit verdient, aber zu wenige Menschen davon wissen:
 
-- **Personal Brands:** Coaches, Unternehmer, Experten und Speaker, die ein Gesicht und eine Meinung haben. Mehr dazu auf [Für Personal Brands](/personal-brands).
+- **Personal Brands:** Coaches, Unternehmer, Experten und Speaker, die ein Gesicht und eine Meinung haben. Direkt zur Anfrage: [Kampagne starten](/#stepper).
 - **Unternehmen:** Gastronomie, E-Commerce, Immobilien, Beauty oder B2B. Entscheidend ist nicht die Branche, sondern ob sich der Content clippen lässt: klare Aussagen, starke Momente, echte Persönlichkeit. Mehr dazu in [Was ist guter Content für Clipping?](/fachartikel/guter-content-fuer-clipping)
-- **Agenturen:** Social-Media- und Marketingagenturen, die ihren Kunden Reichweite verkaufen, ohne selbst ein Netzwerk aus Clippern aufzubauen. Siehe [Für Agenturen](/agenturen).
+- **Agenturen:** Social-Media- und Marketingagenturen, die ihren Kunden Reichweite verkaufen, ohne selbst ein Netzwerk aus Clippern aufzubauen. Hier geht es zum [Formular für Agenturen](/brands#stepper).
 - **Musik, Podcasts und Streams:** Formate mit viel Material und vielen starken Momenten.
 
 ## Was bringt Clipping in Zahlen?

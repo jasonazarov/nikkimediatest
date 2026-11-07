@@ -10,7 +10,15 @@ Keine langen Gedankenstriche im Text.
 - Verdienst der Clipper nie beziffern: Gute Clipper sind am Erfolg der Kampagnen beteiligt, die Nikki Media gewinnt.
 - Omnipräsenz ist genauso wichtig wie Reichweite: Begriff und Hebelwirkung erklären.
 - Schlechter Content ist nicht clipbar: Kein Artikel darf behaupten, Distribution ersetze guten Content.
-- Clipper brauchen keine Vorerfahrung, sie werden beim Onboarding gebrieft.
+- Clipper brauchen keine Vorerfahrung, sie werden beim Onboarding eingeschult und gebrieft. Erfahrung mit
+  CapCut oder anderen Videoschnitt-Tools ist von Vorteil.
+- Clipper-Vergütung: Jeder Clipper macht je nach Resultat und Zuverlässigkeit einen eigenen Preis mit Nikki Media
+  aus. Beispiel (Angabe des Auftraggebers): Ein Clipper hat neben seinem Vollzeitjob in einem Monat eine höhere
+  vierstellige Summe umgesetzt, weil er gute Resultate geliefert hat und zuverlässig war. Keine genauen Beträge.
+- Aufwärmen der Accounts: 7 Tage (nicht 2 bis 3), damit der Algorithmus erkennt, dass ein Mensch den Account
+  betreibt und kein Bot.
+- Links direkt aufs passende Formular: Kunden /#stepper, Clipper /clipper#stepper, Creator /creator#stepper,
+  Agenturen /brands#stepper. /agenturen, /personal-brands und /investoren gibt es nicht mehr.
 
 **Import (unveröffentlicht, nur nach Freigabe):** `node scripts/fachartikel-import.mjs` (live) bzw. `--local` (Vorschau).
 
@@ -18,7 +26,7 @@ Keine langen Gedankenstriche im Text.
 Reel-Zahlen; keine Laufzeiten, Umsätze oder Reservierungen. Alle Zahlen „im Kampagnenzeitraum“.
 
 **Bitte vor dem Veröffentlichen prüfen:** Werbekennzeichnung (04), Steuer- und Arbeitsvertragshinweis (13, 16),
-„rund 100 Mio. Menschen im DACH-Raum“ (14), Zeitangabe „ein bis zwei Stunden am Tag“ aus Marktquellen (16, 17).
+„rund 100 Mio. Menschen im DACH-Raum“ (14), Clipper-Beispiel „höhere vierstellige Summe“ (13, 16), Zeitangabe „ein bis zwei Stunden am Tag“ aus Marktquellen (16, 17).
 
 ## Die Entwürfe
 

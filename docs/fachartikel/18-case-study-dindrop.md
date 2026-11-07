@@ -56,7 +56,7 @@ Ja, solange das Material starke Momente hat. Bei DinDrop war viel Archiv vorhand
 
 ### Was kostet so eine Kampagne?
 
-Abgerechnet wird nach erreichten Views, bei Nikki Media mit ~5 € pro 1.000 Views. Clips ohne Reichweite kosten nichts. Wie viel Reichweite zu deinem Budget passt, zeigt der Views-Regler auf der [Startseite](/).
+Abgerechnet wird nach erreichten Views, bei Nikki Media mit ~5 € pro 1.000 Views. Clips ohne Reichweite kosten nichts. Welche Reichweite zu deinem Budget passt, rechnen wir im Strategiegespräch mit dir durch: [Kampagne anfragen](/#stepper).
 
 ## Fazit
 

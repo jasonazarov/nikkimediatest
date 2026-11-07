@@ -48,7 +48,7 @@ Neben der Hook war die Wiederholung entscheidend. Die Zielgruppe sollte die Mark
 - **Produktmarken** aus Mode, Uhren, Schmuck, Kosmetik oder Lifestyle
 - **E-Commerce-Shops**, deren Produkte im Video überzeugen
 - **Neue Marken**, die in einer Nische schnell wiedererkannt werden wollen
-- **Agenturen**, die für Produktkunden Reichweite liefern, siehe [Für Agenturen](/agenturen)
+- **Agenturen**, die für Produktkunden Reichweite liefern, siehe [Formular für Agenturen](/brands#stepper)
 
 Voraussetzung ist ein Produkt, das man gern ansieht, und Aufnahmen, die es in guter Qualität zeigen.
 

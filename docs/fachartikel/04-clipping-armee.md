@@ -20,7 +20,7 @@ Heute ist die Clipping-Armee kein Zufallsprodukt mehr, sondern ein Werkzeug, das
 - **Accounts:** Viele Nischen-Accounts auf TikTok, Instagram, YouTube und Facebook, oft als Fan-Accounts oder Theme Pages geführt.
 - **Steuerung:** Jemand muss Kampagnen zuordnen, Qualität prüfen und Zahlen auswerten. Bei Nikki Media übernimmt das unser Team über die Plattform.
 
-Wenn du selbst Teil davon werden willst, findest du alles auf [Clipper werden](/clipper) und [Creator werden](/creator).
+Wenn du selbst Teil davon werden willst, findest du alles auf [Clipper werden](/clipper#stepper) und [Creator werden](/creator#stepper).
 
 ## Warum eine Armee mehr erreicht als ein einzelner Account
 
@@ -35,7 +35,7 @@ Ein Rechenbeispiel: 200 Accounts posten jeweils 10 Clips. Das sind 2.000 Chancen
 Masse ohne Kontrolle schadet einer Marke. Deshalb braucht eine Clipping-Armee klare Regeln:
 
 1. **Briefing:** Jede Kampagne hat Vorgaben zu Tonalität, Themen und Tabus.
-2. **Aufwärmen:** Neue Accounts werden vor dem ersten Post in der Nische der Zielgruppe aufgewärmt.
+2. **Aufwärmen:** Neue Accounts werden vor dem ersten Post sieben Tage lang in der Nische der Zielgruppe aufgewärmt, damit der Algorithmus erkennt, dass ein Mensch dahintersteht und kein Bot.
 3. **Prüfung:** Jedes Video wird kontrolliert. View-Verlauf und Interaktionen müssen zusammenpassen.
 4. **Nachweise:** Ab 10.000 Views gibt es einen Insights-Nachweis per Bildschirmaufnahme.
 5. **Leistungsbezahlung:** Clipper verdienen nur, wenn ihre Videos echte Reichweite bringen. Das schafft den richtigen Anreiz.
@@ -46,7 +46,7 @@ Aus unseren [Case Studies](/#case-studies): DinDrop über 100 Mio. organische Vi
 
 ## Kann man eine Clipping-Armee selbst aufbauen?
 
-Theoretisch ja. Praktisch bedeutet es: Clipper finden, prüfen, bezahlen, Accounts überwachen, Betrug erkennen und Zahlen auswerten. Viele Unternehmen und Agenturen unterschätzen diesen Aufwand. Deshalb arbeiten Agenturen mit uns als Partner im Hintergrund, siehe [Für Agenturen](/agenturen).
+Theoretisch ja. Praktisch bedeutet es: Clipper finden, prüfen, bezahlen, Accounts überwachen, Betrug erkennen und Zahlen auswerten. Viele Unternehmen und Agenturen unterschätzen diesen Aufwand. Deshalb arbeiten Agenturen mit uns als Partner im Hintergrund, siehe [Formular für Agenturen](/brands#stepper).
 
 ## Häufige Fragen zur Clipping-Armee
 
@@ -60,7 +60,7 @@ Die Clips laufen über die Accounts der Clipper, als eigenständige Kurzvideos. 
 
 ### Wie schnell ist eine Clipping-Armee einsatzbereit?
 
-Nach dem Setup werden die Accounts zwei bis drei Tage aufgewärmt. Danach gehen die ersten Clips live. Eine Kampagne läuft meist über 30, 60 oder 90 Tage.
+Nach dem Setup werden die Accounts sieben Tage lang aufgewärmt. In dieser Zeit lernt der Algorithmus, dass ein Mensch den Account betreibt und kein Bot. Danach gehen die ersten Clips live. Eine Kampagne läuft meist über 30, 60 oder 90 Tage.
 
 ## Fazit
 

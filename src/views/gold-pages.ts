@@ -307,12 +307,13 @@ export const goldFoot = () => `<footer class="g-foot">
 /* ------------------------------------------------------------ Rahmen */
 
 const NAV: { href: string; label: string; key?: Variant }[] = [
+  // Wie das Menü der Landingpages. /agenturen, /personal-brands und /investoren sind seit
+  // November 2026 nicht mehr auf der Seite (Weiterleitung in routes/public.ts).
+  { href: '/#case-studies', label: 'Case Studies' },
   { href: '/fachartikel', label: 'Fachartikel' },
-  { href: '/agenturen', label: 'Für Agenturen', key: 'agenturen' },
-  { href: '/personal-brands', label: 'Für Personal Brands', key: 'personal-brands' },
-  { href: '/investoren', label: 'Für Investoren', key: 'investoren' },
   { href: '/clipper', label: 'Clipper werden' },
   { href: '/creator', label: 'Creator werden' },
+  { href: '/brands', label: 'Für Agenturen' },
 ]
 
 interface PageOptions {

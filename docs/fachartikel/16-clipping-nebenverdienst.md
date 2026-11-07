@@ -5,7 +5,7 @@ excerpt: Clipping passt neben einen Vollzeitjob: feste Kampagnen, freie Zeiteint
 author: Jason Azarov
 keywords: Clipping Nebenverdienst, Nebenjob, Arbeitnehmer, Clipper werden, flexibel arbeiten, Social Media Nebenjob
 ---
-**Kurz gesagt:** Clipping eignet sich besonders für Arbeitnehmer, die neben ihrem Job einen planbaren Nebenverdienst aufbauen wollen. Kampagnen laufen über feste Zeiträume, die Arbeit lässt sich frei einteilen und großteils am Smartphone erledigen. Vergütet wird nach Leistung: Gute Clipper sind am Erfolg der Kampagnen beteiligt, die Nikki Media gewinnt.
+**Kurz gesagt:** Clipping eignet sich besonders für Arbeitnehmer, die neben ihrem Job einen planbaren Nebenverdienst aufbauen wollen. Kampagnen laufen über feste Zeiträume, die Arbeit lässt sich frei einteilen und großteils am Smartphone erledigen. Vergütet wird nach Leistung: Jeder Clipper macht mit Nikki Media je nach Resultat und Zuverlässigkeit einen eigenen Preis aus.
 
 ## Für wen ist Clipping gemacht?
 
@@ -23,7 +23,7 @@ Clipping ist für alle, die Social Media ohnehin verstehen und daraus etwas mach
 2. **Freie Zeiteinteilung:** Es gibt keine festen Arbeitszeiten. Du schneidest, wann es in deinen Tag passt.
 3. **Arbeit am Smartphone:** Mit Apps wie CapCut lässt sich der Großteil direkt am Handy erledigen, auch in der Bahn.
 4. **Kein Kundenkontakt:** Kampagnen ordnet Nikki Media zu. Du musst keine Aufträge suchen, keine Angebote schreiben und keine Kunden betreuen.
-5. **Leistungsbezogene Vergütung:** Je besser deine Clips, desto größer dein Anteil an der Kampagne.
+5. **Leistungsbezogene Vergütung:** Je besser und verlässlicher deine Arbeit, desto besser dein Preis.
 
 ## Wie viel Zeit brauchst du?
 
@@ -39,7 +39,9 @@ Ein bewährter Ablauf aus der Praxis:
 
 ## Was du über Vergütung wissen solltest
 
-Bei Nikki Media bist du als Clipper am Budget der Kampagnen beteiligt, die wir für Unternehmen, Agenturen und Personal Brands gewinnen. Bezahlt wird nach erreichter Reichweite. Deine Konditionen legt Nikki Media als Preisstaffelung fest, du siehst sie in deinem Dashboard. Wer zuverlässig gute Clips liefert, bekommt mehr Kampagnen zugeordnet. Mehr dazu in [Wie verdient man als Clipper Geld?](/fachartikel/geld-verdienen-als-clipper)
+Bei Nikki Media machst du als Clipper je nach Resultat und Zuverlässigkeit einen eigenen Preis aus. Deine Konditionen siehst du in deinem Dashboard. Wer zuverlässig gute Clips liefert, bekommt mehr Kampagnen zugeordnet.
+
+> Ein Beispiel aus unserem Netzwerk: Ein Clipper hat neben seinem Vollzeitjob in einem einzigen Monat eine höhere vierstellige Summe umgesetzt, weil er gute Resultate geliefert hat und zuverlässig war. Mehr dazu in [Wie verdient man als Clipper Geld?](/fachartikel/geld-verdienen-als-clipper)
 
 ## Was du vorher klären solltest
 
@@ -50,15 +52,15 @@ Bei Nikki Media bist du als Clipper am Budget der Kampagnen beteiligt, die wir f
 
 ## Brauchst du Erfahrung?
 
-Nein. Viele Clipper starten ohne Vorerfahrung im Schnitt und lernen mit den ersten Kampagnen. Beim Onboarding wirst du für jede Kampagne gebrieft. Alles dazu im Artikel [Braucht man Vorerfahrung für Clipping?](/fachartikel/clipping-ohne-vorerfahrung).
+Nein. Beim Onboarding wirst du eingeschult und für jede Kampagne gebrieft. Erfahrung mit CapCut oder anderen Videoschnitt-Tools ist von Vorteil, aber keine Voraussetzung. Alles dazu im Artikel [Braucht man Vorerfahrung für Clipping?](/fachartikel/clipping-ohne-vorerfahrung).
 
 ## So startest du
 
-1. Trag dich über [Clipper werden](/clipper) ein.
+1. Trag dich über [Clipper werden](/clipper#stepper) ein.
 2. Bestätige deine E-Mail-Adresse per Code.
 3. Warte auf die Zuordnung zu einer Kampagne.
 4. Lies das Briefing, wärme deine Accounts auf und poste deine ersten Clips.
 
 ## Fazit
 
-Clipping ist ein Nebenverdienst, der sich nach deinem Alltag richtet und nicht umgekehrt. Feste Kampagnen, freie Zeiteinteilung und eine Vergütung nach Leistung machen es planbar. [Trag dich hier als Clipper ein](/clipper).
+Clipping ist ein Nebenverdienst, der sich nach deinem Alltag richtet und nicht umgekehrt. Feste Kampagnen, freie Zeiteinteilung und eine Vergütung nach Leistung machen es planbar. [Trag dich hier als Clipper ein](/clipper#stepper).

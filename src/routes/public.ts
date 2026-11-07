@@ -3,7 +3,7 @@ import { clipperLandingPage } from '../views/clipper'
 import { creatorLandingPage } from '../views/creator-landing'
 import { brandsLandingPage } from '../views/brands-landing'
 import { landingPage } from '../views/landing'
-import { agenturenPage, investorenPage, personalBrandsPage } from '../views/gold-pages'
+// agenturenPage, personalBrandsPage, investorenPage (views/gold-pages.ts) sind seit November 2026 nicht mehr eingebunden.
 import { articlePage, articlesBlockSite, articlesIndexPage, articleUrl, llmsTxt } from '../views/gold-articles'
 import { articleBySlug, publishedArticles, type Article } from '../lib/articles'
 import { datenschutzPage, impressumPage } from '../views/legal'
@@ -51,9 +51,15 @@ publicRoutes.get('/brands', (c) =>
  * dazu das Investorenformular (→ /api/investors).
  */
 const fresh = { 'cache-control': 'public, max-age=0, must-revalidate' }
-publicRoutes.get('/agenturen', async (c) => c.html(agenturenPage(await safeArticles(c.env, 3)), 200, fresh))
-publicRoutes.get('/personal-brands', async (c) => c.html(personalBrandsPage(await safeArticles(c.env, 3)), 200, fresh))
-publicRoutes.get('/investoren', async (c) => c.html(investorenPage(await safeArticles(c.env, 3)), 200, fresh))
+/*
+ * /agenturen, /personal-brands und /investoren sind seit November 2026 nicht mehr auf der
+ * Seite (Vorgabe des Auftraggebers). Wer eine alte Adresse aufruft, landet beim passenden
+ * Formular: Agenturen auf /brands, alle anderen auf der Startseite. Der Code der Seiten
+ * bleibt in views/gold-pages.ts, Archiv als ZIP unter archiv/landingpages/.
+ */
+publicRoutes.get('/agenturen', (c) => c.redirect('/brands#stepper', 301))
+publicRoutes.get('/personal-brands', (c) => c.redirect('/#stepper', 301))
+publicRoutes.get('/investoren', (c) => c.redirect('/', 301))
 
 /* Fachartikel (lib/articles.ts, views/gold-articles.ts) — gepflegt unter /admin/fachartikel. */
 publicRoutes.get('/fachartikel', async (c) => c.html(articlesIndexPage(await safeArticles(c.env)), 200, fresh))
@@ -120,9 +126,6 @@ publicRoutes.get('/sitemap.xml', async (c) => {
   <url><loc>${c.env.APP_URL}/clipper</loc><lastmod>${SITE_UPDATED}</lastmod><priority>0.8</priority></url>
   <url><loc>${c.env.APP_URL}/creator</loc><lastmod>${SITE_UPDATED}</lastmod><priority>0.8</priority></url>
   <url><loc>${c.env.APP_URL}/brands</loc><lastmod>${SITE_UPDATED}</lastmod><priority>0.8</priority></url>
-  <url><loc>${c.env.APP_URL}/agenturen</loc><lastmod>${SITE_UPDATED}</lastmod><priority>0.8</priority></url>
-  <url><loc>${c.env.APP_URL}/personal-brands</loc><lastmod>${SITE_UPDATED}</lastmod><priority>0.8</priority></url>
-  <url><loc>${c.env.APP_URL}/investoren</loc><lastmod>${SITE_UPDATED}</lastmod><priority>0.6</priority></url>
   <url><loc>${c.env.APP_URL}/fachartikel</loc><lastmod>${articles[0] ? new Date(Math.max(...articles.map((a) => a.updatedAt)) * 1000).toISOString().slice(0, 10) : SITE_UPDATED}</lastmod><priority>0.7</priority></url>
 ${articles.map((a) => `  <url><loc>${articleUrl(a)}</loc><lastmod>${new Date(a.updatedAt * 1000).toISOString().slice(0, 10)}</lastmod><priority>0.7</priority></url>`).join('\n')}
 </urlset>

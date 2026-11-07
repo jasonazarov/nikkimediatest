@@ -31,7 +31,7 @@ Diese Zahlen zeigen: Reichweite ist keine Frage der Branche. Auch Kaviar und ein
 
 ## Organische Reichweite planbar machen
 
-Organisch heißt nicht zufällig. Mit Clipping wird Reichweite zu einer Größe, die du einkaufen kannst wie Werbung, nur dass du für echte Aufmerksamkeit bezahlst und nicht für eingeblendete Anzeigen. Bei Nikki Media liegt der Preis bei ~5 € pro 1.000 Views. Mit dem Views-Regler auf der [Startseite](/) siehst du sofort, welche Reichweite zu deinem Budget passt.
+Organisch heißt nicht zufällig. Mit Clipping wird Reichweite zu einer Größe, die du einkaufen kannst wie Werbung, nur dass du für echte Aufmerksamkeit bezahlst und nicht für eingeblendete Anzeigen. Bei Nikki Media liegt der Preis bei ~5 € pro 1.000 Views. Welche Reichweite zu deinem Budget passt, rechnen wir im Strategiegespräch mit dir durch: [Kampagne anfragen](/#stepper).
 
 Im Vertrag steht eine garantierte Anzahl organischer Views. Die Clipper posten, bis das Budget erreicht ist. Videos, die nicht laufen, kosten dich nichts.
 
@@ -54,4 +54,4 @@ Werbeanzeigen werden übersprungen, organische Videos werden angeschaut. Ein Cli
 
 ## Fazit
 
-Organische Reichweite ist 2026 eine Frage von gutem Content und starker Distribution. Wer viele starke Clips über viele Accounts verteilt, kommt planbar auf Millionen Views und wird in seiner Nische omnipräsent. Wie das für dein Material aussieht, zeigt dir der Views-Regler auf [nikkimedia.co](/), oder du [stellst direkt eine Anfrage](/#stepper).
+Organische Reichweite ist 2026 eine Frage von gutem Content und starker Distribution. Wer viele starke Clips über viele Accounts verteilt, kommt planbar auf Millionen Views und wird in seiner Nische omnipräsent. Wie das für dein Material aussieht, zeigen wir dir im Strategiegespräch: [Stell direkt eine Anfrage](/#stepper).

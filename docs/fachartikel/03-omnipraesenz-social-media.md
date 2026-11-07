@@ -22,7 +22,7 @@ Für Coaches, Unternehmer, Berater und Speaker ist Sichtbarkeit die Grundlage je
 - **Top of Mind:** Wenn der Bedarf entsteht, fällt der Zielgruppe dein Name zuerst ein.
 - **Preissetzung:** Bekannte Experten können höhere Preise verlangen als unbekannte.
 
-Mehr dazu auf unserer Seite [Für Personal Brands](/personal-brands).
+Direkt zur Anfrage: [Kampagne starten](/#stepper).
 
 ## Wie entsteht Omnipräsenz in der Praxis?
 
@@ -69,4 +69,4 @@ Weil bei Clipping pro 1.000 Views abgerechnet wird, ist Omnipräsenz planbar. Be
 
 ## Fazit
 
-Omnipräsenz ist der Zustand, in dem deine Zielgruppe an dir nicht mehr vorbeikommt. Mit Clipping entsteht er aus Material, das du ohnehin hast. Wenn du sehen willst, wie das für dich aussieht, [stell hier deine Anfrage](/personal-brands).
+Omnipräsenz ist der Zustand, in dem deine Zielgruppe an dir nicht mehr vorbeikommt. Mit Clipping entsteht er aus Material, das du ohnehin hast. Wenn du sehen willst, wie das für dich aussieht, [stell hier deine Anfrage](/#stepper).

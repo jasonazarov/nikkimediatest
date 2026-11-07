@@ -620,3 +620,16 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   `/brands` (und `/agenturen`) hat 6 statt 8 Schritte: „Eure Agentur“ = Kunden + Art der Agentur in einem Schritt,
   die Social-Media-Kanäle stehen freiwillig ganz unten im Kontakt-Schritt. Teilfragen als `.substep` (site.css,
   Abschnitt „Mehrere Fragen in einem Schritt“). Der Schritt springt erst weiter, wenn alle Teilfragen beantwortet sind.
+- **/agenturen, /personal-brands und /investoren sind NICHT mehr auf der Seite** (Vorgabe des Auftraggebers,
+  November 2026: „überflüssige Landingpages“). Die Routen leiten per 301 weiter: `/agenturen` → `/brands#stepper`,
+  `/personal-brands` → `/#stepper`, `/investoren` → `/`. Raus aus Menü (`NAV` in `gold-pages.ts`, jetzt wie das Menü
+  der Landingpages), Sitemap, `/llms.txt` und FAQ. Der Code der Seiten bleibt in `views/gold-pages.ts` (der Blog nutzt
+  `goldNav`/`goldFoot` daraus), ein Archiv je Seite liegt als ZIP unter `archiv/landingpages/` (Seite zum Öffnen,
+  Screenshots, Quellcode, LIESMICH). Nicht ohne ausdrückliche Ansage wieder einbauen.
+- **Links in Fachartikeln führen direkt zum passenden Formular** (Vorgabe des Auftraggebers): Kunden → `/#stepper`,
+  Clipper → `/clipper#stepper`, Creator mit Kampagne → `/creator#stepper`, Agenturen mit Kunden → `/brands#stepper`.
+  Dasselbe im Kasten am Ende jedes Artikels (`articleCta` in `gold-articles.ts`). Inhaltliche Vorgaben für alle
+  Fachartikel stehen in `docs/fachartikel/README.md` (Preis nur „~5 € pro 1.000 Views“, Aufwärmen der Accounts
+  7 Tage, keine Vorerfahrung nötig, Clipper-Preis je nach Resultat und Zuverlässigkeit).
+- **Lokale Demo auf dem eigenen Rechner:** `bash scripts/demo-lokal.sh` (Testdatenbank, Fachartikel nur dort
+  veröffentlicht, nichts live) → http://localhost:8080 und http://localhost:8080/__vorschau.

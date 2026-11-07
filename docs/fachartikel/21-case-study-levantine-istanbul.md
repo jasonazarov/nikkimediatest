@@ -63,7 +63,7 @@ Ja. Das Prinzip ist überall dasselbe: starke Bilder aus der Küche, breite Vert
 
 ### Was kostet das für ein Restaurant?
 
-Abgerechnet wird nach erreichten Views, bei Nikki Media mit ~5 € pro 1.000 Views. Wie viel Reichweite zu deinem Budget passt, zeigt der Views-Regler auf der [Startseite](/).
+Abgerechnet wird nach erreichten Views, bei Nikki Media mit ~5 € pro 1.000 Views. Welche Reichweite zu deinem Budget passt, rechnen wir im Strategiegespräch mit dir durch: [Kampagne anfragen](/#stepper).
 
 ## Fazit
 

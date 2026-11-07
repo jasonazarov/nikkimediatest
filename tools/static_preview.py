@@ -40,7 +40,7 @@ CRAWL = {
                  "/kampagnen/accounts"], "/kampagnen", 14),
     "agency": (["/collaboration", "/collaboration/kampagnen", "/collaboration/creator", "/collaboration/clipper",
                 "/collaboration/meine", "/collaboration/buchungen", "/collaboration/preise", "/collaboration/neu"], "/collaboration", 16),
-    None: (["/", "/agenturen", "/personal-brands", "/investoren", "/clipper", "/creator", "/brands", "/fachartikel",
+    None: (["/", "/clipper", "/creator", "/brands", "/fachartikel",
             "/login", "/impressum", "/datenschutz"], "/fachartikel", 20),
 }
 SKIP = re.compile(r"^/(api|media|logout)|/download|\.(mp4|mov|zip)$")

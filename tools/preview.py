@@ -321,7 +321,7 @@ def stop_server(proc: subprocess.Popen) -> None:
 
 
 PAGES: dict[str | None, list[str]] = {
-    None: ["/", "/clipper", "/creator", "/brands", "/agenturen", "/personal-brands", "/investoren", "/fachartikel",
+    None: ["/", "/clipper", "/creator", "/brands", "/fachartikel",
            "/fachartikel/was-ist-clipping", "/login"],
     "admin": ["/admin", "/admin/analytics", "/admin/projekte", "/admin/projekte/p-0", "/admin/clipper", "/admin/creator",
               "/admin/kunden", "/admin/leads", "/admin/agenturen", "/admin/fachartikel", "/admin/fachartikel/a-0", "/admin/upsells"],
@@ -397,7 +397,7 @@ def start_page() -> bytes:
         for r, label, _, hint in ROLE_CARDS
     )
     pub = "".join(f'<a class="l" href="{u}">{t}</a>' for u, t in [
-        ("/", "Startseite"), ("/agenturen", "Für Agenturen"), ("/personal-brands", "Personal Brands"), ("/investoren", "Investoren"),
+        ("/", "Startseite"),
         ("/clipper", "Clipper werden"), ("/creator", "Creator werden"), ("/brands", "Brands"), ("/fachartikel", "Blog / Fachartikel"),
         ("/fachartikel/was-ist-clipping", "Beispielartikel"), ("/login", "Login-Seite")])
     return f"""<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">

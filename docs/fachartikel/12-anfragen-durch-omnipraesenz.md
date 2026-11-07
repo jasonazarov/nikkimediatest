@@ -57,7 +57,7 @@ Bei Clipping zahlst du für Sichtbarkeit, nicht für Klicks oder Leads. Der Prei
 
 ### Wie lange dauert es, bis Anfragen kommen?
 
-Die ersten Clips gehen nach zwei bis drei Tagen Aufwärmphase live. Sichtbarkeit entsteht ab dem ersten viralen Clip, Vertrauen braucht mehrere Begegnungen. Deshalb laufen Kampagnen meist 30, 60 oder 90 Tage.
+Die ersten Clips gehen nach sieben Tagen Aufwärmphase live. Sichtbarkeit entsteht ab dem ersten viralen Clip, Vertrauen braucht mehrere Begegnungen. Deshalb laufen Kampagnen meist 30, 60 oder 90 Tage.
 
 ### Muss ich selbst auf allen Plattformen aktiv sein?
 

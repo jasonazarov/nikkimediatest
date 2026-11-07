@@ -45,7 +45,7 @@ DinDrop ist eine Creator-Brand, die über Clipping mehr als 100 Mio. organische 
 - **Gründer und Unternehmer**, die als Gesicht ihrer Firma bekannt werden wollen
 - **Experten, Coaches und Speaker**, die Autorität in ihrer Nische aufbauen
 - **Gastronomie, Hotels und Lifestyle-Marken**, die zeigen können, was sie besonders macht
-- **Agenturen**, die ihren Kunden PR mit messbarer Reichweite anbieten wollen, siehe [Für Agenturen](/agenturen)
+- **Agenturen**, die ihren Kunden PR mit messbarer Reichweite anbieten wollen, siehe [Formular für Agenturen](/brands#stepper)
 
 ## Was eine PR-Maschine kostet
 
@@ -59,7 +59,7 @@ Für Bekanntheit in der Breite oft ja, für Fachmedien, Krisenkommunikation und 
 
 ### Wie schnell wirkt eine PR-Maschine?
 
-Die ersten Clips gehen nach zwei bis drei Tagen Aufwärmphase live. Ein einzelner Clip kann in wenigen Tagen hunderttausende Views erreichen.
+Die ersten Clips gehen nach sieben Tagen Aufwärmphase live. Ein einzelner Clip kann in wenigen Tagen hunderttausende Views erreichen.
 
 ## Fazit
 

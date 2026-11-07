@@ -1858,3 +1858,7 @@ ul { margin: 0; padding: 0; list-style: none; }
   .opts--pills .opt > span { padding: 8px 10px; text-align: center; }
   .opts--pills .opt > span b { font-size: .8rem; }
 }
+
+/* Sprungziel #stepper (Links aus den Fachartikeln, Weiterleitungen): Abstand zur festen Kopfzeile,
+   damit das Formular beim Sprung vollständig im Bild ist. */
+#stepper { scroll-margin-top: 96px; }
