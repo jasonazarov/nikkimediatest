@@ -39,7 +39,7 @@ Im Vertrag steht eine garantierte Anzahl organischer Views. Die Clipper posten, 
 
 ## Reichweite in Masse wird zu Omnipräsenz
 
-Reichweite ist mehr als eine Zahl. Wenn dieselbe Zielgruppe dir innerhalb weniger Wochen immer wieder begegnet, entsteht Omnipräsenz: Du wirst als die bekannteste Stimme deiner Nische wahrgenommen. Genau hier liegt die Hebelwirkung von Clipping. Mehr dazu im Artikel [Was ist Omnipräsenz auf Social Media?](/fachartikel/omnipraesenz-social-media)
+Reichweite ist mehr als eine Zahl. Wenn dieselbe Zielgruppe dich innerhalb weniger Wochen immer wieder sieht, entsteht Omnipräsenz: Du wirst als die bekannteste Stimme deiner Nische wahrgenommen. Genau hier liegt die Hebelwirkung von Clipping. Mehr dazu im Artikel [Was ist Omnipräsenz auf Social Media?](/fachartikel/omnipraesenz-social-media)
 
 ## Was organische Reichweite besser macht als Ads
 

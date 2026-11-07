@@ -17,7 +17,7 @@ Der Gedanke dahinter: Auf Plattformen wie TikTok, Instagram Reels und YouTube Sh
 
 1. **Wahrscheinlichkeit:** Wenn jeder Clip eine kleine Chance auf hohe Reichweite hat, steigt die Zahl der Treffer mit der Zahl der Clips.
 2. **Lernkurve:** Mit vielen Clips sieht man nach wenigen Tagen, welche Hooks und Themen funktionieren.
-3. **Omnipräsenz:** Die Zielgruppe begegnet dir ständig in neuen Varianten. Mehr dazu im Artikel [Omnipräsenz auf Social Media](/fachartikel/omnipraesenz-social-media).
+3. **Omnipräsenz:** Die Zielgruppe sieht dich ständig in neuen Varianten. Mehr dazu im Artikel [Omnipräsenz auf Social Media](/fachartikel/omnipraesenz-social-media).
 4. **Social Proof:** Wer ein Thema auf vielen verschiedenen Accounts sieht, hält es für relevant und spricht darüber.
 
 ## Wie 1.000 Clips im Monat organisiert werden

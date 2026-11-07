@@ -9,7 +9,7 @@ keywords: Anfragen gewinnen, Leads, Inbound, Omnipräsenz, Personal Brand, Kunde
 
 ## Warum Sichtbarkeit Anfragen bringt
 
-Menschen kaufen von denen, die sie kennen und denen sie vertrauen. Vertrauen entsteht durch wiederholte Begegnungen. Wer dir zehnmal in einer Woche auf TikTok, Instagram und YouTube begegnet, hat das Gefühl, dich zu kennen. Wenn der Bedarf entsteht, schreibt er dir, und nicht dem Wettbewerber, den er noch nie gesehen hat.
+Menschen kaufen von denen, die sie kennen und denen sie vertrauen. Vertrauen entsteht durch wiederholte Begegnungen. Wer dich zehnmal in einer Woche auf TikTok, Instagram und YouTube sieht, hat das Gefühl, dich zu kennen. Wenn der Bedarf entsteht, schreibt er dir, und nicht dem Wettbewerber, den er noch nie gesehen hat.
 
 Das ist der Kern von Inbound: Kunden kommen zu dir, statt dass du ihnen hinterherläufst. Was Omnipräsenz genau ist, erklärt der Artikel [Omnipräsenz auf Social Media](/fachartikel/omnipraesenz-social-media).
 

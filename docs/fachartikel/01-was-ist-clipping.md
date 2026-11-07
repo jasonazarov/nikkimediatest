@@ -27,7 +27,7 @@ Mehr zum Ablauf einer Kampagne findest du im Artikel [Hinter den Kulissen einer 
 
 ## Warum Omnipräsenz der eigentliche Gewinn ist
 
-Clipping bringt nicht nur Views. Weil deine Clips über viele Accounts gleichzeitig laufen, begegnet dir deine Zielgruppe immer wieder: auf TikTok, auf Instagram, auf YouTube. Daraus entsteht Omnipräsenz, das Gefühl, dass an dir in deiner Nische niemand vorbeikommt. Wer omnipräsent ist, wird als Nummer eins wahrgenommen. Wie diese Hebelwirkung funktioniert, erklärt der Artikel [Was ist Omnipräsenz auf Social Media?](/fachartikel/omnipraesenz-social-media)
+Clipping bringt nicht nur Views. Weil deine Clips über viele Accounts gleichzeitig laufen, sieht deine Zielgruppe dich immer wieder: auf TikTok, auf Instagram, auf YouTube. Daraus entsteht Omnipräsenz, das Gefühl, dass an dir in deiner Nische niemand vorbeikommt. Wer omnipräsent ist, wird als Nummer eins wahrgenommen. Wie diese Hebelwirkung funktioniert, erklärt der Artikel [Was ist Omnipräsenz auf Social Media?](/fachartikel/omnipraesenz-social-media)
 
 ## Für wen lohnt sich Clipping?
 

@@ -5,7 +5,7 @@ excerpt: Omnipräsenz heißt: Deine Zielgruppe sieht dich überall, jeden Tag. S
 author: Jason Azarov
 keywords: Omnipräsenz, Personal Brand, Sichtbarkeit, Mere-Exposure-Effekt, Top of Mind
 ---
-**Kurz gesagt:** Omnipräsenz bedeutet, dass deine Zielgruppe dir auf Social Media immer wieder begegnet, auf TikTok, Instagram, YouTube und Facebook, über viele Accounts und in vielen Varianten. Wer überall auftaucht, wird als Marktführer wahrgenommen. Mit Clipping entsteht diese Präsenz, ohne dass du jeden Tag selbst Content produzierst.
+**Kurz gesagt:** Omnipräsenz bedeutet, dass deine Zielgruppe dich auf Social Media immer wieder sieht, auf TikTok, Instagram, YouTube und Facebook, über viele Accounts und in vielen Varianten. Wer überall auftaucht, wird als Marktführer wahrgenommen. Mit Clipping entsteht diese Präsenz, ohne dass du jeden Tag selbst Content produzierst.
 
 ## Was bedeutet Omnipräsenz?
 
@@ -55,7 +55,7 @@ Der Hebel liegt darin, dass sich diese Stufen gegenseitig verstärken. Je bekann
 
 ## Ein Beispiel aus der Praxis
 
-Max Tornow, Business-Mentor, gehört zu unseren [Case Studies](/#case-studies). Über Clipping kamen 70 Mio. organische Views über zwei Accounts zusammen. Für eine Personal Brand bedeutet das: Die Zielgruppe ist ihm in kurzer Zeit immer wieder begegnet, auf vielen Accounts und in vielen Varianten. Genau das ist Omnipräsenz.
+Max Tornow, Business-Mentor, gehört zu unseren [Case Studies](/#case-studies). Über Clipping kamen 70 Mio. organische Views über zwei Accounts zusammen. Für eine Personal Brand bedeutet das: Seine Zielgruppe hat ihn in kurzer Zeit immer wieder gesehen, auf vielen Accounts und in vielen Varianten. Genau das ist Omnipräsenz.
 
 > Omnipräsenz ist kein Zufall und keine Frage des Talents. Sie ist das Ergebnis von gutem Content, Menge, Regelmäßigkeit und Verteilung.
 
