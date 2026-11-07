@@ -667,5 +667,9 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   `favicon-48/96/192/512.png`, `apple-touch-icon.png`. Alle Seitenköpfe verlinken `/favicon.ico`, `/favicon.svg`,
   `/favicon-96.png` und `/apple-touch-icon.png` (Google zeigt ein Favicon erst ab 48 px und holt es neu, wenn die
   Seite neu gecrawlt wird).
+- **Vorschauen vor der Freigabe** (`docs/vorschau/<name>.patch`, siehe `docs/vorschau/LIESMICH.md`): eine
+  Änderung, die der Auftraggeber erst lokal sehen will, liegt als Patch bei und ist NICHT im Code.
+  `bash scripts/demo-lokal.sh <name>` spielt sie nur in eine Kopie unter `~/.nikki-vorschau/<name>` ein
+  (git worktree) und startet dort die Demo. Nach dem „ja“: Änderung richtig einspielen, Patch löschen.
 - **Lokale Demo auf dem eigenen Rechner:** `bash scripts/demo-lokal.sh` (Testdatenbank, Fachartikel nur dort
   veröffentlicht, nichts live) → http://localhost:8080 und http://localhost:8080/__vorschau.
