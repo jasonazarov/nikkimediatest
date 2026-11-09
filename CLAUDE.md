@@ -685,6 +685,15 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   TikTok ≈ 33.000–67.000, Nikki Media ≈ 200.000). Die Werte entsprechen den Angaben des Wettbewerbers Ombrie; als
   Quellen stehen auf der Seite bewusst die unabhängigen Spannen von Dynamoi (Meta, Kosten pro ThruPlay) und MB Adv
   (TikTok, Kosten pro Videoaufruf), in denen sie liegen. Ombrie wird nicht genannt. Nicht „bis 50× günstiger“ schreiben.
+- **Use Cases auf TikTok** (Vorgabe des Auftraggebers, November 2026, per lokaler Demo freigegeben): Omid Mouazzen
+  (YouTube „Hypercars & Lifestyle“, Clipping-Account @nikkiclips1, 1,3 Mio. Views in 8 Tagen) und Islam Dulatov
+  (UFC-Kämpfer, Clipping-Account @kavkazkibiror, 1 Mio. Views). Je eine Case-Study-Karte auf der Startseite mit drei
+  vom Auftraggeber ausgewählten Videos (Vorschaubilder aus den öffentlichen TikTok-Videoseiten, `/img/cases/<account>-<id>.jpg`,
+  Klick öffnet das Video), in der Kundenleiste und in der Clip-Wand von Startseite, `/clipper` und `/creator`
+  (`CLIP_ACCOUNTS`, `CLIP_AVATAR`, Art `video` = TikTok). Profilbilder: Omids YouTube-Bild, Islams offizielles Porträt.
+  Reihenfolge der Case Studies (Vorgabe): DinDrop, Caspian Blue, Max Tornow, Omid Mouazzen, Islam Dulatov,
+  Levantine Istanbul, Panperium. Der eingebettete TikTok-Player wurde verworfen: TikTok zeigt dort oft nur
+  „Schau dir dieses Video bei TikTok an“.
 - **Vorschauen vor der Freigabe** (`docs/vorschau/<name>.patch`, siehe `docs/vorschau/LIESMICH.md`): eine
   Änderung, die der Auftraggeber erst lokal sehen will, liegt als Patch bei und ist NICHT im Code.
   `bash scripts/demo-lokal.sh <name>` spielt sie nur in eine Kopie unter `~/.nikki-vorschau/<name>` ein

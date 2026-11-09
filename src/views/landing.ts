@@ -287,11 +287,13 @@ ${AURORA}
       <span class="chip"><i class="chip__ini chip__ini--photo"><img src="/img/avatars/panperium.jpg" alt="" loading="lazy" decoding="async" width="30" height="30">PP</i><b>Panperium<small>Luxury-Lifestyle</small></b></span>
       <span class="chip"><i class="chip__ini chip__ini--photo"><img src="/img/avatars/max_tornow_business.jpg" alt="" loading="lazy" decoding="async" width="30" height="30">MT</i><b>Max Tornow<small>Business-Mentor</small></b></span>
       <span class="chip"><i class="chip__ini chip__ini--photo"><img src="/img/avatars/levantine_istanbul.jpg" alt="" loading="lazy" decoding="async" width="30" height="30">LV</i><b>Levantine Istanbul<small>Fire Cuisine Bar</small></b></span>
+      <span class="chip"><i class="chip__ini chip__ini--photo"><img src="/img/avatars/omid_mouazzen.jpg" alt="" loading="lazy" decoding="async" width="30" height="30">OM</i><b>Omid Mouazzen<small>Hypercars &amp; Lifestyle</small></b></span>
+      <span class="chip"><i class="chip__ini chip__ini--photo"><img src="/img/avatars/islam_dulatov.jpg" alt="" loading="lazy" decoding="async" width="30" height="30">ID</i><b>Islam Dulatov<small>UFC-Kämpfer</small></b></span>
     </div>
   </div>
 
   <!-- Clip-Wall: echte Cover aus den laufenden Kampagnen, jede Kachel
-       verlinkt auf den Original-Beitrag bei Instagram. -->
+       verlinkt auf den Original-Beitrag bei Instagram bzw. TikTok (Omid Mouazzen, Islam Dulatov). -->
   <div class="clipwall rv" aria-label="Ausschnitt aus den Clips, die wir aktuell ausrollen">
     <div class="clipwall__row">
       <div class="clipwall__track" data-speed="23">
@@ -302,6 +304,10 @@ ${AURORA}
         <a class="clipwall__card" href="https://www.instagram.com/levantine_istanbul/reel/Da2pgoToIw_/" target="_blank" rel="noopener">
           <img src="/img/cases/levantine_istanbul-Da2pgoToIw_.jpg" alt="Clip von @levantine_istanbul" loading="lazy" decoding="async" width="270" height="480">
           <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/levantine_istanbul.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Levantine</span></span>
+        </a>
+        <a class="clipwall__card" href="https://www.tiktok.com/@nikkiclips1/video/7697936933170842902" target="_blank" rel="noopener">
+          <img src="/img/cases/nikkiclips1-7697936933170842902.jpg" alt="Clip von @nikkiclips1" loading="lazy" decoding="async" width="270" height="480">
+          <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/omid_mouazzen.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Omid Mouazzen</span></span>
         </a>
         <a class="clipwall__card" href="https://www.instagram.com/caspianbluecaviar/reel/DQ4ga9SDEnj/" target="_blank" rel="noopener">
           <img src="/img/cases/caspianbluecaviar-DQ4ga9SDEnj.jpg" alt="Clip von @caspianbluecaviar" loading="lazy" decoding="async" width="270" height="480">
@@ -315,6 +321,10 @@ ${AURORA}
           <img src="/img/cases/panperium-DZurxhPjezN.jpg" alt="Beitrag von @panperium" loading="lazy" decoding="async" width="270" height="480">
           <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/panperium.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Panperium</span></span>
         </a>
+        <a class="clipwall__card" href="https://www.tiktok.com/@kavkazkibiror/video/7697192512531909891" target="_blank" rel="noopener">
+          <img src="/img/cases/kavkazkibiror-7697192512531909891.jpg" alt="Clip von @kavkazkibiror" loading="lazy" decoding="async" width="270" height="480">
+          <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/islam_dulatov.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Islam Dulatov</span></span>
+        </a>
         <a class="clipwall__card" href="https://www.instagram.com/levantine_istanbul/reel/DUTFpaeiMZA/" target="_blank" rel="noopener">
           <img src="/img/cases/levantine_istanbul-DUTFpaeiMZA.jpg" alt="Clip von @levantine_istanbul" loading="lazy" decoding="async" width="270" height="480">
           <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/levantine_istanbul.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Levantine</span></span>
@@ -326,6 +336,10 @@ ${AURORA}
         <a class="clipwall__card" href="https://www.instagram.com/caspianbluecaviar/reel/DMzr3__qHsw/" target="_blank" rel="noopener">
           <img src="/img/cases/caspianbluecaviar-DMzr3__qHsw.jpg" alt="Clip von @caspianbluecaviar" loading="lazy" decoding="async" width="270" height="480">
           <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/caspianbluecaviar.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Caspian Blue</span></span>
+        </a>
+        <a class="clipwall__card" href="https://www.tiktok.com/@nikkiclips1/video/7697940793650187542" target="_blank" rel="noopener">
+          <img src="/img/cases/nikkiclips1-7697940793650187542.jpg" alt="Clip von @nikkiclips1" loading="lazy" decoding="async" width="270" height="480">
+          <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/omid_mouazzen.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Omid Mouazzen</span></span>
         </a>
         <a class="clipwall__card" href="https://www.instagram.com/panperium/reel/DZfCoAoNLUi/" target="_blank" rel="noopener">
           <img src="/img/cases/panperium-DZfCoAoNLUi.jpg" alt="Clip von @panperium" loading="lazy" decoding="async" width="270" height="480">
@@ -351,6 +365,10 @@ ${AURORA}
           <img src="/img/cases/panperium-DZF78B8je1g.jpg" alt="Beitrag von @panperium" loading="lazy" decoding="async" width="270" height="480">
           <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/panperium.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Panperium</span></span>
         </a>
+        <a class="clipwall__card" href="https://www.tiktok.com/@kavkazkibiror/video/7698596967307431190" target="_blank" rel="noopener">
+          <img src="/img/cases/kavkazkibiror-7698596967307431190.jpg" alt="Clip von @kavkazkibiror" loading="lazy" decoding="async" width="270" height="480">
+          <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/islam_dulatov.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Islam Dulatov</span></span>
+        </a>
         <a class="clipwall__card" href="https://www.instagram.com/levantine_istanbul/reel/DBQxgMHAw1U/" target="_blank" rel="noopener">
           <img src="/img/cases/levantine_istanbul-DBQxgMHAw1U.jpg" alt="Clip von @levantine_istanbul" loading="lazy" decoding="async" width="270" height="480">
           <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/levantine_istanbul.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Levantine</span></span>
@@ -358,6 +376,10 @@ ${AURORA}
         <a class="clipwall__card" href="https://www.instagram.com/dindrop7/reel/DbbJyZgIUjl/" target="_blank" rel="noopener">
           <img src="/img/cases/dindrop7-DbbJyZgIUjl.jpg" alt="Clip von @dindrop7" loading="lazy" decoding="async" width="270" height="480">
           <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/dindrop7.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>DinDrop</span></span>
+        </a>
+        <a class="clipwall__card" href="https://www.tiktok.com/@nikkiclips1/video/7696153649105341718" target="_blank" rel="noopener">
+          <img src="/img/cases/nikkiclips1-7696153649105341718.jpg" alt="Clip von @nikkiclips1" loading="lazy" decoding="async" width="270" height="480">
+          <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/omid_mouazzen.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Omid Mouazzen</span></span>
         </a>
         <a class="clipwall__card" href="https://www.instagram.com/max_tornow_business/reel/C8pRTW6MinC/" target="_blank" rel="noopener">
           <img src="/img/cases/max_tornow_business-C8pRTW6MinC.jpg" alt="Clip von @max_tornow_business" loading="lazy" decoding="async" width="270" height="480">
@@ -370,6 +392,10 @@ ${AURORA}
         <a class="clipwall__card" href="https://www.instagram.com/levantine_istanbul/reel/C9406cJIC_D/" target="_blank" rel="noopener">
           <img src="/img/cases/levantine_istanbul-C9406cJIC_D.jpg" alt="Clip von @levantine_istanbul" loading="lazy" decoding="async" width="270" height="480">
           <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/levantine_istanbul.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Levantine</span></span>
+        </a>
+        <a class="clipwall__card" href="https://www.tiktok.com/@kavkazkibiror/video/7698966279020907798" target="_blank" rel="noopener">
+          <img src="/img/cases/kavkazkibiror-7698966279020907798.jpg" alt="Clip von @kavkazkibiror" loading="lazy" decoding="async" width="270" height="480">
+          <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/islam_dulatov.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Islam Dulatov</span></span>
         </a>
         <a class="clipwall__card" href="https://www.instagram.com/dindrop7/reel/DZlBQOrgilt/" target="_blank" rel="noopener">
           <img src="/img/cases/dindrop7-DZlBQOrgilt.jpg" alt="Clip von @dindrop7" loading="lazy" decoding="async" width="270" height="480">
@@ -771,8 +797,8 @@ ${AURORA}
       <span class="eyebrow">Case Studies</span>
       <h2 class="h2">Echte Accounts. Echte Clips. Echte Reichweite.</h2>
       <p class="lead">
-        Influencer, Luxus-Food-Brands, Restaurant-Marken, digitale Produkte, Dienstleistungen vor Ort,
-        Musiker und Co.: Für diese Kunden schneiden unsere Clipper täglich Kurzvideos und rollen sie aus.
+        Influencer, YouTube-Creator, Sportler, Luxus-Food-Brands, Restaurant-Marken, digitale Produkte,
+        Dienstleistungen vor Ort, Musiker und Co.: Für diese Kunden schneiden unsere Clipper täglich Kurzvideos und rollen sie aus.
         Alle Zahlen beziehen sich auf den jeweiligen Kampagnenzeitraum.
       </p>
     </div>
@@ -995,7 +1021,145 @@ ${AURORA}
         </div>
       </article>
 
-      <!-- ─── Case 4 · Levantine Istanbul ──────────────────────────────── -->
+      <!-- ─── Case 4 · Omid Mouazzen (TikTok, Clipping-Account @nikkiclips1) ── -->
+      <!-- Zahlen laut Auftraggeber (November 2026): 1,3 Mio. Views nach 8 Tagen. Profilbild: YouTube-Kanal.
+           Die drei Kacheln führen auf die drei vom Auftraggeber ausgewählten Videos. Den eingebetteten
+           TikTok-Player haben wir verworfen (TikTok blendet oft „Schau dir dieses Video bei TikTok an“ ein);
+           Standbilder = TikTok-Vorschaubilder der Videos, /img/cases/nikkiclips1-<id>.jpg. -->
+      <article class="case case--rev rv">
+        <div class="case__inner">
+          <div class="case__copy">
+            <span class="case__tag">Hypercars &amp; Lifestyle · YouTube-Creator</span>
+            <h3>Omid Mouazzen: 1,3 Mio. Views in 8 Tagen</h3>
+            <p>
+              Omid Mouazzen zeigt auf YouTube Hypercars, Luxusautos und den Alltag als Autohändler.
+              Für ihn haben wir einen eigenen Clipping-Account auf TikTok aufgebaut. Unsere Clipper
+              schneiden aus seinem Content kurze 9:16-Clips und spielen sie dort täglich aus.
+            </p>
+            <ul class="case__bullets">
+              <li><span class="tick" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6.4 4.6 9 10 3.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Eigener Clipping-Account auf TikTok: @nikkiclips1</li>
+              <li><span class="tick" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6.4 4.6 9 10 3.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> 1,3 Mio. Views nach nur 8 Tagen</li>
+            </ul>
+            <div class="case__stats">
+              <div class="case__stat"><b data-count="1.3" data-dec="1" data-suffix=" Mio.">0</b><small>Views in 8 Tagen</small></div>
+            </div>
+            <a class="case__link" href="https://www.tiktok.com/@nikkiclips1" target="_blank" rel="noopener">
+              @nikkiclips1 auf TikTok ansehen
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </div>
+
+          <div class="case__widget">
+            <div class="igw">
+              <div class="igw__head">
+                <span class="igw__av"><span><img src="/img/avatars/omid_mouazzen.jpg" alt="Profilbild von Omid Mouazzen" loading="lazy" decoding="async" width="52" height="52">OM</span></span>
+                <span class="igw__id"><b>nikkiclips1</b><small>Clipping-Account für Omid Mouazzen</small></span>
+                <span class="igw__ig" aria-hidden="true"><img src="/img/platforms/tiktok.svg" alt="" width="22" height="22"></span>
+              </div>
+
+              <div class="igw__meta">
+                <div><b>1,3 Mio.</b><small>Views</small></div><div><b>8 Tage</b><small>Zeitraum</small></div><div><b>TikTok</b><small>Plattform</small></div>
+              </div>
+
+              <div class="igw__grid">
+                <div class="igw__cell">
+                  <a class="igw__poster igw__poster--photo" href="https://www.tiktok.com/@nikkiclips1/video/7697940793650187542" target="_blank" rel="noopener" aria-label="Video 1 von @nikkiclips1 auf TikTok ansehen">
+                    <img src="/img/cases/nikkiclips1-7697940793650187542.jpg" alt="Vorschaubild eines TikTok-Videos von @nikkiclips1" loading="lazy" decoding="async" width="360" height="640">
+                    <span class="pl" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 12 12" fill="#fff"><path d="M3 1.5v9l7-4.5-7-4.5Z"/></svg></span>
+                  </a>
+                </div>
+                <div class="igw__cell">
+                  <a class="igw__poster igw__poster--photo" href="https://www.tiktok.com/@nikkiclips1/video/7697936933170842902" target="_blank" rel="noopener" aria-label="Video 2 von @nikkiclips1 auf TikTok ansehen">
+                    <img src="/img/cases/nikkiclips1-7697936933170842902.jpg" alt="Vorschaubild eines TikTok-Videos von @nikkiclips1" loading="lazy" decoding="async" width="360" height="640">
+                    <span class="pl" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 12 12" fill="#fff"><path d="M3 1.5v9l7-4.5-7-4.5Z"/></svg></span>
+                  </a>
+                </div>
+                <div class="igw__cell">
+                  <a class="igw__poster igw__poster--photo" href="https://www.tiktok.com/@nikkiclips1/video/7696153649105341718" target="_blank" rel="noopener" aria-label="Video 3 von @nikkiclips1 auf TikTok ansehen">
+                    <img src="/img/cases/nikkiclips1-7696153649105341718.jpg" alt="Vorschaubild eines TikTok-Videos von @nikkiclips1" loading="lazy" decoding="async" width="360" height="640">
+                    <span class="pl" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 12 12" fill="#fff"><path d="M3 1.5v9l7-4.5-7-4.5Z"/></svg></span>
+                  </a>
+                </div>
+              </div>
+
+              <div class="igw__foot">
+                <small>Clipping-Account auf TikTok</small>
+                <a href="https://www.tiktok.com/@nikkiclips1" target="_blank" rel="noopener">Profil öffnen</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ─── Case 5 · Islam Dulatov (TikTok, Clipping-Account @kavkazkibiror) ── -->
+      <!-- Zahlen laut Auftraggeber (November 2026): 1 Mio. Views. Profilbild: offizielles Porträt (vom Auftraggeber geschickt).
+           Kacheln: Vorschaubilder der drei vom Auftraggeber ausgewählten TikTok-Videos, /img/cases/kavkazkibiror-<id>.jpg. -->
+      <article class="case rv">
+        <div class="case__inner">
+          <div class="case__copy">
+            <span class="case__tag">UFC-Kämpfer · Sport &amp; MMA</span>
+            <h3>Islam Dulatov: 1 Mio. Views für einen UFC-Kämpfer</h3>
+            <p>
+              Islam Dulatov kämpft in der UFC im Weltergewicht. Über den Clipping-Account
+              @kavkazkibiror auf TikTok haben unsere Clipper seine Momente in kurze Clips verwandelt
+              und eine Kampfsport-Community erreicht, die genau solche Inhalte schaut.
+            </p>
+            <ul class="case__bullets">
+              <li><span class="tick" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6.4 4.6 9 10 3.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Clips über den TikTok-Account @kavkazkibiror</li>
+              <li><span class="tick" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6.4 4.6 9 10 3.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> 1 Mio. Views für Islam Dulatov</li>
+            </ul>
+            <div class="case__stats">
+              <div class="case__stat"><b data-count="1" data-suffix=" Mio.">0</b><small>Views auf TikTok</small></div>
+            </div>
+            <a class="case__link" href="https://www.tiktok.com/@kavkazkibiror" target="_blank" rel="noopener">
+              @kavkazkibiror auf TikTok ansehen
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </div>
+
+          <div class="case__widget">
+            <div class="igw">
+              <div class="igw__head">
+                <span class="igw__av"><span><img src="/img/avatars/islam_dulatov.jpg" alt="Profilbild von Islam Dulatov" loading="lazy" decoding="async" width="52" height="52">ID</span></span>
+                <span class="igw__id"><b>kavkazkibiror</b><small>Clipping-Account für Islam Dulatov</small></span>
+                <span class="igw__ig" aria-hidden="true"><img src="/img/platforms/tiktok.svg" alt="" width="22" height="22"></span>
+              </div>
+
+              <div class="igw__meta">
+                <div><b>1 Mio.</b><small>Views</small></div><div><b>MMA</b><small>Nische</small></div><div><b>TikTok</b><small>Plattform</small></div>
+              </div>
+
+              <div class="igw__grid">
+                <div class="igw__cell">
+                  <a class="igw__poster igw__poster--photo" href="https://www.tiktok.com/@kavkazkibiror/video/7698966279020907798" target="_blank" rel="noopener" aria-label="Video 1 von @kavkazkibiror auf TikTok ansehen">
+                    <img src="/img/cases/kavkazkibiror-7698966279020907798.jpg" alt="Vorschaubild eines TikTok-Videos von @kavkazkibiror" loading="lazy" decoding="async" width="360" height="640">
+                    <span class="pl" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 12 12" fill="#fff"><path d="M3 1.5v9l7-4.5-7-4.5Z"/></svg></span>
+                  </a>
+                </div>
+                <div class="igw__cell">
+                  <a class="igw__poster igw__poster--photo" href="https://www.tiktok.com/@kavkazkibiror/video/7698596967307431190" target="_blank" rel="noopener" aria-label="Video 2 von @kavkazkibiror auf TikTok ansehen">
+                    <img src="/img/cases/kavkazkibiror-7698596967307431190.jpg" alt="Vorschaubild eines TikTok-Videos von @kavkazkibiror" loading="lazy" decoding="async" width="360" height="640">
+                    <span class="pl" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 12 12" fill="#fff"><path d="M3 1.5v9l7-4.5-7-4.5Z"/></svg></span>
+                  </a>
+                </div>
+                <div class="igw__cell">
+                  <a class="igw__poster igw__poster--photo" href="https://www.tiktok.com/@kavkazkibiror/video/7697192512531909891" target="_blank" rel="noopener" aria-label="Video 3 von @kavkazkibiror auf TikTok ansehen">
+                    <img src="/img/cases/kavkazkibiror-7697192512531909891.jpg" alt="Vorschaubild eines TikTok-Videos von @kavkazkibiror" loading="lazy" decoding="async" width="360" height="640">
+                    <span class="pl" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 12 12" fill="#fff"><path d="M3 1.5v9l7-4.5-7-4.5Z"/></svg></span>
+                  </a>
+                </div>
+              </div>
+
+              <div class="igw__foot">
+                <small>Clipping-Account auf TikTok</small>
+                <a href="https://www.tiktok.com/@kavkazkibiror" target="_blank" rel="noopener">Profil öffnen</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ─── Case 6 · Levantine Istanbul ──────────────────────────────── -->
       <article class="case case--rev rv">
         <div class="case__inner">
           <div class="case__copy">
@@ -1063,7 +1227,7 @@ ${AURORA}
         </div>
       </article>
 
-      <!-- ─── Case 5 · Panperium ───────────────────────────────────────── -->
+      <!-- ─── Case 7 · Panperium ───────────────────────────────────────── -->
       <!-- Branchen-Bezeichnung an den tatsächlichen Account angeglichen:
            @panperium ist eine Luxury-Lifestyle-/Trading-Marke, keine Food-Marke. -->
       <article class="case rv">

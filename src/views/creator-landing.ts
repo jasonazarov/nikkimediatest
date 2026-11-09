@@ -158,10 +158,19 @@ const CLIP_ACCOUNTS = {
   levantine_istanbul: 'Levantine',
   max_tornow_business: 'Max Tornow',
   panperium: 'Panperium',
+  // TikTok-Clipping-Accounts (Use Cases November 2026): das Etikett nennt den Kunden, nicht den Account.
+  nikkiclips1: 'Omid Mouazzen',
+  kavkazkibiror: 'Islam Dulatov',
 } as const
 
+/** Profilbild je Account, wo es nicht wie der Account heißt (TikTok-Clipping-Accounts zeigen den Kunden). */
+const CLIP_AVATAR: Partial<Record<keyof typeof CLIP_ACCOUNTS, string>> = {
+  nikkiclips1: 'omid_mouazzen',
+  kavkazkibiror: 'islam_dulatov',
+}
+
 /** Ein Beitrag bei Instagram: Account, Art (`reel` oder `p` für Post) und ID. */
-type Clip = readonly [account: keyof typeof CLIP_ACCOUNTS, kind: 'reel' | 'p', id: string]
+type Clip = readonly [account: keyof typeof CLIP_ACCOUNTS, kind: 'reel' | 'p' | 'video', id: string]
 
 /**
  * Kampagnen-Beispiele: echte Cover aus laufenden Kampagnen, zwei gegenläufige
@@ -174,12 +183,15 @@ const CLIPWALL: readonly { speed: number; reverse: boolean; clips: readonly Clip
     clips: [
       ['panperium', 'reel', 'DZfCoAoNLUi'],
       ['dindrop7', 'reel', 'DbLpapmA_Bw'],
+      ['nikkiclips1', 'video', '7697936933170842902'],
       ['levantine_istanbul', 'reel', 'DEUXjpeIHPR'],
       ['caspianbluecaviar', 'reel', 'DMzr3__qHsw'],
       ['max_tornow_business', 'reel', 'C8pRTW6MinC'],
+      ['kavkazkibiror', 'video', '7697192512531909891'],
       ['dindrop7', 'reel', 'DPRDIqUiIeB'],
       ['panperium', 'p', 'DZurxhPjezN'],
       ['levantine_istanbul', 'reel', 'DUTFpaeiMZA'],
+      ['nikkiclips1', 'video', '7697940793650187542'],
     ],
   },
   {
@@ -188,20 +200,29 @@ const CLIPWALL: readonly { speed: number; reverse: boolean; clips: readonly Clip
     clips: [
       ['caspianbluecaviar', 'reel', 'DKZ-ra1qDiR'],
       ['levantine_istanbul', 'reel', 'C9406cJIC_D'],
+      ['kavkazkibiror', 'video', '7698596967307431190'],
       ['dindrop7', 'reel', 'DbbJyZgIUjl'],
       ['max_tornow_business', 'reel', 'C_PxECKAj61'],
+      ['nikkiclips1', 'video', '7696153649105341718'],
       ['panperium', 'reel', 'DZvEvMPNa15'],
       ['caspianbluecaviar', 'reel', 'DP_uoY6jFCU'],
       ['dindrop7', 'reel', 'DZlBQOrgilt'],
+      ['kavkazkibiror', 'video', '7698966279020907798'],
       ['max_tornow_business', 'reel', 'DCHhYijJK4b'],
     ],
   },
 ]
 
+/** `video` = TikTok-Video (https://www.tiktok.com/@account/video/id), sonst Instagram. */
+const clipHref = (account: string, kind: Clip[1], id: string): string =>
+  kind === 'video'
+    ? `https://www.tiktok.com/@${esc(account)}/video/${esc(id)}`
+    : `https://www.instagram.com/${esc(account)}/${kind}/${esc(id)}/`
+
 const clipCard = ([account, kind, id]: Clip): string => `
-        <a class="clipwall__card" href="https://www.instagram.com/${esc(account)}/${kind}/${esc(id)}/" target="_blank" rel="noopener noreferrer">
-          <img src="/img/cases/${esc(account)}-${esc(id)}.jpg" alt="${kind === 'p' ? 'Beitrag' : 'Clip'} von @${esc(account)}" loading="lazy" decoding="async" width="270" height="480">
-          <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/${esc(account)}.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>${esc(CLIP_ACCOUNTS[account])}</span></span>
+        <a class="clipwall__card" href="${clipHref(account, kind, id)}" target="_blank" rel="noopener noreferrer">
+          <img src="/img/cases/${esc(account)}-${esc(id)}.jpg" alt="${kind === 'p' ? 'Post' : 'Clip'} von @${esc(account)}" loading="lazy" decoding="async" width="270" height="480">
+          <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/${esc(CLIP_AVATAR[account] ?? account)}.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>${esc(CLIP_ACCOUNTS[account])}</span></span>
         </a>`
 
 export const clipwallRows = (): string =>
@@ -563,6 +584,8 @@ ${AURORA}
       <span class="chip"><i class="chip__ini chip__ini--photo"><img src="/img/avatars/panperium.jpg" alt="" loading="lazy" decoding="async" width="30" height="30">PP</i><b>Panperium<small>Luxury-Lifestyle</small></b></span>
       <span class="chip"><i class="chip__ini chip__ini--photo"><img src="/img/avatars/max_tornow_business.jpg" alt="" loading="lazy" decoding="async" width="30" height="30">MT</i><b>Max Tornow<small>Business-Mentor</small></b></span>
       <span class="chip"><i class="chip__ini chip__ini--photo"><img src="/img/avatars/levantine_istanbul.jpg" alt="" loading="lazy" decoding="async" width="30" height="30">LV</i><b>Levantine Istanbul<small>Fire Cuisine Bar</small></b></span>
+      <span class="chip"><i class="chip__ini chip__ini--photo"><img src="/img/avatars/omid_mouazzen.jpg" alt="" loading="lazy" decoding="async" width="30" height="30">OM</i><b>Omid Mouazzen<small>Hypercars &amp; Lifestyle</small></b></span>
+      <span class="chip"><i class="chip__ini chip__ini--photo"><img src="/img/avatars/islam_dulatov.jpg" alt="" loading="lazy" decoding="async" width="30" height="30">ID</i><b>Islam Dulatov<small>UFC-Kämpfer</small></b></span>
     </div>
   </div>
 
