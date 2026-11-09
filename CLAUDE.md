@@ -649,7 +649,7 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   Kampagnen) und „Neue Kampagne erstellen“ (ganze Karte klickbar) direkt unter der Begrüßung, beide `nmw-brand-glass`
   (Styles `dash-whop.css`, „Agentur-Übersicht: Kampagnen ganz oben“). Views-Grafik, Virale Clips und Push folgen
   erst danach: Die Seite setzt `TOP_MARK` (`layout.ts`), `withTopSections` fügt die oberen Bereiche dort ein.
-- **Büro Wien** (Vorgabe des Auftraggebers, November 2026): Firmensitz laut Impressum bleibt Dubai, darunter steht
+- **Büro Wien** (Vorgabe des Auftraggebers, November 2026; seit 09.11.2026 auf Wunsch OHNE die frühere Dubai-Adresse): im Impressum steht nur
   „Büro Wien, Darwingasse 6, 1020 Wien, Österreich“. Dieselbe Adresse wie im Google-Unternehmensprofil steht als
   `address` in `ORGANIZATION` (`seo.ts`) und in `/llms.txt`. Schreibweise überall gleich halten (Google vergleicht sie).
 - **Clipper buchen wie Creator buchen** (Vorgabe des Auftraggebers, November 2026; Migration 0028

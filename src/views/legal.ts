@@ -73,11 +73,6 @@ export const impressumPage = () =>
 
       <h2>NIKKI MEDIA</h2>
       <p>
-        <strong>Office &amp; Contact</strong><br>
-        Dubai Silicon Oasis<br>
-        Dubai, United Arab Emirates
-      </p>
-      <p>
         <strong>Büro Wien</strong><br>
         Darwingasse 6<br>
         1020 Wien, Österreich
