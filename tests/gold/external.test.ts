@@ -2,7 +2,7 @@
 // Zernio-Antworten, dann Summen, Views-Grafik und „Virale Clips“ je Rolle.
 import { makeD1 } from './d1'
 import assert from 'node:assert/strict'
-import { externalRow, grandTotals, syncExternalPosts, totalsForProjects } from '../../src/lib/metrics'
+import { externalRow, grandTotals, syncExternalAfterConnect, syncExternalPosts, totalsForProjects } from '../../src/lib/metrics'
 import { viewsAnalyticsFor } from '../../src/lib/analytics'
 import { viralClipsFor } from '../../src/lib/viral'
 
@@ -40,7 +40,7 @@ const post = (id: string, views: number, extra: Record<string, unknown> = {}) =>
 let calls: string[] = []
 let reply: () => Response
 const realFetch = globalThis.fetch
-globalThis.fetch = (async (url: string) => { calls.push(String(url)); return reply() }) as any
+globalThis.fetch = (async (url: string, init?: any) => { calls.push(`${init?.method ?? 'GET'} ${url}`); return reply() }) as any
 const json = (body: unknown, status = 200) => () => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } })
 
 ;(async () => {
@@ -61,7 +61,7 @@ const json = (body: unknown, status = 200) => () => new Response(JSON.stringify(
   let r = await syncExternalPosts(env, { now: NOW })
   assert.deepEqual(r, { accounts: 1, fetched: 1, posts: 2, paused: false })
   assert.equal(calls.length, 1)
-  const q = new URL(calls[0]).searchParams
+  const q = new URL(calls[0].split(' ')[1]).searchParams
   assert.equal(q.get('accountId'), 'acc1'); assert.equal(q.get('source'), 'external'); assert.equal(q.get('limit'), '100')
   const rows = db.raw.prepare('SELECT post_id, project_id, username, views, thumb_url FROM external_posts ORDER BY post_id').all() as any[]
   assert.deepEqual(rows.map((r) => [r.post_id, r.project_id, r.username, r.views]), [['1', 'p1', 'nikkiclips1', 1000], ['5', 'p1', 'nikkiclips1', 300]])
@@ -112,6 +112,18 @@ const json = (body: unknown, status = 200) => () => new Response(JSON.stringify(
   const vk = await viralClipsFor(env, { id: 'ucl', role: 'clipper' } as any)
   assert.deepEqual(vk.map((c) => c.views), [500])
   console.log('✓ Virale Clips: externe Videos mit Link und Cover, beim Clipper nicht')
+
+  // Gleich nach dem Verbinden: Zernio liest den Account sofort, dann holen wir die Videos ab.
+  x(`INSERT INTO projects (id,customer_id,name,status,created_at) VALUES ('p3','ca','Neu verbunden','aktiv',1)`)
+  x(`INSERT INTO publish_accounts (provider_account_id,project_id,creator_id,provider_profile_id,platform,username,updated_at) VALUES ('acc3','p3',NULL,'prof3','tiktok','neu',1)`)
+  calls = []
+  reply = json({ posts: [{ ...post('31', 5000), platforms: [{ ...post('31', 5000).platforms[0], accountId: 'acc3' }] }], pagination: { pages: 1 } })
+  await syncExternalAfterConnect(env, 'p3', 'acc3')
+  assert.equal(calls[0], 'POST https://zernio.com/api/v1/posts/sync-external')
+  assert.ok(calls[1].startsWith('GET https://zernio.com/api/v1/analytics?accountId=acc3&source=external'))
+  assert.equal(calls.length, 2)
+  assert.equal((await totalsForProjects(env, ['p3'])).get('p3')!.views, 5000)
+  console.log('✓ Nach dem Verbinden: Zernio liest sofort, Views stehen ohne Wartezeit da')
 
   delete env.ZERNIO_API_KEY
   assert.deepEqual(await syncExternalPosts(env, { now: NOW + 9 * 3600 }), { accounts: 0, fetched: 0, posts: 0, paused: false })

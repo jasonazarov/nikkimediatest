@@ -6,6 +6,7 @@ import {
   getPostAnalytics,
   listExternalPosts,
   POST_LIST_LIMIT,
+  refreshExternalPosts,
   zernioReady,
   ZernioError,
   type AnalyticsResult,
@@ -988,6 +989,28 @@ export async function syncExternalPosts(
     }
   }
   return result
+}
+
+/**
+ * Gleich nach dem Verbinden eines Kampagnen-Accounts: Zernio liest ihn sofort
+ * von der Plattform (`refreshExternalPosts`), dann holen wir die Videos der
+ * Kampagne ab. So stehen die Views ohne Wartezeit im Dashboard, statt erst nach
+ * Zernios eigenem Durchgang und unserem nächsten Viertelstundenlauf.
+ * Läuft im Hintergrund (`waitUntil`) und wirft nie: der Viertelstundenlauf holt
+ * alles nach, was hier nicht klappt.
+ */
+export async function syncExternalAfterConnect(env: Env, projectId: string, accountId: string): Promise<void> {
+  if (!zernioReady(env)) return
+  try {
+    await refreshExternalPosts(env, accountId)
+  } catch (err) {
+    console.error('[metrics] Zernio hat den Account nicht sofort gelesen', accountId, err instanceof ZernioError ? err.short : err)
+  }
+  try {
+    await syncExternalPosts(env, { projectId, force: true })
+  } catch (err) {
+    console.error('[metrics] Externe Posts nach dem Verbinden nicht geholt', projectId, err)
+  }
 }
 
 /** Zahlen der extern geposteten Videos je Kampagne. Fehlt die Tabelle noch (Migration 0029), zählen sie nicht. */

@@ -4,6 +4,7 @@ import { presignGet, extOf, PUBLISH_SIGN_TTL_SEC } from './r2'
 import * as provider from './zernio'
 import type { Platform } from './zernio'
 import type { Env } from './types'
+import { syncExternalAfterConnect } from './metrics'
 import type { ClipApproval, Deliverable } from '../db/schema'
 
 /**
@@ -1449,9 +1450,14 @@ export async function absorbConnectReturn(
   return {
     ok: t.connected(`${label}${handle}`),
     owner: result.owner,
+    // Account-Gruppe nachziehen und die direkt geposteten Videos des Accounts
+    // gleich abholen (lib/metrics.ts), damit ihre Views sofort dastehen.
     background: isCreatorOwner(result.owner)
       ? undefined
-      : refreshGroupForProject(env, result.owner.projectId),
+      : Promise.all([
+          refreshGroupForProject(env, result.owner.projectId),
+          syncExternalAfterConnect(env, result.owner.projectId, accountId),
+        ]).then(() => undefined),
   }
 }
 

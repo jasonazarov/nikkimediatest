@@ -646,3 +646,13 @@ export async function listExternalPosts(
   }
   return parsed as ZernioPostList
 }
+
+/**
+ * POST /v1/posts/sync-external — Zernio liest die neuesten Posts eines Accounts
+ * SOFORT von der Plattform, statt bis zum nächsten eigenen Durchgang (etwa alle
+ * 90 Minuten) zu warten. Gleich nach dem Verbinden aufgerufen, damit die direkt
+ * geposteten Videos ohne Wartezeit im Dashboard stehen. Zernio bremst je Account
+ * auf einen Abruf alle ~15 Sekunden.
+ */
+export const refreshExternalPosts = (env: Env, accountId: string) =>
+  call<unknown>(env, 'POST', '/v1/posts/sync-external', { accountId })
