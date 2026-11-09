@@ -16,4 +16,5 @@ Nach der Freigabe wird die √Ñnderung richtig eingespielt und die Datei hier gel√
 
 | Vorschau | Inhalt |
 |---|---|
-| (keine offene Vorschau) | `dashboards` wurde am 07.11.2026 freigegeben und ist eingespielt. |
+| `usecases` | Zwei neue Use Cases auf TikTok: Omid Mouazzen (@nikkiclips1, 1,3 Mio. Views in 8 Tagen) und Islam Dulatov (@kavkazkibiror, 1 Mio. Views), als Case-Study-Karten auf der Startseite und in der Kundenleiste. |
+| (erledigt) | `dashboards` wurde am 07.11.2026 freigegeben und ist eingespielt. |
