@@ -16,5 +16,5 @@ Nach der Freigabe wird die Änderung richtig eingespielt und die Datei hier gel�
 
 | Vorschau | Inhalt |
 |---|---|
-| `usecases` | Zwei neue Use Cases auf TikTok: Omid Mouazzen (@nikkiclips1, 1,3 Mio. Views in 8 Tagen) und Islam Dulatov (@kavkazkibiror, 1 Mio. Views), als Case-Study-Karten auf der Startseite und in der Kundenleiste. Bei Omid zeigen die drei Kacheln die Vorschaubilder der drei ausgewählten TikTok-Videos und öffnen sie per Klick. |
+| `usecases` | Zwei neue Use Cases auf TikTok: Omid Mouazzen (@nikkiclips1, 1,3 Mio. Views in 8 Tagen) und Islam Dulatov (@kavkazkibiror, 1 Mio. Views), als Case-Study-Karten auf der Startseite und in der Kundenleiste. Bei beiden zeigen die drei Kacheln die Vorschaubilder der ausgewählten TikTok-Videos und öffnen sie per Klick. |
 | (erledigt) | `dashboards` wurde am 07.11.2026 freigegeben und ist eingespielt. |
