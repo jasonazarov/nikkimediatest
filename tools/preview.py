@@ -205,6 +205,28 @@ def seed_sql() -> tuple[str, dict[str, str]]:
                 out.append(insert("metrics_sync", {"post_id": post, "deliverable_id": did, "project_id": pid, "platform": plat,
                                                    "published_at": published, "status": "ok", "next_at": NOW + 3600, "tries": 1, "last_at": NOW - 900}))
 
+    # Extern gepostete Videos (Migration 0029): eine Agentur-Kampagne ohne Clips über die Plattform,
+    # an der ein TikTok-Account hängt. Die Clipper haben selbst in der TikTok-App gepostet; der
+    # Abgleich (lib/metrics.ts → syncExternalPosts) hat die Videos samt Views von Zernio geholt.
+    # Erfundene Testzahlen, nur in der lokalen Testdatenbank.
+    out.append(insert("projects", {
+        "id": "p-ext", "customer_id": "cu-ag", "name": "Omid Mouazzen: Hypercars & Lifestyle", "status": "aktiv",
+        "creator_distribution": 0, "briefing_views": 1_500_000, "briefing_budget_cents": 750_000,
+        "briefing_package": "1 Mio. Views", "briefing_niche": "Automobil", "briefing_platforms": '["tiktok"]',
+        "created_at": NOW - 10 * DAY}))
+    out.append(insert("publish_accounts", {"provider_account_id": "acc-tt-nikkiclips1", "project_id": "p-ext",
+                                           "provider_profile_id": "prof-tt-nikkiclips1", "platform": "tiktok",
+                                           "username": "nikkiclips1", "display_name": "Nikki Clips", "updated_at": NOW - 9 * DAY}))
+    real = ["7697940793650187542", "7697936933170842902", "7696153649105341718"]
+    for n, views_n in enumerate([412_000, 268_000, 187_000, 121_000, 96_000, 74_000, 58_000, 41_000, 27_000, 16_000]):
+        vid = real[n] if n < len(real) else None
+        out.append(insert("external_posts", {
+            "post_id": f"ext-{n}", "account_id": "acc-tt-nikkiclips1", "project_id": "p-ext", "platform": "tiktok",
+            "username": "nikkiclips1", "url": f"https://www.tiktok.com/@nikkiclips1/video/{vid}" if vid else None,
+            "thumb_url": f"/img/cases/nikkiclips1-{vid}.jpg" if vid else None,
+            "published_at": NOW - (8 - n % 8) * DAY + 3600 * n, "views": views_n, "likes": views_n // 14,
+            "comments": views_n // 350, "shares": views_n // 120, "saves": views_n // 200, "synced_at": NOW - 1200}))
+
     out.append(insert("creator_bookings", {"id": "cb-1", "agency_user_id": "u-agency", "creator_id": "cr-1", "project_id": "p-4",
                                             "message": "Passt perfekt zur Zielgruppe.", "status": "angefragt", "created_at": NOW - 2 * DAY}))
 
