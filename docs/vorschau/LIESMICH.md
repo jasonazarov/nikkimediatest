@@ -16,5 +16,6 @@ Nach der Freigabe wird die Änderung richtig eingespielt und die Datei hier gel�
 
 | Vorschau | Inhalt |
 |---|---|
+| `agentur-kampagnen` | Agentur-Übersicht: Der Kasten oben zeigt statt des ersten Briefings die bis zu 3 neuesten EIGENEN Kampagnen (neueste zuerst, Status, Views, Ziel, Budget, Anlagedatum, ganz klickbar). Gelöschte Kampagnen verschwinden damit. In der Demo hat die Agentur dafür drei zusätzliche Testkampagnen. |
 | (erledigt) | `usecases` wurde am 09.11.2026 freigegeben und ist eingespielt. |
 | (erledigt) | `dashboards` wurde am 07.11.2026 freigegeben und ist eingespielt. |

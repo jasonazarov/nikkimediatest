@@ -1,0 +1,208 @@
+diff --git a/public/assets/dash-whop.css b/public/assets/dash-whop.css
+index a1a71b9..342164b 100644
+--- a/public/assets/dash-whop.css
++++ b/public/assets/dash-whop.css
+@@ -590,3 +590,24 @@ html.nmd .nmw-camp-hero__new:hover { transform: translateY(-2px); box-shadow: in
+ .nmw-camp-hero__new:hover .nmw-camp-hero__cta span { transform: translateX(3px); }
+ .nmw-camp-hero__cta span { transition: transform .15s ease; }
+ @media (prefers-reduced-motion: reduce) { html.nmd .nmw-camp-hero__new, .nmw-camp-hero__cta span { transition: none; } }
++/* Die drei neuesten eigenen Kampagnen im Kopf der Agentur-Übersicht (Vorgabe des Auftraggebers,
++   November 2026): je Kampagne eine Glaszeile, die neueste oben, ganz klickbar. */
++.nmw-camp-hero__rows { position: relative; z-index: 1; margin-top: 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; min-width: 0; }
++.nmw-camp-hero__row {
++  display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; color: #fff; text-decoration: none;
++  background: rgba(255, 255, 255, .06); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12);
++  transition: background .15s ease, box-shadow .15s ease;
++}
++.nmw-camp-hero__row:hover { background: rgba(255, 255, 255, .1); box-shadow: inset 0 0 0 1px rgba(47, 224, 140, .55); }
++.nmw-camp-hero__row { min-width: 0; }
++.nmw-camp-hero__row > .min-w-0 { flex: 1 1 auto; min-width: 0; }
++.nmw-camp-hero__row-title { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-display, inherit); font-size: 1.05rem; font-weight: 800; }
++.nmw-camp-hero__row-meta { display: block; margin-top: 2px; font-size: .8rem; color: rgba(255, 255, 255, .65); }
++.nmw-camp-hero__row-chip {
++  flex: none; padding: 3px 10px; border-radius: 999px; font-size: .72rem; font-weight: 700; color: #d6fde9;
++  background: rgba(47, 224, 140, .16); box-shadow: inset 0 0 0 1px rgba(47, 224, 140, .45);
++}
++.nmw-camp-hero__row-go { flex: none; color: #9cf6c8; font-weight: 800; transition: transform .15s ease; }
++.nmw-camp-hero__row:hover .nmw-camp-hero__row-go { transform: translateX(3px); }
++@media (max-width: 640px) { .nmw-camp-hero__row-chip { display: none; } }
++@media (prefers-reduced-motion: reduce) { .nmw-camp-hero__row, .nmw-camp-hero__row-go { transition: none; } }
+diff --git a/src/routes/collaboration.ts b/src/routes/collaboration.ts
+index cf0c9e6..2951e4d 100644
+--- a/src/routes/collaboration.ts
++++ b/src/routes/collaboration.ts
+@@ -115,7 +115,15 @@ async function allCampaigns(
+   const db = getDb(env)
+   const others = and(ne(schema.users.role, 'agency'), eq(schema.users.demo, 0))
+   const projects = await db
+-    .select({ id: schema.projects.id, name: schema.projects.name, status: schema.projects.status, customerId: schema.projects.customerId })
++    .select({
++      id: schema.projects.id,
++      name: schema.projects.name,
++      status: schema.projects.status,
++      customerId: schema.projects.customerId,
++      createdAt: schema.projects.createdAt,
++      briefingViews: schema.projects.briefingViews,
++      briefingBudgetCents: schema.projects.briefingBudgetCents,
++    })
+     .from(schema.projects)
+     .innerJoin(schema.customers, eq(schema.customers.id, schema.projects.customerId))
+     .innerJoin(schema.users, eq(schema.users.id, schema.customers.userId))
+@@ -158,6 +166,10 @@ async function allCampaigns(
+       views: totals.get(p.id)?.views ?? 0,
+       clippers: team.filter((m) => m.role === 'clipper').length,
+       creators: team.filter((m) => m.role === 'creator').length,
++      createdAt: p.createdAt,
++      // Ziel und Budget nur für die eigenen: fremde Briefings gehen eine Agentur nichts an.
++      targetViews: p.customerId === ownCustomerId ? p.briefingViews : null,
++      budgetCents: p.customerId === ownCustomerId ? p.briefingBudgetCents : null,
+     }
+   })
+ }
+diff --git a/src/views/collaboration.ts b/src/views/collaboration.ts
+index 3db2454..91ed8fb 100644
+--- a/src/views/collaboration.ts
++++ b/src/views/collaboration.ts
+@@ -799,6 +799,11 @@ export interface AgencyCampaign {
+   views: number
+   clippers: number
+   creators: number
++  /** Angelegt (Unix-Sekunden) — nur bei echten Kampagnen aus der Datenbank. */
++  createdAt?: number
++  /** Views und Budget aus dem Kampagnen-Briefing, falls angegeben. */
++  targetViews?: number | null
++  budgetCents?: number | null
+ }
+ 
+ export interface AgencyCreator {
+@@ -857,6 +862,21 @@ const campaignCardOf = (c: AgencyCampaign) =>
+     ],
+   })
+ 
++const OWN_STATUS: Record<string, string> = { aktiv: 'Aktiv', pausiert: 'Pausiert', beendet: 'Beendet', abgeschlossen: 'Abgeschlossen' }
++
++/** Eine Zeile im Kopf der Übersicht: eigene Kampagne mit Views, Ziel, Budget und Anlagedatum. */
++const ownCampaignRow = (c: AgencyCampaign) => ({
++  href: `/collaboration/meine/${c.id}`,
++  title: c.name,
++  chip: OWN_STATUS[c.status] ?? c.status,
++  meta: [
++    `${formatCompact(c.views, 'de')} Views`,
++    ...(c.targetViews ? [`Ziel ${formatCompact(c.targetViews, 'de')}`] : []),
++    ...(c.budgetCents ? [`Budget ${formatEuro(c.budgetCents)}`] : []),
++    ...(c.createdAt ? [`angelegt ${new Date(c.createdAt * 1000).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Europe/Vienna' })}`] : []),
++  ],
++})
++
+ const initials = (name: string) =>
+   name
+     .split(/\s+/)
+@@ -939,6 +959,13 @@ export function overviewPage(o: {
+ }): string {
+   const first = o.user.fullName.split(' ')[0]
+   const latest = o.campaigns.slice(0, 6)
++  // Kopf: die drei neuesten EIGENEN Kampagnen, die neueste zuerst (Vorgabe des
++  // Auftraggebers). Nur echte aus der Datenbank: eine gelöschte ist damit weg,
++  // die Use Cases der Demo-Agentur (ohne Anlagedatum) stehen hier nicht.
++  const mine = o.campaigns
++    .filter((c) => c.own && c.createdAt)
++    .sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0))
++    .slice(0, 3)
+   const body = `
+       ${
+         o.justUnlocked
+@@ -954,13 +981,10 @@ export function overviewPage(o: {
+       <!-- Deine Kampagne + Neue Kampagne ganz oben (Vorgabe des Auftraggebers, November 2026):
+            beide in Markengrün als Liquid Glass. Views-Grafik, Virale Clips und Push folgen danach (TOP_MARK). -->
+       ${campHero({
+-        eyebrow: 'Deine Kampagne',
+-        chip: 'Briefing',
+-        title: agencyPackageLabel(o.lead.package),
+-        stats: [
+-          { value: viewsShort(o.lead.viewsTarget), label: 'Views', valueFirst: true },
+-          { label: 'Budget', value: o.lead.budgetCents ? formatEuro(o.lead.budgetCents) : '–' },
+-        ],
++        eyebrow: mine.length > 1 ? 'Deine Kampagnen' : 'Deine Kampagne',
++        title: 'Noch keine eigene Kampagne',
++        text: 'Leg deine erste Kampagne an: Views wählen, Preis sehen, starten.',
++        rows: mine.map(ownCampaignRow),
+         primary: { href: '/collaboration/meine', label: 'Material hochladen', icon: 'upload' },
+         ghosts: [
+           { href: '/collaboration/creator', label: 'Creator buchen' },
+diff --git a/src/views/layout.ts b/src/views/layout.ts
+index 0dc2f55..cbcd926 100644
+--- a/src/views/layout.ts
++++ b/src/views/layout.ts
+@@ -227,8 +227,33 @@ export interface CampHero {
+   mainAttrs?: string
+   /** Die ganz klickbare Kachel rechts; fehlt sie, nimmt die große Kachel die volle Breite. */
+   side?: { href?: string; attrs?: string; title: string; text: string; cta: string; icon: HeroIcon }
++  /**
++   * Statt einer großen Zeile eine Liste von Kampagnen (z. B. die drei neuesten
++   * eigenen der Agentur). Gesetzt, ersetzt sie `title`/`text`/`stats`; leer,
++   * stehen `title` und `text` als Leerzustand da. Alles wird escaped.
++   */
++  rows?: HeroRow[]
+ }
+ 
++export interface HeroRow {
++  href: string
++  title: string
++  /** Status-Etikett rechts, z. B. „Aktiv“. */
++  chip?: string
++  /** Kleine Angaben darunter, mit „·“ getrennt. */
++  meta: string[]
++}
++
++const heroRow = (r: HeroRow) => `
++              <a href="${esc(r.href)}" class="nmw-camp-hero__row">
++                <span class="min-w-0">
++                  <span class="nmw-camp-hero__row-title">${esc(r.title)}</span>
++                  <span class="nmw-camp-hero__row-meta">${r.meta.map((m) => esc(m).replace(/ /g, '&nbsp;')).join(' · ')}</span>
++                </span>
++                ${r.chip ? `<span class="nmw-camp-hero__row-chip">${esc(r.chip)}</span>` : ''}
++                <span class="nmw-camp-hero__row-go" aria-hidden="true">→</span>
++              </a>`
++
+ const heroButton = (l: HeroLink, cls: string) => {
+   const inner = `${l.icon ? heroSvg(l.icon, 'h-4 w-4') : ''}${esc(l.label)}`
+   return l.href ? `<a href="${esc(l.href)}" class="${cls}"${l.attrs ? ` ${l.attrs}` : ''}>${inner}</a>` : `<button type="button" class="${cls}"${l.attrs ? ` ${l.attrs}` : ''}>${inner}</button>`
+@@ -267,9 +292,13 @@ export function campHero(o: CampHero): string {
+               <span class="text-xs font-bold uppercase tracking-[.16em] text-brand-2">${esc(o.eyebrow)}</span>
+               ${o.chip ? `<span class="nmw-camp-hero__live"><i aria-hidden="true"></i>${esc(o.chip)}</span>` : ''}
+             </div>
+-            <p class="mt-2 font-display text-2xl font-extrabold leading-tight sm:text-3xl">${esc(o.title)}</p>
++            ${
++              o.rows?.length
++                ? `<div class="nmw-camp-hero__rows" data-own-campaigns>${o.rows.map(heroRow).join('')}\n            </div>`
++                : `<p class="mt-2 font-display text-2xl font-extrabold leading-tight sm:text-3xl">${esc(o.title)}</p>
+             ${o.text ? `<p class="mt-2 max-w-2xl text-sm text-white/70">${esc(o.text)}</p>` : ''}
+-            ${stats ? `<div class="mt-4 flex flex-wrap gap-2">\n              ${stats}\n            </div>` : ''}
++            ${stats ? `<div class="mt-4 flex flex-wrap gap-2">\n              ${stats}\n            </div>` : ''}`
++            }
+           </div>
+           ${buttons.length ? `<div class="flex flex-wrap items-center gap-3">\n            ${buttons.join('\n            ')}\n          </div>` : ''}
+         </div>${
+diff --git a/tools/preview.py b/tools/preview.py
+index 7db01fc..de5ea12 100644
+--- a/tools/preview.py
++++ b/tools/preview.py
+@@ -234,6 +234,18 @@ def seed_sql() -> tuple[str, dict[str, str]]:
+                 "views": p["views"], "likes": p["likes"], "comments": p["comments"], "shares": p["shares"], "saves": p["saves"],
+                 "impressions": p["impressions"], "reach": p["reach"], "synced_at": synced}))
+ 
++    # Weitere eigene Kampagnen der Agentur, ohne Zahlen: zeigen, dass der Kopf der Übersicht nur die
++    # drei NEUESTEN eigenen Kampagnen auflistet (die neueste zuerst). „Frühling“ ist die vierte und fehlt dort.
++    for pid, name, created, views_t, cents in [
++        ("p-own-herbst", "Testkampagne Herbst", 1_793_000_000, 500_000, 250_000),
++        ("p-own-sommer", "Testkampagne Sommer", 1_788_000_000, 2_000_000, 1_000_000),
++        ("p-own-fruehling", "Testkampagne Frühling", 1_778_000_000, 1_000_000, 500_000),
++    ]:
++        out.append(insert("projects", {
++            "id": pid, "customer_id": "cu-ag", "name": name, "status": "aktiv", "creator_distribution": 0,
++            "briefing_views": views_t, "briefing_budget_cents": cents, "briefing_platforms": '["tiktok","instagram"]',
++            "created_at": min(created, NOW - DAY)}))
++
+     out.append(insert("creator_bookings", {"id": "cb-1", "agency_user_id": "u-agency", "creator_id": "cr-1", "project_id": "p-ext",
+                                             "message": "Passt perfekt zur Zielgruppe.", "status": "angefragt", "created_at": NOW - 2 * DAY}))
+ 
