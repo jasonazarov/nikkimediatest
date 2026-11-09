@@ -31,6 +31,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import hmac
+import json
 import os
 import random
 import secrets
@@ -42,6 +43,7 @@ import sys
 import time
 import urllib.request
 import uuid
+from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -206,26 +208,30 @@ def seed_sql() -> tuple[str, dict[str, str]]:
                                                    "published_at": published, "status": "ok", "next_at": NOW + 3600, "tries": 1, "last_at": NOW - 900}))
 
     # Extern gepostete Videos (Migration 0029): eine Agentur-Kampagne ohne Clips über die Plattform,
-    # an der ein TikTok-Account hängt. Die Clipper haben selbst in der TikTok-App gepostet; der
-    # Abgleich (lib/metrics.ts → syncExternalPosts) hat die Videos samt Views von Zernio geholt.
-    # Erfundene Testzahlen, nur in der lokalen Testdatenbank.
-    out.append(insert("projects", {
-        "id": "p-ext", "customer_id": "cu-ag", "name": "Omid Mouazzen: Hypercars & Lifestyle", "status": "aktiv",
-        "creator_distribution": 0, "briefing_views": 1_500_000, "briefing_budget_cents": 750_000,
-        "briefing_package": "1 Mio. Views", "briefing_niche": "Automobil", "briefing_platforms": '["tiktok"]',
-        "created_at": NOW - 10 * DAY}))
-    out.append(insert("publish_accounts", {"provider_account_id": "acc-tt-nikkiclips1", "project_id": "p-ext",
-                                           "provider_profile_id": "prof-tt-nikkiclips1", "platform": "tiktok",
-                                           "username": "nikkiclips1", "display_name": "Nikki Clips", "updated_at": NOW - 9 * DAY}))
-    real = ["7697940793650187542", "7697936933170842902", "7696153649105341718"]
-    for n, views_n in enumerate([412_000, 268_000, 187_000, 121_000, 96_000, 74_000, 58_000, 41_000, 27_000, 16_000]):
-        vid = real[n] if n < len(real) else None
-        out.append(insert("external_posts", {
-            "post_id": f"ext-{n}", "account_id": "acc-tt-nikkiclips1", "project_id": "p-ext", "platform": "tiktok",
-            "username": "nikkiclips1", "url": f"https://www.tiktok.com/@nikkiclips1/video/{vid}" if vid else None,
-            "thumb_url": f"/img/cases/nikkiclips1-{vid}.jpg" if vid else None,
-            "published_at": NOW - (8 - n % 8) * DAY + 3600 * n, "views": views_n, "likes": views_n // 14,
-            "comments": views_n // 350, "shares": views_n // 120, "saves": views_n // 200, "synced_at": NOW - 1200}))
+    # an der der TikTok-Account @nikkiclips1 hängt. Die Clipper haben selbst in der TikTok-App gepostet.
+    # Live holt der Abgleich (lib/metrics.ts → syncExternalPosts) die Videos selbst über Zernio. Hier
+    # steht ein ECHTER Schnappschuss dieser Abfrage (tools/preview-data/nikkiclips1.json, 98 Videos,
+    # abgerufen am 09.11.2026). Kampagne und Briefing sind Testdaten.
+    snap_file = ROOT / "tools" / "preview-data" / "nikkiclips1.json"
+    if snap_file.exists():
+        snap = json.loads(snap_file.read_text(encoding="utf-8"))
+        posts = snap["posts"]
+        first = min(p["publishedAt"] for p in posts)
+        out.append(insert("projects", {
+            "id": "p-ext", "customer_id": "cu-ag", "name": "Omid Mouazzen: Hypercars & Lifestyle", "status": "aktiv",
+            "creator_distribution": 0, "briefing_views": 1_500_000, "briefing_budget_cents": 750_000,
+            "briefing_package": "1 Mio. Views", "briefing_niche": "Automobil", "briefing_platforms": '["tiktok"]',
+            "created_at": first - DAY}))
+        out.append(insert("publish_accounts", {"provider_account_id": "acc-tt-nikkiclips1", "project_id": "p-ext",
+                                               "provider_profile_id": "prof-tt-nikkiclips1", "platform": "tiktok",
+                                               "username": snap["account"], "display_name": snap["account"], "updated_at": first}))
+        synced = min(NOW, int(datetime.fromisoformat(snap["fetchedAt"].replace("Z", "+00:00")).timestamp()))
+        for p in posts:
+            out.append(insert("external_posts", {
+                "post_id": p["postId"], "account_id": "acc-tt-nikkiclips1", "project_id": "p-ext", "platform": snap["platform"],
+                "username": snap["account"], "url": p["url"], "thumb_url": p["thumbUrl"], "published_at": p["publishedAt"],
+                "views": p["views"], "likes": p["likes"], "comments": p["comments"], "shares": p["shares"], "saves": p["saves"],
+                "impressions": p["impressions"], "reach": p["reach"], "synced_at": synced}))
 
     out.append(insert("creator_bookings", {"id": "cb-1", "agency_user_id": "u-agency", "creator_id": "cr-1", "project_id": "p-4",
                                             "message": "Passt perfekt zur Zielgruppe.", "status": "angefragt", "created_at": NOW - 2 * DAY}))

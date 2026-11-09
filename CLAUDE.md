@@ -703,6 +703,9 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   Sie zählen in den Kampagnen-Summen (`totalsForProjects`, `grandTotals`), in der Views-Grafik und als eigene Clips
   in „Virale Clips“ (Cover von Zernio); Clipper sehen sie nicht (`PostScope.projectWhere`). Admin „Refresh numbers“
   holt sie für die Kampagne sofort. Fehlt die Tabelle, zählen sie einfach nicht. Test: `npx tsx tests/gold/external.test.ts`.
+  Am 09.11.2026 mit der echten Zernio-Antwort geprüft (@nikkiclips1: 98 Videos, 1.568.045 Views, Zahlen gleich den
+  öffentlichen TikTok-Seiten). Dieser Schnappschuss liegt als `tools/preview-data/nikkiclips1.json` und füllt die
+  lokale Demo (Agentur-Kampagne „Omid Mouazzen“).
 - **Vorschauen vor der Freigabe** (`docs/vorschau/<name>.patch`, siehe `docs/vorschau/LIESMICH.md`): eine
   Änderung, die der Auftraggeber erst lokal sehen will, liegt als Patch bei und ist NICHT im Code.
   `bash scripts/demo-lokal.sh <name>` spielt sie nur in eine Kopie unter `~/.nikki-vorschau/<name>` ein
