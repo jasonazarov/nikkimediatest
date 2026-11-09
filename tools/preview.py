@@ -161,10 +161,11 @@ def seed_sql() -> tuple[str, dict[str, str]]:
         # Creator schneiden auch: ihr Bereich braucht zusätzlich einen Clipper-Datensatz (routes/campaigns.ts → areaOf)
         out.append(insert("clippers", {"id": f"c-cr-{i}", "user_id": u, "display_name": name, "status": "aktiv", "created_at": NOW - 30 * DAY}))
 
-    # Kampagnen: drei vom Kunden, eine eigene des Creators, eine der Agentur
-    owners = ["cu-1", "cu-1", "cu-1", "cu-cr-0", "cu-ag"]
+    # Kampagnen: drei vom Kunden, eine eigene des Creators. Die Agentur hat nur die Kampagne mit den
+    # echten Zahlen von @nikkiclips1 (unten, „Extern gepostete Videos“), keine erfundene daneben.
+    owners = ["cu-1", "cu-1", "cu-1", "cu-cr-0"]
     projects = []
-    for i, (name, views, cents, niche) in enumerate(CAMPAIGNS + [("Klein & Partner: Bäckerei Mayer", 2_000_000, 1_000_000, "Food")]):
+    for i, (name, views, cents, niche) in enumerate(CAMPAIGNS):
         pid = f"p-{i}"
         projects.append(pid)
         out.append(insert("projects", {
@@ -233,7 +234,7 @@ def seed_sql() -> tuple[str, dict[str, str]]:
                 "views": p["views"], "likes": p["likes"], "comments": p["comments"], "shares": p["shares"], "saves": p["saves"],
                 "impressions": p["impressions"], "reach": p["reach"], "synced_at": synced}))
 
-    out.append(insert("creator_bookings", {"id": "cb-1", "agency_user_id": "u-agency", "creator_id": "cr-1", "project_id": "p-4",
+    out.append(insert("creator_bookings", {"id": "cb-1", "agency_user_id": "u-agency", "creator_id": "cr-1", "project_id": "p-ext",
                                             "message": "Passt perfekt zur Zielgruppe.", "status": "angefragt", "created_at": NOW - 2 * DAY}))
 
     # Leads
