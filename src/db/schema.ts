@@ -978,3 +978,37 @@ export const upsellRequests = sqliteTable(
     index('upsell_requests_project_idx').on(t.projectId),
   ],
 )
+
+/**
+ * Extern gepostete Videos eines verbundenen Kampagnen-Accounts (Migration 0029).
+ *
+ * Direkt in der App der Plattform gepostet, nicht über NIKKI MEDIA. Zernio liest
+ * sie selbst von der Plattform, lib/metrics.ts holt sie stündlich ab
+ * (`syncExternalPosts`). Sie zählen für die Kampagne des Accounts.
+ */
+export const externalPosts = sqliteTable(
+  'external_posts',
+  {
+    postId: text('post_id').notNull(),
+    accountId: text('account_id').notNull(),
+    projectId: text('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
+    platform: text('platform').notNull(),
+    username: text('username'),
+    url: text('url'),
+    thumbUrl: text('thumb_url'),
+    publishedAt: integer('published_at').notNull(),
+    views: integer('views').notNull().default(0),
+    likes: integer('likes').notNull().default(0),
+    comments: integer('comments').notNull().default(0),
+    shares: integer('shares').notNull().default(0),
+    saves: integer('saves').notNull().default(0),
+    impressions: integer('impressions').notNull().default(0),
+    reach: integer('reach').notNull().default(0),
+    syncedAt: integer('synced_at').notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.postId, t.accountId] }),
+    index('external_posts_project_idx').on(t.projectId),
+    index('external_posts_account_idx').on(t.accountId),
+  ],
+)

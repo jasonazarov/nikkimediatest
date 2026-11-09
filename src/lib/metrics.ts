@@ -4,10 +4,13 @@ import { getDb, nowSec, schema } from './db'
 import { audit } from './audit'
 import {
   getPostAnalytics,
+  listExternalPosts,
+  POST_LIST_LIMIT,
   zernioReady,
   ZernioError,
   type AnalyticsResult,
   type ZernioAnalyticsResponse,
+  type ZernioListedPost,
   type ZernioPlatformAnalytics,
   type ZernioPostAnalytics,
 } from './zernio'
@@ -41,6 +44,10 @@ import type { Env } from './types'
    Je Plattform ist es ein eigener Zernio-Post; ein Post kann an mehrere
    Accounts derselben Plattform gehen, deshalb zählt `post_metrics` je
    Post UND Account.
+
+   Dazu die Videos, die Clipper direkt in der App der Plattform gepostet
+   haben (`external_posts`, siehe „Extern gepostete Videos“ unten). Sie
+   zählen in den Summen je Kampagne und insgesamt mit, nicht je Clip.
    -------------------------------------------------------------------------- */
 
 const HOUR = 3600
@@ -755,6 +762,267 @@ export async function syncProjectMetrics(env: Env, projectId: string): Promise<S
   return run(env, { limit: PROJECT_LIMIT, projectId, manual: true })
 }
 
+/* ------------------------------------------------ Extern gepostete Videos */
+
+/*
+ * Clipper posten oft selbst, direkt in der App von TikTok, Instagram & Co.
+ * Solche Videos liefen nicht über uns und hatten deshalb keine Zahlen, obwohl
+ * der Account an der Kampagne hängt. Zernio liest jeden verbundenen Account
+ * selbst von der Plattform (etwa alle 90 Minuten). Der Viertelstundenlauf holt
+ * die Liste je Account höchstens einmal je Stunde ab und schreibt sie nach
+ * `external_posts` (Migration 0029).
+ *
+ *   - Gezählt wird für die Kampagne, an der der Account hängt
+ *     (`publish_accounts.project_id`), mit allen Posts des letzten Jahres,
+ *     auch denen von vor dem Verbinden.
+ *   - Accounts von Creatorn zählen nicht: dort läuft ihr eigenes Programm,
+ *     keine Kampagne.
+ *   - Über uns veröffentlichte Posts bleiben draußen (`latePostId` gesetzt
+ *     oder ihr Link steht schon in `post_metrics`), sie zählen dort bereits.
+ *   - Werbung (`isAd`) zählt nicht als organische Reichweite.
+ *
+ * Bewusst rohes SQL über `env.DB`: so lässt sich der Abgleich ohne Worker
+ * testen (tests/gold/external.test.ts).
+ */
+
+/** Höchstens so oft je Account. */
+const EXTERNAL_EVERY = HOUR
+const EXTERNAL_KEY = 'external_synced:'
+/** Zernio nimmt höchstens 366 Tage je Abfrage. */
+const EXTERNAL_DAYS = 365
+/** Seiten zu 100 Posts je Account und Lauf; ältere behalten ihren letzten Stand. */
+const EXTERNAL_MAX_PAGES = 5
+/** Abrufe je Viertelstundenlauf (derselbe Lauf schickt auch Posts und den Selbsttest raus). */
+export const EXTERNAL_PER_RUN = 8
+/** Abrufe für den Admin-Knopf „Refresh numbers“ einer Kampagne. */
+const EXTERNAL_PER_PROJECT = 20
+
+export interface ExternalSyncResult {
+  /** Accounts, deren Liste abgefragt wurde. */
+  accounts: number
+  /** Abrufe bei Zernio. */
+  fetched: number
+  /** Geschriebene Posts (neu oder aktualisiert). */
+  posts: number
+  /** Analytics ruhen (402). */
+  paused: boolean
+}
+
+interface ExternalAccount {
+  account_id: string
+  project_id: string
+  platform: string
+  username: string | null
+  last: string | null
+}
+
+interface ExternalRow {
+  postId: string
+  platform: string
+  username: string | null
+  url: string | null
+  thumbUrl: string | null
+  publishedAt: number
+  syncedAt: number
+  values: Record<MetricKey, number>
+}
+
+/** Nur echte Web-Adressen: sie landen als Link und Bild in den Dashboards. */
+const webUrl = (v: unknown) => (typeof v === 'string' && /^https:\/\/[^\s"'<>]+$/i.test(v.trim()) ? v.trim() : null)
+
+const isoDate = (unix: number) => new Date(unix * 1000).toISOString().slice(0, 10)
+
+/** Ein Eintrag der Liste als Zeile — oder null, wenn er nicht zählt. */
+export function externalRow(
+  raw: unknown,
+  acc: Pick<ExternalAccount, 'account_id' | 'platform' | 'username'>,
+  ts: number,
+): ExternalRow | null {
+  if (!isObject(raw)) return null
+  const p = raw as ZernioListedPost
+  const postId = typeof p._id === 'string' && p._id ? p._id : null
+  if (!postId || p.latePostId || p.isAd) return null
+  const entries = (Array.isArray(p.platforms) ? p.platforms : []).filter(
+    (e): e is ZernioPlatformAnalytics => isObject(e),
+  )
+  const entry = entries.find((e) => e.accountId === acc.account_id) ?? (entries.length === 1 ? entries[0] : null)
+  if (entry?.status === 'failed') return null
+  const a: ZernioPostAnalytics | null = (isObject(entry?.analytics) ? entry?.analytics : null) ?? (isObject(p.analytics) ? p.analytics : null)
+  const values = {} as Record<MetricKey, number>
+  for (const k of METRIC_KEYS) values[k] = metric(a, k) ?? 0
+  return {
+    postId,
+    platform: lowerText(entry?.platform) ?? lowerText(p.platform) ?? acc.platform,
+    username: cleanUsername(entry?.accountUsername) ?? acc.username,
+    url: webUrl(entry?.platformPostUrl) ?? webUrl(p.platformPostUrl),
+    thumbUrl: webUrl(p.thumbnailUrl),
+    publishedAt: isoToSec(p.publishedAt, ts) ?? ts,
+    syncedAt: isoToSec(a?.lastUpdated, ts) ?? ts,
+    values,
+  }
+}
+
+/**
+ * Schreibt die Posts eines Accounts. Eine 0, wo schon mehr stand, ersetzt die
+ * Zahl nicht (wie `writesFor`): eine 0 nach echten Views ist ein Aussetzer der
+ * Plattform, kein Verlust.
+ */
+async function writeExternal(env: Env, acc: ExternalAccount, rows: ExternalRow[]): Promise<number> {
+  if (!rows.length) return 0
+  const { results } = await env.DB.prepare('SELECT url FROM post_metrics WHERE account_id = ? AND url IS NOT NULL')
+    .bind(acc.account_id)
+    .all()
+  const ours = new Set(((results ?? []) as { url: string }[]).map((r) => r.url))
+  const keep = rows.filter((r) => !r.url || !ours.has(r.url))
+  const keepMax = (k: MetricKey) => `${k} = CASE WHEN excluded.${k} > 0 THEN excluded.${k} ELSE external_posts.${k} END`
+  const stmt = env.DB.prepare(
+    `INSERT INTO external_posts (post_id, account_id, project_id, platform, username, url, thumb_url, published_at,
+       views, likes, comments, shares, saves, impressions, reach, synced_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT (post_id, account_id) DO UPDATE SET
+       project_id = excluded.project_id, platform = excluded.platform,
+       username = COALESCE(excluded.username, external_posts.username),
+       url = COALESCE(excluded.url, external_posts.url),
+       thumb_url = COALESCE(excluded.thumb_url, external_posts.thumb_url),
+       published_at = excluded.published_at, ${METRIC_KEYS.map(keepMax).join(', ')},
+       synced_at = excluded.synced_at`,
+  )
+  const statements = keep.map((r) =>
+    stmt.bind(
+      r.postId, acc.account_id, acc.project_id, r.platform, r.username, r.url, r.thumbUrl, r.publishedAt,
+      ...METRIC_KEYS.map((k) => r.values[k]), r.syncedAt,
+    ),
+  )
+  for (let i = 0; i < statements.length; i += ID_CHUNK) await env.DB.batch(statements.slice(i, i + ID_CHUNK))
+  return keep.length
+}
+
+async function markExternal(env: Env, accountId: string, ts: number): Promise<void> {
+  await env.DB.prepare(
+    `INSERT INTO app_state (key, value, updated_at) VALUES (?, ?, ?)
+     ON CONFLICT (key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at`,
+  )
+    .bind(EXTERNAL_KEY + accountId, String(ts), ts)
+    .run()
+}
+
+/**
+ * Holt die extern geposteten Videos der Kampagnen-Accounts ab.
+ *
+ * Ohne `projectId` (Viertelstundenlauf): nur Accounts, deren letzte Abfrage
+ * eine Stunde her ist, die ältesten zuerst, höchstens `maxRequests` Abrufe.
+ * Mit `projectId` und `force` (Admin-Knopf): alle Accounts dieser Kampagne
+ * sofort. Ohne ZERNIO_API_KEY passiert nichts, während einer 402-Pause nur
+ * mit `force`.
+ */
+export async function syncExternalPosts(
+  env: Env,
+  o: { projectId?: string; force?: boolean; maxRequests?: number; now?: number } = {},
+): Promise<ExternalSyncResult> {
+  const result: ExternalSyncResult = { accounts: 0, fetched: 0, posts: 0, paused: false }
+  if (!zernioReady(env)) return result
+  const ts = o.now ?? nowSec()
+
+  if (!o.force) {
+    const pause = (await env.DB.prepare('SELECT value FROM app_state WHERE key = ?').bind(PAUSE_KEY).first()) as
+      | { value: string | null }
+      | null
+    if (pause && Number(pause.value) > ts) {
+      result.paused = true
+      return result
+    }
+  }
+
+  const { results } = await env.DB.prepare(
+    `SELECT pa.provider_account_id AS account_id, pa.project_id, pa.platform, pa.username, s.value AS last
+     FROM publish_accounts pa
+     LEFT JOIN app_state s ON s.key = '${EXTERNAL_KEY}' || pa.provider_account_id
+     WHERE pa.project_id IS NOT NULL ${o.projectId ? 'AND pa.project_id = ?' : ''}
+     ORDER BY COALESCE(CAST(s.value AS INTEGER), 0), pa.provider_account_id`,
+  )
+    .bind(...(o.projectId ? [o.projectId] : []))
+    .all()
+  const accounts = ((results ?? []) as unknown as ExternalAccount[]).filter(
+    (a) => o.force || !a.last || Number(a.last) <= ts - (EXTERNAL_EVERY - 5 * 60),
+  )
+
+  let budget = Math.max(1, o.maxRequests ?? (o.projectId ? EXTERNAL_PER_PROJECT : EXTERNAL_PER_RUN))
+  const fromDate = isoDate(ts - EXTERNAL_DAYS * DAY)
+  const toDate = isoDate(ts)
+  let stop = false
+
+  for (const acc of accounts) {
+    if (budget <= 0 || stop) break
+    result.accounts++
+    const rows: ExternalRow[] = []
+    for (let page = 1; page <= EXTERNAL_MAX_PAGES && budget > 0; page++) {
+      budget--
+      result.fetched++
+      let list
+      try {
+        list = await listExternalPosts(env, { accountId: acc.account_id, fromDate, toDate, page })
+      } catch (err) {
+        const status = err instanceof ZernioError ? err.status : 0
+        // 402: Plan ohne Analytics. 429/401/403: jeder weitere Abruf liefe gegen
+        // dieselbe Wand. Dann bleibt der Account fällig und kommt im nächsten Lauf dran.
+        if (status === 402 || status === 429 || status === 401 || status === 403) stop = true
+        if (status === 402) result.paused = true
+        console.error('[metrics] Externe Posts nicht abgefragt', acc.account_id, err instanceof ZernioError ? err.short : err)
+        break
+      }
+      const posts = Array.isArray(list.posts) ? list.posts : []
+      for (const p of posts) {
+        const row = externalRow(p, acc, ts)
+        if (row) rows.push(row)
+      }
+      const pages = Number(list.pagination?.pages)
+      if (posts.length < POST_LIST_LIMIT || (Number.isFinite(pages) && page >= pages)) break
+    }
+    try {
+      result.posts += await writeExternal(env, acc, rows)
+      // Auch nach einem gewöhnlichen Fehler: der Account kommt dann in einer
+      // Stunde wieder dran statt in jedem Viertelstundenlauf.
+      if (!stop) await markExternal(env, acc.account_id, ts)
+    } catch (err) {
+      console.error('[metrics] Externe Posts nicht geschrieben', acc.account_id, err)
+    }
+  }
+  return result
+}
+
+/** Zahlen der extern geposteten Videos je Kampagne. Fehlt die Tabelle noch (Migration 0029), zählen sie nicht. */
+async function externalTotals(env: Env, projectIds?: string[]): Promise<Map<string, MetricTotals>> {
+  const out = new Map<string, MetricTotals>()
+  const query = async (ids?: string[]) => {
+    const where = ids ? `WHERE project_id IN (${ids.map(() => '?').join(',')})` : ''
+    const { results } = await env.DB.prepare(
+      `SELECT project_id, COALESCE(SUM(CASE WHEN views > 0 THEN views ELSE impressions END), 0) AS views,
+              COALESCE(SUM(likes), 0) AS likes, COALESCE(SUM(comments), 0) AS comments,
+              COALESCE(SUM(shares), 0) AS shares, COUNT(*) AS posts, MAX(synced_at) AS synced_at
+       FROM external_posts ${where} GROUP BY project_id`,
+    )
+      .bind(...(ids ?? []))
+      .all()
+    for (const r of (results ?? []) as Record<string, unknown>[]) {
+      out.set(String(r.project_id), {
+        views: Number(r.views) || 0,
+        likes: Number(r.likes) || 0,
+        comments: Number(r.comments) || 0,
+        shares: Number(r.shares) || 0,
+        posts: Number(r.posts) || 0,
+        syncedAt: r.synced_at === null || r.synced_at === undefined ? null : Number(r.synced_at),
+      })
+    }
+  }
+  try {
+    if (!projectIds) await query()
+    else for (let i = 0; i < projectIds.length; i += ID_CHUNK) await query(projectIds.slice(i, i + ID_CHUNK))
+  } catch (err) {
+    console.error('[metrics] Externe Posts nicht gelesen', err)
+  }
+  return out
+}
+
 /* ---------------------------------------------------------------- Lesen */
 
 export interface MetricTotals {
@@ -846,7 +1114,8 @@ const creatorFilter = (creatorId: string | null | undefined) =>
   creatorId === undefined ? undefined : creatorId === null ? isNull(pm.creatorId) : eq(pm.creatorId, creatorId)
 
 /**
- * Summen je Projekt. Die Hauptzahlen enthalten ALLE Posts des Projekts;
+ * Summen je Projekt. Die Hauptzahlen enthalten ALLE Posts des Projekts,
+ * auch die extern geposteten Videos seiner Accounts (`external_posts`);
  * `viaCreators` ist der Anteil daran, der über Creator-Accounts lief
  * („davon über Creator“). Projekte ohne Zahlen fehlen in der Map.
  */
@@ -867,6 +1136,12 @@ export async function totalsForProjects(
     if (!entry) out.set(r.projectId, (entry = { ...emptyTotals(), viaCreators: emptyTotals() }))
     addInto(entry, toTotals(r))
     if (r.via) addInto(entry.viaCreators, toTotals(r))
+  }
+  // Extern gepostete Videos der Kampagnen-Accounts zählen mit.
+  for (const [projectId, ext] of await externalTotals(env, projectIds)) {
+    let entry = out.get(projectId)
+    if (!entry) out.set(projectId, (entry = { ...emptyTotals(), viaCreators: emptyTotals() }))
+    addInto(entry, ext)
   }
   return out
 }
@@ -977,6 +1252,7 @@ export async function grandTotals(env: Env): Promise<MetricTotalsWithCreators> {
     addInto(out, toTotals(r))
     if (r.via) addInto(out.viaCreators, toTotals(r))
   }
+  for (const ext of (await externalTotals(env)).values()) addInto(out, ext)
   return out
 }
 

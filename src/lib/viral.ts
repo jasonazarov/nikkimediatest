@@ -8,8 +8,10 @@ import { showcaseViral, showsShowcase } from './showcase'
  * „Virale Clips“ — die Clips mit den meisten Views, für das Feld oben in
  * jeder Übersicht (layout.ts → /assets/viral.js → GET /api/viral-clips).
  *
- * Gelesen wird nur `post_metrics` (dieselben Zahlen wie überall, Views wie
- * `viewsOf` in metrics.ts). Wer was sieht, folgt den Regeln des Projekts:
+ * Gelesen wird `post_metrics` (dieselben Zahlen wie überall, Views wie
+ * `viewsOf` in metrics.ts), dazu die extern geposteten Videos der
+ * Kampagnen-Accounts (`external_posts`, je Video ein Clip). Wer was sieht,
+ * folgt den Regeln des Projekts:
  *
  *   admin     alle Clips
  *   customer  Clips der eigenen Kampagnen
@@ -68,22 +70,37 @@ export interface PostScope {
   showAccounts: boolean
   /** Eingrenzung allein über Kampagnen (Admin, Kunde, Agentur) — dann taugen Tagesstände je Kampagne. */
   projectScoped: boolean
+  /**
+   * Dieselbe Eingrenzung NUR über `projects p`, für extern gepostete Videos
+   * (`external_posts`), die keinen Clip und keinen Clipper haben. Sie gehören
+   * zu den Kampagnen des Besitzers: Admin alle, Kunde und Agentur ihre, Creator
+   * ihre eigenen. Clipper sehen sie nicht. `null` heißt: keine.
+   */
+  projectWhere: string | null
+  projectBinds: unknown[]
 }
 
 export async function postScopeFor(env: Env, user: User): Promise<PostScope | null> {
   switch (user.role) {
     case 'admin':
-      return { where: '1 = 1', binds: [], showAccounts: true, projectScoped: true }
+      return { where: '1 = 1', binds: [], showAccounts: true, projectScoped: true, projectWhere: '1 = 1', projectBinds: [] }
     case 'customer':
     case 'agency': {
       const customer = await idOf(env, 'customers', user.id)
       if (!customer) return null
-      return { where: 'p.customer_id = ?', binds: [customer.id], showAccounts: true, projectScoped: true }
+      return {
+        where: 'p.customer_id = ?',
+        binds: [customer.id],
+        showAccounts: true,
+        projectScoped: true,
+        projectWhere: 'p.customer_id = ?',
+        projectBinds: [customer.id],
+      }
     }
     case 'clipper': {
       const clipper = await idOf(env, 'clippers', user.id)
       if (!clipper) return null
-      return { where: 'd.clipper_id = ?', binds: [clipper.id], showAccounts: false, projectScoped: false }
+      return { where: 'd.clipper_id = ?', binds: [clipper.id], showAccounts: false, projectScoped: false, projectWhere: null, projectBinds: [] }
     }
     case 'creator': {
       const [customer, clipper, creator] = await Promise.all([
@@ -97,7 +114,14 @@ export async function postScopeFor(env: Env, user: User): Promise<PostScope | nu
       if (clipper) (any.push('d.clipper_id = ?'), binds.push(clipper.id))
       if (creator) (any.push('pm.creator_id = ?'), binds.push(creator.id))
       if (!any.length) return null
-      return { where: `(${any.join(' OR ')})`, binds, showAccounts: false, projectScoped: false }
+      return {
+        where: `(${any.join(' OR ')})`,
+        binds,
+        showAccounts: false,
+        projectScoped: false,
+        projectWhere: customer ? 'p.customer_id = ?' : null,
+        projectBinds: customer ? [customer.id] : [],
+      }
     }
     default:
       return null
@@ -151,9 +175,11 @@ async function realViralClipsFor(env: Env, user: User, limit: number): Promise<V
     .bind(...binds)
     .all()
   const rows = (results ?? []) as unknown as Row[]
+  const lim = Math.max(1, Math.min(24, limit))
+  const external = await externalViral(env, scope, lim)
 
   const canSign = r2Ready(env)
-  return Promise.all(
+  const own = await Promise.all(
     rows.map(async (r) => {
       let thumb: string | null = null
       if (r.thumbnail_key && canSign) {
@@ -179,4 +205,43 @@ async function realViralClipsFor(env: Env, user: User, limit: number): Promise<V
       }
     }),
   )
+  if (!external.length) return own
+  return [...own, ...external].sort((a, b) => b.views - a.views).slice(0, lim)
+}
+
+const EXT_VIEWS = `(CASE WHEN ep.views > 0 THEN ep.views ELSE ep.impressions END)`
+
+/**
+ * Extern gepostete Videos als eigene Clips (lib/metrics.ts, „Extern gepostete
+ * Videos“). Vorschaubild: das Cover von der Plattform, sonst das der Kampagne.
+ * Fehlt die Tabelle noch (Migration 0029), gibt es schlicht keine.
+ */
+async function externalViral(env: Env, scope: PostScope, limit: number): Promise<ViralClip[]> {
+  if (!scope.projectWhere) return []
+  try {
+    const { results } = await env.DB.prepare(
+      `SELECT ep.post_id, ep.account_id, ep.platform, ep.url, ep.username, ep.thumb_url,
+              p.id AS project_id, p.name AS campaign, ${EXT_VIEWS} AS views, ep.likes, ep.shares, ep.comments
+       FROM external_posts ep JOIN projects p ON p.id = ep.project_id
+       WHERE ${scope.projectWhere} AND ${EXT_VIEWS} > 0
+       ORDER BY views DESC LIMIT ?`,
+    )
+      .bind(...scope.projectBinds, limit)
+      .all()
+    return ((results ?? []) as Record<string, unknown>[]).map((r) => ({
+      id: `x:${r.post_id}:${r.account_id}`,
+      campaign: String(r.campaign ?? ''),
+      views: Number(r.views) || 0,
+      likes: Number(r.likes) || 0,
+      shares: Number(r.shares) || 0,
+      comments: Number(r.comments) || 0,
+      platforms: r.platform ? [String(r.platform)] : [],
+      url: scope.showAccounts && r.url ? String(r.url) : null,
+      handle: scope.showAccounts && r.username ? String(r.username) : null,
+      thumb: r.thumb_url ? String(r.thumb_url) : `/media/kampagne/${encodeURIComponent(String(r.project_id))}/thumb`,
+    }))
+  } catch (err) {
+    console.error('[viral] Externe Posts nicht gelesen', err)
+    return []
+  }
 }

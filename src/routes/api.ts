@@ -118,7 +118,7 @@ import {
   syncAccounts,
   upsertAccount,
 } from '../lib/publisher'
-import { syncOverview, syncProjectMetrics } from '../lib/metrics'
+import { syncExternalPosts, syncOverview, syncProjectMetrics } from '../lib/metrics'
 import { CUSTOMER_AREA } from '../views/app'
 import { AGENCY_CAMPAIGN_AREA } from '../views/collaboration'
 import {
@@ -2928,18 +2928,26 @@ adminApi.post('/projects/:id/metrics/refresh', async (c) => {
 
   try {
     const result = await syncProjectMetrics(c.env, projectId)
+    // Dazu die extern geposteten Videos der Accounts dieser Kampagne, sofort.
+    // Ein Fehler dort hält die Zahlen der eigenen Posts nicht auf.
+    let external = 0
+    try {
+      external = (await syncExternalPosts(c.env, { projectId, force: true })).posts
+    } catch (err) {
+      console.error('[admin] Externe Posts nicht abgeglichen', projectId, err)
+    }
     await audit(c.env, {
       actorId: c.get('user').id,
       action: 'metrics.refresh',
       entity: 'project',
       entityId: projectId,
-      payload: result,
+      payload: { ...result, external },
     })
     // Wie viele Posts des Projekts überhaupt im Zeitplan stehen — nach dem
     // Lauf, der neue gleich aufnimmt. Bei 0 hieße „nichts fällig“ etwas
     // Falsches: es gibt schlicht noch keinen Post, nach dem man fragen kann.
     const tracked = result.fetched ? null : (await syncOverview(c.env, projectId)).total
-    return c.json({ ok: true, fetched: result.fetched, updated: result.updated, paused: result.paused, tracked })
+    return c.json({ ok: true, fetched: result.fetched, updated: result.updated, paused: result.paused, tracked, external })
   } catch (err) {
     console.error('[admin] Zahlen nicht abgeglichen', projectId, err)
     return c.json({ error: 'Refreshing the numbers failed.' }, 502)

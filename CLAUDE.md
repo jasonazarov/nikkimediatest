@@ -694,6 +694,15 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   Reihenfolge der Case Studies (Vorgabe): DinDrop, Caspian Blue, Max Tornow, Omid Mouazzen, Islam Dulatov,
   Levantine Istanbul, Panperium. Der eingebettete TikTok-Player wurde verworfen: TikTok zeigt dort oft nur
   „Schau dir dieses Video bei TikTok an“.
+- **Extern gepostete Videos zählen mit** (Vorgabe des Auftraggebers, November 2026; Migration 0029
+  `external_posts`, `syncExternalPosts` in `src/lib/metrics.ts`): Clipper posten oft selbst in der App der
+  Plattform. Für jeden Account, der an einer KAMPAGNE hängt (`publish_accounts.project_id`, nicht Creator-Accounts),
+  holt der Viertelstundenlauf je Account höchstens einmal je Stunde bei Zernio die direkt geposteten Videos des
+  letzten Jahres (`GET /v1/analytics?accountId=…&source=external`, bis 500 neueste je Lauf). Über uns
+  veröffentlichte Posts (`latePostId` oder Link schon in `post_metrics`) und Werbung (`isAd`) bleiben draußen.
+  Sie zählen in den Kampagnen-Summen (`totalsForProjects`, `grandTotals`), in der Views-Grafik und als eigene Clips
+  in „Virale Clips“ (Cover von Zernio); Clipper sehen sie nicht (`PostScope.projectWhere`). Admin „Refresh numbers“
+  holt sie für die Kampagne sofort. Fehlt die Tabelle, zählen sie einfach nicht. Test: `npx tsx tests/gold/external.test.ts`.
 - **Vorschauen vor der Freigabe** (`docs/vorschau/<name>.patch`, siehe `docs/vorschau/LIESMICH.md`): eine
   Änderung, die der Auftraggeber erst lokal sehen will, liegt als Patch bei und ist NICHT im Code.
   `bash scripts/demo-lokal.sh <name>` spielt sie nur in eine Kopie unter `~/.nikki-vorschau/<name>` ein

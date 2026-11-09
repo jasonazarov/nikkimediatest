@@ -8,7 +8,7 @@ import { loginSelfTest } from './lib/selftest'
 import { mailLoginBroken } from './lib/mail'
 import { checkStorageWarning } from './lib/domain'
 import { catchUp } from './lib/publisher'
-import { syncMetrics } from './lib/metrics'
+import { EXTERNAL_PER_RUN, syncExternalPosts, syncMetrics } from './lib/metrics'
 import { deleteObject } from './lib/r2'
 import { publicRoutes } from './routes/public'
 import { authRoutes } from './routes/auth'
@@ -269,6 +269,19 @@ async function metricsCatchUp(env: AppEnv['Bindings']) {
     }
   } catch (err) {
     console.error('[cron] Zahlen-Abgleich fehlgeschlagen', err)
+  }
+  // Videos, die Clipper direkt in der App der Plattform gepostet haben
+  // (lib/metrics.ts, „Extern gepostete Videos“): je Account einmal je Stunde.
+  try {
+    const e = await syncExternalPosts(env, { maxRequests: EXTERNAL_PER_RUN })
+    if (e.fetched) {
+      console.log(
+        `[cron] Externe Posts: ${e.accounts} Accounts abgefragt, ${e.posts} Posts aktualisiert` +
+          (e.paused ? ': Analytics ruhen (402)' : ''),
+      )
+    }
+  } catch (err) {
+    console.error('[cron] Externe Posts fehlgeschlagen', err)
   }
 }
 

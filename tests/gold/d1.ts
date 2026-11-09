@@ -12,6 +12,8 @@ export function makeD1(migrationsDir: string) {
     first: async <T>(col?: string) => { const r = db.prepare(sql).get(...(binds as any[])) as any; return (r ? (col ? r[col] : r) : null) as T },
     all: async <T>() => ({ results: db.prepare(sql).all(...(binds as any[])) as T[], success: true }),
     run: async () => { const r = db.prepare(sql).run(...(binds as any[])); return { success: true, meta: { changes: Number(r.changes) } } },
+    // Für Drizzle (getDb): Zeilen als Arrays in Spaltenreihenfolge.
+    raw: async () => (db.prepare(sql).all(...(binds as any[])) as any[]).map((r) => Object.values(r)),
   })
   return { raw: db, prepare: (sql: string) => stmt(sql), batch: async (s: any[]) => Promise.all(s.map((x) => x.run())) }
 }

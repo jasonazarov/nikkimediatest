@@ -7,9 +7,10 @@ import { SHOWCASE_LIVE, showcaseClips, showcaseDailyRows, showcaseViewsRows, sho
  * Views-Analyse für die Grafik oben in jeder Übersicht und auf
  * /admin/analytics (assets/views.js → GET /api/views-analytics).
  *
- * Nur lesend, ohne neue Tabelle: Grundlage sind dieselben Zahlen wie überall
- * (`post_metrics`, Views wie `viewsOf` in metrics.ts) und das
- * Veröffentlichungsdatum aus `metrics_sync`. Die Kurve zeigt deshalb, wie
+ * Nur lesend: Grundlage sind dieselben Zahlen wie überall (`post_metrics`,
+ * Views wie `viewsOf` in metrics.ts) und das Veröffentlichungsdatum aus
+ * `metrics_sync`, dazu die extern geposteten Videos der Kampagnen-Accounts
+ * (`external_posts`, mit ihrem eigenen Veröffentlichungstag). Die Kurve zeigt deshalb, wie
  * viele Views die Clips gesammelt haben, aufsummiert nach dem Tag ihrer
  * Veröffentlichung. Sie wächst an Tagen, an denen Clips rausgingen, die
  * heute viele Views haben. Ein Verlauf „Stand je Tag“ bräuchte tägliche
@@ -67,35 +68,58 @@ export async function viewsAnalyticsFor(env: Env, user: User, now = Math.floor(D
   if (!scope && !extra.length) return empty()
   if (!scope) return build(empty(), [], [], [], extra, now)
 
-  const from = `FROM post_metrics pm
-      JOIN deliverables d ON d.id = pm.deliverable_id
-      JOIN projects p ON p.id = pm.project_id
-      WHERE ${scope.where}`
-  const b = scope.binds
-
-  const [totals, byDay, byCampaign, byPlatform] = await Promise.all([
-    env.DB.prepare(
-      `SELECT COALESCE(SUM(${VIEWS}),0) AS views, COALESCE(SUM(pm.likes),0) AS likes, COALESCE(SUM(pm.comments),0) AS comments,
-              COALESCE(SUM(pm.shares),0) AS shares, COUNT(*) AS posts, COUNT(DISTINCT pm.deliverable_id) AS clips,
-              COUNT(DISTINCT pm.project_id) AS campaigns, MAX(pm.synced_at) AS synced_at ${from}`,
-    ).bind(...b).first() as Promise<Record<string, number | null> | null>,
-    // Veröffentlicht laut Zeitplan; fehlt der Eintrag, gilt der erste Stand der Zahlen.
-    env.DB.prepare(
-      `SELECT COALESCE(ms.published_at, pm.synced_at) AS at, ${VIEWS} AS v
+  // Eine Liste aller Posts im Bereich: über uns veröffentlichte (`post_metrics`)
+  // und extern gepostete Videos der Kampagnen-Accounts (`external_posts`, je
+  // Video ein Clip). Fehlt die Tabelle noch (Migration 0029), ohne sie.
+  const own = `SELECT pm.project_id AS project_id, pm.deliverable_id AS clip, pm.platform AS platform, ${VIEWS} AS v,
+         pm.likes AS likes, pm.comments AS comments, pm.shares AS shares, pm.synced_at AS synced_at,
+         COALESCE(ms.published_at, pm.synced_at) AS at
        FROM post_metrics pm
        JOIN deliverables d ON d.id = pm.deliverable_id
        JOIN projects p ON p.id = pm.project_id
        LEFT JOIN metrics_sync ms ON ms.post_id = pm.post_id
-       WHERE ${scope.where}`,
-    ).bind(...b).all(),
-    env.DB.prepare(
-      `SELECT p.id AS id, p.name AS name, SUM(${VIEWS}) AS views, COUNT(*) AS posts, COUNT(DISTINCT pm.deliverable_id) AS clips
-       ${from} GROUP BY p.id HAVING SUM(${VIEWS}) > 0 ORDER BY views DESC LIMIT 12`,
-    ).bind(...b).all(),
-    env.DB.prepare(
-      `SELECT pm.platform AS platform, SUM(${VIEWS}) AS views ${from} GROUP BY pm.platform HAVING SUM(${VIEWS}) > 0 ORDER BY views DESC`,
-    ).bind(...b).all(),
-  ])
+       WHERE ${scope.where}`
+  const ext = `SELECT ep.project_id, 'x:' || ep.post_id || ':' || ep.account_id, ep.platform,
+         (CASE WHEN ep.views > 0 THEN ep.views ELSE ep.impressions END), ep.likes, ep.comments, ep.shares,
+         ep.synced_at, ep.published_at
+       FROM external_posts ep
+       JOIN projects p ON p.id = ep.project_id
+       WHERE ${scope.projectWhere}`
+
+  const read = (withExternal: boolean) => {
+    const cte = `WITH posts AS (${withExternal ? `${own} UNION ALL ${ext}` : own})`
+    const b = withExternal ? [...scope.binds, ...scope.projectBinds] : scope.binds
+    return Promise.all([
+      env.DB.prepare(
+        `${cte} SELECT COALESCE(SUM(v),0) AS views, COALESCE(SUM(likes),0) AS likes, COALESCE(SUM(comments),0) AS comments,
+                COALESCE(SUM(shares),0) AS shares, COUNT(*) AS posts, COUNT(DISTINCT clip) AS clips,
+                COUNT(DISTINCT project_id) AS campaigns, MAX(synced_at) AS synced_at FROM posts`,
+      ).bind(...b).first() as Promise<Record<string, number | null> | null>,
+      // Veröffentlicht laut Zeitplan; fehlt der Eintrag, gilt der erste Stand der Zahlen.
+      env.DB.prepare(`${cte} SELECT at, v FROM posts`).bind(...b).all(),
+      env.DB.prepare(
+        `${cte} SELECT p.id AS id, p.name AS name, SUM(posts.v) AS views, COUNT(*) AS posts, COUNT(DISTINCT posts.clip) AS clips
+         FROM posts JOIN projects p ON p.id = posts.project_id
+         GROUP BY p.id HAVING SUM(posts.v) > 0 ORDER BY views DESC LIMIT 12`,
+      ).bind(...b).all(),
+      env.DB.prepare(
+        `${cte} SELECT platform, SUM(v) AS views FROM posts GROUP BY platform HAVING SUM(v) > 0 ORDER BY views DESC`,
+      ).bind(...b).all(),
+    ])
+  }
+
+  let rows: Awaited<ReturnType<typeof read>>
+  if (scope.projectWhere) {
+    try {
+      rows = await read(true)
+    } catch (err) {
+      console.error('[analytics] Externe Posts nicht gelesen', err)
+      rows = await read(false)
+    }
+  } else {
+    rows = await read(false)
+  }
+  const [totals, byDay, byCampaign, byPlatform] = rows
 
   const out = empty()
   if (totals) {

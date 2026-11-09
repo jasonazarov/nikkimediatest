@@ -270,13 +270,16 @@ const REFRESH_METRICS_SCRIPT = `
           return d;
         });
       }).then(function (d) {
+        var ext = d.external ? ' \\u00b7 ' + d.external + ' external' : '';
         btn.textContent = d.paused
           ? 'Zernio returned 402 \\u2014 paused'
           : d.fetched
-            ? d.fetched + ' fetched \\u00b7 ' + (d.updated || 0) + ' updated'
-            : d.tracked === 0
-              ? 'No posts of this campaign yet'
-              : 'Nothing due \\u2014 asked within the last minutes';
+            ? d.fetched + ' fetched \\u00b7 ' + (d.updated || 0) + ' updated' + ext
+            : d.external
+              ? d.external + ' external posts updated'
+              : d.tracked === 0
+                ? 'No posts of this campaign yet'
+                : 'Nothing due \\u2014 asked within the last minutes';
         window.setTimeout(function () { window.location.reload(); }, 1200);
       }).catch(function (e) {
         window.alert(e.message);

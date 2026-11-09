@@ -565,3 +565,84 @@ export async function getPostAnalytics(env: Env, postId: string): Promise<Analyt
     parsed?.details ?? parsed?.issues,
   )
 }
+
+/* ------------------------------------------------ Extern gepostete Videos */
+
+/** Ein Eintrag aus `GET /v1/analytics` ohne postId (`AnalyticsListResponse.posts[]`). */
+export interface ZernioListedPost {
+  /** ID des externen Posts bei Zernio. */
+  _id?: string
+  /** Gesetzt, wenn der Post über Zernio (also über uns) veröffentlicht wurde. */
+  latePostId?: string | null
+  publishedAt?: string | null
+  status?: string
+  analytics?: ZernioPostAnalytics | null
+  platforms?: ZernioPlatformAnalytics[]
+  platform?: string
+  platformPostUrl?: string | null
+  isExternal?: boolean
+  /** Zahlen mit bezahlter Ausspielung: zählen nicht als organische Reichweite. */
+  isAd?: boolean
+  /** Zernio hält abgelaufene TikTok-, Instagram- und Facebook-Cover selbst vor, der Link bleibt gültig. */
+  thumbnailUrl?: string | null
+}
+
+export interface ZernioPostList {
+  posts?: ZernioListedPost[]
+  pagination?: { page?: number; limit?: number; total?: number; pages?: number }
+}
+
+/** Größte Seite, die Zernio für die Liste annimmt. */
+export const POST_LIST_LIMIT = 100
+
+/**
+ * GET /v1/analytics?accountId=…&source=external — die Posts EINES Accounts,
+ * die direkt auf der Plattform veröffentlicht wurden, mit ihren Zahlen.
+ *
+ * Zernio liest jeden verbundenen Account selbst etwa alle 90 Minuten von der
+ * Plattform. Zeitraum höchstens 366 Tage (`fromDate` bis `toDate`, JJJJ-MM-TT),
+ * neueste zuerst. Fehler wie bei `call`, also auch 402 als `ZernioError`;
+ * eine hängende Verbindung endet nach `ANALYTICS_TIMEOUT_MS`.
+ *
+ * Abnehmer ist allein lib/metrics.ts (`syncExternalPosts`).
+ */
+export async function listExternalPosts(
+  env: Env,
+  o: { accountId: string; fromDate: string; toDate: string; page: number },
+): Promise<ZernioPostList> {
+  if (!env.ZERNIO_API_KEY) {
+    throw new ZernioError(0, 'ZERNIO_API_KEY ist nicht gesetzt.')
+  }
+  const q = new URLSearchParams({
+    accountId: o.accountId,
+    source: 'external',
+    fromDate: o.fromDate,
+    toDate: o.toDate,
+    limit: String(POST_LIST_LIMIT),
+    page: String(o.page),
+    sortBy: 'date',
+    order: 'desc',
+  })
+  const res = await fetch(`${BASE}/v1/analytics?${q}`, {
+    method: 'GET',
+    headers: { authorization: `Bearer ${env.ZERNIO_API_KEY}` },
+    signal: AbortSignal.timeout(ANALYTICS_TIMEOUT_MS),
+  })
+  const raw = await res.text()
+  let parsed: any = null
+  try {
+    parsed = raw ? JSON.parse(raw) : null
+  } catch {
+    /* Kein JSON — dann trägt `raw` die Meldung. */
+  }
+  if (!res.ok || typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new ZernioError(
+      res.ok ? 502 : res.status,
+      String(parsed?.error ?? parsed?.message ?? (raw.slice(0, 300) || res.statusText)),
+      parsed?.details ?? parsed?.issues,
+      typeof parsed?.code === 'string' ? parsed.code : undefined,
+      retryAfterSec(res.headers.get('retry-after')),
+    )
+  }
+  return parsed as ZernioPostList
+}
