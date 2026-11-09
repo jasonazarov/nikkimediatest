@@ -3679,10 +3679,81 @@ literal 0
 HcmV?d00001
 
 diff --git a/src/views/clipper.ts b/src/views/clipper.ts
-index 40f30fd..ba5adb4 100644
+index 40f30fd..0c11fed 100644
 --- a/src/views/clipper.ts
 +++ b/src/views/clipper.ts
-@@ -490,6 +490,8 @@ ${AURORA}
+@@ -101,10 +101,19 @@ const CLIP_ACCOUNTS = {
+   levantine_istanbul: 'Levantine',
+   max_tornow_business: 'Max Tornow',
+   panperium: 'Panperium',
++  // TikTok-Clipping-Accounts (Use Cases November 2026): das Etikett nennt den Kunden, nicht den Account.
++  nikkiclips1: 'Omid Mouazzen',
++  kavkazkibiror: 'Islam Dulatov',
+ } as const
+ 
++/** Profilbild je Account, wo es nicht wie der Account heißt (TikTok-Clipping-Accounts zeigen den Kunden). */
++const CLIP_AVATAR: Partial<Record<keyof typeof CLIP_ACCOUNTS, string>> = {
++  nikkiclips1: 'omid_mouazzen',
++  kavkazkibiror: 'islam_dulatov',
++}
++
+ /** Ein Beitrag bei Instagram: Account, Art (`reel` oder `p` für Post) und ID. */
+-type Clip = readonly [account: keyof typeof CLIP_ACCOUNTS, kind: 'reel' | 'p', id: string]
++type Clip = readonly [account: keyof typeof CLIP_ACCOUNTS, kind: 'reel' | 'p' | 'video', id: string]
+ 
+ /**
+  * Clip-Wall: echte Cover aus den laufenden Kampagnen, zwei gegenläufige
+@@ -118,12 +127,15 @@ const CLIPWALL: readonly { speed: number; reverse: boolean; clips: readonly Clip
+     clips: [
+       ['dindrop7', 'reel', 'DM-7GyZIkb0'],
+       ['levantine_istanbul', 'reel', 'Da2pgoToIw_'],
++      ['nikkiclips1', 'video', '7697936933170842902'],
+       ['caspianbluecaviar', 'reel', 'DQ4ga9SDEnj'],
+       ['max_tornow_business', 'reel', 'C1xEPryiQ4t'],
+       ['panperium', 'p', 'DZurxhPjezN'],
++      ['kavkazkibiror', 'video', '7697192512531909891'],
+       ['levantine_istanbul', 'reel', 'DUTFpaeiMZA'],
+       ['dindrop7', 'reel', 'DPRDIqUiIeB'],
+       ['caspianbluecaviar', 'reel', 'DMzr3__qHsw'],
++      ['nikkiclips1', 'video', '7697940793650187542'],
+       ['panperium', 'reel', 'DZfCoAoNLUi'],
+       ['levantine_istanbul', 'reel', 'DEUXjpeIHPR'],
+       ['dindrop7', 'reel', 'DbLpapmA_Bw'],
+@@ -135,11 +147,14 @@ const CLIPWALL: readonly { speed: number; reverse: boolean; clips: readonly Clip
+     clips: [
+       ['caspianbluecaviar', 'reel', 'DKZ-ra1qDiR'],
+       ['panperium', 'p', 'DZF78B8je1g'],
++      ['kavkazkibiror', 'video', '7698596967307431190'],
+       ['levantine_istanbul', 'reel', 'DBQxgMHAw1U'],
+       ['dindrop7', 'reel', 'DbbJyZgIUjl'],
++      ['nikkiclips1', 'video', '7696153649105341718'],
+       ['max_tornow_business', 'reel', 'C8pRTW6MinC'],
+       ['panperium', 'reel', 'DZvEvMPNa15'],
+       ['levantine_istanbul', 'reel', 'C9406cJIC_D'],
++      ['kavkazkibiror', 'video', '7698966279020907798'],
+       ['dindrop7', 'reel', 'DZlBQOrgilt'],
+       ['max_tornow_business', 'reel', 'C_PxECKAj61'],
+       ['panperium', 'p', 'DbGw3_SCDud'],
+@@ -148,10 +163,16 @@ const CLIPWALL: readonly { speed: number; reverse: boolean; clips: readonly Clip
+   },
+ ]
+ 
++/** `video` = TikTok-Video (https://www.tiktok.com/@account/video/id), sonst Instagram. */
++const clipHref = (account: string, kind: Clip[1], id: string): string =>
++  kind === 'video'
++    ? `https://www.tiktok.com/@${esc(account)}/video/${esc(id)}`
++    : `https://www.instagram.com/${esc(account)}/${kind}/${esc(id)}/`
++
+ const clipCard = ([account, kind, id]: Clip): string => `
+-        <a class="clipwall__card" href="https://www.instagram.com/${esc(account)}/${kind}/${esc(id)}/" target="_blank" rel="noopener noreferrer">
++        <a class="clipwall__card" href="${clipHref(account, kind, id)}" target="_blank" rel="noopener noreferrer">
+           <img src="/img/cases/${esc(account)}-${esc(id)}.jpg" alt="${kind === 'p' ? 'Post' : 'Clip'} von @${esc(account)}" loading="lazy" decoding="async" width="270" height="480">
+-          <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/${esc(account)}.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>${esc(CLIP_ACCOUNTS[account])}</span></span>
++          <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/${esc(CLIP_AVATAR[account] ?? account)}.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>${esc(CLIP_ACCOUNTS[account])}</span></span>
+         </a>`
+ 
+ const clipwallRows = (): string =>
+@@ -490,6 +511,8 @@ ${AURORA}
        <span class="chip"><i class="chip__ini chip__ini--photo"><img src="/img/avatars/panperium.jpg" alt="" loading="lazy" decoding="async" width="30" height="30">PP</i><b>Panperium<small>Luxury-Lifestyle</small></b></span>
        <span class="chip"><i class="chip__ini chip__ini--photo"><img src="/img/avatars/max_tornow_business.jpg" alt="" loading="lazy" decoding="async" width="30" height="30">MT</i><b>Max Tornow<small>Business-Mentor</small></b></span>
        <span class="chip"><i class="chip__ini chip__ini--photo"><img src="/img/avatars/levantine_istanbul.jpg" alt="" loading="lazy" decoding="async" width="30" height="30">LV</i><b>Levantine Istanbul<small>Fire Cuisine Bar</small></b></span>
@@ -3692,10 +3763,80 @@ index 40f30fd..ba5adb4 100644
    </div>
  
 diff --git a/src/views/creator-landing.ts b/src/views/creator-landing.ts
-index fa7cd6e..8128f20 100644
+index fa7cd6e..74dba86 100644
 --- a/src/views/creator-landing.ts
 +++ b/src/views/creator-landing.ts
-@@ -563,6 +563,8 @@ ${AURORA}
+@@ -158,10 +158,19 @@ const CLIP_ACCOUNTS = {
+   levantine_istanbul: 'Levantine',
+   max_tornow_business: 'Max Tornow',
+   panperium: 'Panperium',
++  // TikTok-Clipping-Accounts (Use Cases November 2026): das Etikett nennt den Kunden, nicht den Account.
++  nikkiclips1: 'Omid Mouazzen',
++  kavkazkibiror: 'Islam Dulatov',
+ } as const
+ 
++/** Profilbild je Account, wo es nicht wie der Account heißt (TikTok-Clipping-Accounts zeigen den Kunden). */
++const CLIP_AVATAR: Partial<Record<keyof typeof CLIP_ACCOUNTS, string>> = {
++  nikkiclips1: 'omid_mouazzen',
++  kavkazkibiror: 'islam_dulatov',
++}
++
+ /** Ein Beitrag bei Instagram: Account, Art (`reel` oder `p` für Post) und ID. */
+-type Clip = readonly [account: keyof typeof CLIP_ACCOUNTS, kind: 'reel' | 'p', id: string]
++type Clip = readonly [account: keyof typeof CLIP_ACCOUNTS, kind: 'reel' | 'p' | 'video', id: string]
+ 
+ /**
+  * Kampagnen-Beispiele: echte Cover aus laufenden Kampagnen, zwei gegenläufige
+@@ -174,12 +183,15 @@ const CLIPWALL: readonly { speed: number; reverse: boolean; clips: readonly Clip
+     clips: [
+       ['panperium', 'reel', 'DZfCoAoNLUi'],
+       ['dindrop7', 'reel', 'DbLpapmA_Bw'],
++      ['nikkiclips1', 'video', '7697936933170842902'],
+       ['levantine_istanbul', 'reel', 'DEUXjpeIHPR'],
+       ['caspianbluecaviar', 'reel', 'DMzr3__qHsw'],
+       ['max_tornow_business', 'reel', 'C8pRTW6MinC'],
++      ['kavkazkibiror', 'video', '7697192512531909891'],
+       ['dindrop7', 'reel', 'DPRDIqUiIeB'],
+       ['panperium', 'p', 'DZurxhPjezN'],
+       ['levantine_istanbul', 'reel', 'DUTFpaeiMZA'],
++      ['nikkiclips1', 'video', '7697940793650187542'],
+     ],
+   },
+   {
+@@ -188,20 +200,29 @@ const CLIPWALL: readonly { speed: number; reverse: boolean; clips: readonly Clip
+     clips: [
+       ['caspianbluecaviar', 'reel', 'DKZ-ra1qDiR'],
+       ['levantine_istanbul', 'reel', 'C9406cJIC_D'],
++      ['kavkazkibiror', 'video', '7698596967307431190'],
+       ['dindrop7', 'reel', 'DbbJyZgIUjl'],
+       ['max_tornow_business', 'reel', 'C_PxECKAj61'],
++      ['nikkiclips1', 'video', '7696153649105341718'],
+       ['panperium', 'reel', 'DZvEvMPNa15'],
+       ['caspianbluecaviar', 'reel', 'DP_uoY6jFCU'],
+       ['dindrop7', 'reel', 'DZlBQOrgilt'],
++      ['kavkazkibiror', 'video', '7698966279020907798'],
+       ['max_tornow_business', 'reel', 'DCHhYijJK4b'],
+     ],
+   },
+ ]
+ 
++/** `video` = TikTok-Video (https://www.tiktok.com/@account/video/id), sonst Instagram. */
++const clipHref = (account: string, kind: Clip[1], id: string): string =>
++  kind === 'video'
++    ? `https://www.tiktok.com/@${esc(account)}/video/${esc(id)}`
++    : `https://www.instagram.com/${esc(account)}/${kind}/${esc(id)}/`
++
+ const clipCard = ([account, kind, id]: Clip): string => `
+-        <a class="clipwall__card" href="https://www.instagram.com/${esc(account)}/${kind}/${esc(id)}/" target="_blank" rel="noopener noreferrer">
+-          <img src="/img/cases/${esc(account)}-${esc(id)}.jpg" alt="${kind === 'p' ? 'Beitrag' : 'Clip'} von @${esc(account)}" loading="lazy" decoding="async" width="270" height="480">
+-          <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/${esc(account)}.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>${esc(CLIP_ACCOUNTS[account])}</span></span>
++        <a class="clipwall__card" href="${clipHref(account, kind, id)}" target="_blank" rel="noopener noreferrer">
++          <img src="/img/cases/${esc(account)}-${esc(id)}.jpg" alt="${kind === 'p' ? 'Post' : 'Clip'} von @${esc(account)}" loading="lazy" decoding="async" width="270" height="480">
++          <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/${esc(CLIP_AVATAR[account] ?? account)}.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>${esc(CLIP_ACCOUNTS[account])}</span></span>
+         </a>`
+ 
+ export const clipwallRows = (): string =>
+@@ -563,6 +584,8 @@ ${AURORA}
        <span class="chip"><i class="chip__ini chip__ini--photo"><img src="/img/avatars/panperium.jpg" alt="" loading="lazy" decoding="async" width="30" height="30">PP</i><b>Panperium<small>Luxury-Lifestyle</small></b></span>
        <span class="chip"><i class="chip__ini chip__ini--photo"><img src="/img/avatars/max_tornow_business.jpg" alt="" loading="lazy" decoding="async" width="30" height="30">MT</i><b>Max Tornow<small>Business-Mentor</small></b></span>
        <span class="chip"><i class="chip__ini chip__ini--photo"><img src="/img/avatars/levantine_istanbul.jpg" alt="" loading="lazy" decoding="async" width="30" height="30">LV</i><b>Levantine Istanbul<small>Fire Cuisine Bar</small></b></span>
@@ -3705,10 +3846,10 @@ index fa7cd6e..8128f20 100644
    </div>
  
 diff --git a/src/views/landing.ts b/src/views/landing.ts
-index 9164a12..174afc9 100644
+index 9164a12..735821d 100644
 --- a/src/views/landing.ts
 +++ b/src/views/landing.ts
-@@ -287,6 +287,8 @@ ${AURORA}
+@@ -287,11 +287,13 @@ ${AURORA}
        <span class="chip"><i class="chip__ini chip__ini--photo"><img src="/img/avatars/panperium.jpg" alt="" loading="lazy" decoding="async" width="30" height="30">PP</i><b>Panperium<small>Luxury-Lifestyle</small></b></span>
        <span class="chip"><i class="chip__ini chip__ini--photo"><img src="/img/avatars/max_tornow_business.jpg" alt="" loading="lazy" decoding="async" width="30" height="30">MT</i><b>Max Tornow<small>Business-Mentor</small></b></span>
        <span class="chip"><i class="chip__ini chip__ini--photo"><img src="/img/avatars/levantine_istanbul.jpg" alt="" loading="lazy" decoding="async" width="30" height="30">LV</i><b>Levantine Istanbul<small>Fire Cuisine Bar</small></b></span>
@@ -3717,7 +3858,79 @@ index 9164a12..174afc9 100644
      </div>
    </div>
  
-@@ -771,8 +773,8 @@ ${AURORA}
+   <!-- Clip-Wall: echte Cover aus den laufenden Kampagnen, jede Kachel
+-       verlinkt auf den Original-Beitrag bei Instagram. -->
++       verlinkt auf den Original-Beitrag bei Instagram bzw. TikTok (Omid Mouazzen, Islam Dulatov). -->
+   <div class="clipwall rv" aria-label="Ausschnitt aus den Clips, die wir aktuell ausrollen">
+     <div class="clipwall__row">
+       <div class="clipwall__track" data-speed="23">
+@@ -303,6 +305,10 @@ ${AURORA}
+           <img src="/img/cases/levantine_istanbul-Da2pgoToIw_.jpg" alt="Clip von @levantine_istanbul" loading="lazy" decoding="async" width="270" height="480">
+           <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/levantine_istanbul.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Levantine</span></span>
+         </a>
++        <a class="clipwall__card" href="https://www.tiktok.com/@nikkiclips1/video/7697936933170842902" target="_blank" rel="noopener">
++          <img src="/img/cases/nikkiclips1-7697936933170842902.jpg" alt="Clip von @nikkiclips1" loading="lazy" decoding="async" width="270" height="480">
++          <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/omid_mouazzen.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Omid Mouazzen</span></span>
++        </a>
+         <a class="clipwall__card" href="https://www.instagram.com/caspianbluecaviar/reel/DQ4ga9SDEnj/" target="_blank" rel="noopener">
+           <img src="/img/cases/caspianbluecaviar-DQ4ga9SDEnj.jpg" alt="Clip von @caspianbluecaviar" loading="lazy" decoding="async" width="270" height="480">
+           <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/caspianbluecaviar.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Caspian Blue</span></span>
+@@ -315,6 +321,10 @@ ${AURORA}
+           <img src="/img/cases/panperium-DZurxhPjezN.jpg" alt="Beitrag von @panperium" loading="lazy" decoding="async" width="270" height="480">
+           <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/panperium.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Panperium</span></span>
+         </a>
++        <a class="clipwall__card" href="https://www.tiktok.com/@kavkazkibiror/video/7697192512531909891" target="_blank" rel="noopener">
++          <img src="/img/cases/kavkazkibiror-7697192512531909891.jpg" alt="Clip von @kavkazkibiror" loading="lazy" decoding="async" width="270" height="480">
++          <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/islam_dulatov.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Islam Dulatov</span></span>
++        </a>
+         <a class="clipwall__card" href="https://www.instagram.com/levantine_istanbul/reel/DUTFpaeiMZA/" target="_blank" rel="noopener">
+           <img src="/img/cases/levantine_istanbul-DUTFpaeiMZA.jpg" alt="Clip von @levantine_istanbul" loading="lazy" decoding="async" width="270" height="480">
+           <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/levantine_istanbul.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Levantine</span></span>
+@@ -327,6 +337,10 @@ ${AURORA}
+           <img src="/img/cases/caspianbluecaviar-DMzr3__qHsw.jpg" alt="Clip von @caspianbluecaviar" loading="lazy" decoding="async" width="270" height="480">
+           <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/caspianbluecaviar.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Caspian Blue</span></span>
+         </a>
++        <a class="clipwall__card" href="https://www.tiktok.com/@nikkiclips1/video/7697940793650187542" target="_blank" rel="noopener">
++          <img src="/img/cases/nikkiclips1-7697940793650187542.jpg" alt="Clip von @nikkiclips1" loading="lazy" decoding="async" width="270" height="480">
++          <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/omid_mouazzen.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Omid Mouazzen</span></span>
++        </a>
+         <a class="clipwall__card" href="https://www.instagram.com/panperium/reel/DZfCoAoNLUi/" target="_blank" rel="noopener">
+           <img src="/img/cases/panperium-DZfCoAoNLUi.jpg" alt="Clip von @panperium" loading="lazy" decoding="async" width="270" height="480">
+           <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/panperium.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Panperium</span></span>
+@@ -351,6 +365,10 @@ ${AURORA}
+           <img src="/img/cases/panperium-DZF78B8je1g.jpg" alt="Beitrag von @panperium" loading="lazy" decoding="async" width="270" height="480">
+           <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/panperium.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Panperium</span></span>
+         </a>
++        <a class="clipwall__card" href="https://www.tiktok.com/@kavkazkibiror/video/7698596967307431190" target="_blank" rel="noopener">
++          <img src="/img/cases/kavkazkibiror-7698596967307431190.jpg" alt="Clip von @kavkazkibiror" loading="lazy" decoding="async" width="270" height="480">
++          <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/islam_dulatov.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Islam Dulatov</span></span>
++        </a>
+         <a class="clipwall__card" href="https://www.instagram.com/levantine_istanbul/reel/DBQxgMHAw1U/" target="_blank" rel="noopener">
+           <img src="/img/cases/levantine_istanbul-DBQxgMHAw1U.jpg" alt="Clip von @levantine_istanbul" loading="lazy" decoding="async" width="270" height="480">
+           <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/levantine_istanbul.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Levantine</span></span>
+@@ -359,6 +377,10 @@ ${AURORA}
+           <img src="/img/cases/dindrop7-DbbJyZgIUjl.jpg" alt="Clip von @dindrop7" loading="lazy" decoding="async" width="270" height="480">
+           <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/dindrop7.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>DinDrop</span></span>
+         </a>
++        <a class="clipwall__card" href="https://www.tiktok.com/@nikkiclips1/video/7696153649105341718" target="_blank" rel="noopener">
++          <img src="/img/cases/nikkiclips1-7696153649105341718.jpg" alt="Clip von @nikkiclips1" loading="lazy" decoding="async" width="270" height="480">
++          <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/omid_mouazzen.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Omid Mouazzen</span></span>
++        </a>
+         <a class="clipwall__card" href="https://www.instagram.com/max_tornow_business/reel/C8pRTW6MinC/" target="_blank" rel="noopener">
+           <img src="/img/cases/max_tornow_business-C8pRTW6MinC.jpg" alt="Clip von @max_tornow_business" loading="lazy" decoding="async" width="270" height="480">
+           <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/max_tornow_business.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Max Tornow</span></span>
+@@ -371,6 +393,10 @@ ${AURORA}
+           <img src="/img/cases/levantine_istanbul-C9406cJIC_D.jpg" alt="Clip von @levantine_istanbul" loading="lazy" decoding="async" width="270" height="480">
+           <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/levantine_istanbul.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Levantine</span></span>
+         </a>
++        <a class="clipwall__card" href="https://www.tiktok.com/@kavkazkibiror/video/7698966279020907798" target="_blank" rel="noopener">
++          <img src="/img/cases/kavkazkibiror-7698966279020907798.jpg" alt="Clip von @kavkazkibiror" loading="lazy" decoding="async" width="270" height="480">
++          <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/islam_dulatov.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>Islam Dulatov</span></span>
++        </a>
+         <a class="clipwall__card" href="https://www.instagram.com/dindrop7/reel/DZlBQOrgilt/" target="_blank" rel="noopener">
+           <img src="/img/cases/dindrop7-DZlBQOrgilt.jpg" alt="Clip von @dindrop7" loading="lazy" decoding="async" width="270" height="480">
+           <span class="clipwall__tag"><img class="clipwall__av" src="/img/avatars/dindrop7.jpg" alt="" loading="lazy" decoding="async" width="18" height="18"><span>DinDrop</span></span>
+@@ -771,8 +797,8 @@ ${AURORA}
        <span class="eyebrow">Case Studies</span>
        <h2 class="h2">Echte Accounts. Echte Clips. Echte Reichweite.</h2>
        <p class="lead">
@@ -3728,7 +3941,7 @@ index 9164a12..174afc9 100644
          Alle Zahlen beziehen sich auf den jeweiligen Kampagnenzeitraum.
        </p>
      </div>
-@@ -1136,6 +1138,144 @@ ${AURORA}
+@@ -1136,6 +1162,144 @@ ${AURORA}
          </div>
        </article>
  
