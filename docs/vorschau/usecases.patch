@@ -1,17 +1,3 @@
-diff --git a/public/assets/site.css b/public/assets/site.css
-index 5e748f8..af1bf7d 100644
---- a/public/assets/site.css
-+++ b/public/assets/site.css
-@@ -957,6 +957,9 @@ ul { margin: 0; padding: 0; list-style: none; }
-   object-fit: cover; transition: transform .5s cubic-bezier(.2, .7, .2, 1);
- }
- .igw__poster--photo:hover img { transform: scale(1.06); }
-+/* TikTok-Videos direkt in der Kachel (offizieller Player, Case Study Omid Mouazzen); der Link darunter bleibt als Rückfall. */
-+.igw__cell--tt iframe { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; border: 0; background: #000; }
-+.igw__cell--tt .pl { display: none; }
- .igw__poster .pl {
-   position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%);
-   width: 38px; height: 38px; border-radius: 50%; background: rgba(255, 255, 255, .2);
 diff --git a/public/img/avatars/islam_dulatov.jpg b/public/img/avatars/islam_dulatov.jpg
 new file mode 100644
 index 0000000000000000000000000000000000000000..2c2e30c2aa36c4c77928e17ae83c8667cb120457
@@ -278,7 +264,7 @@ index fa7cd6e..8128f20 100644
    </div>
  
 diff --git a/src/views/landing.ts b/src/views/landing.ts
-index 9164a12..821ba97 100644
+index 9164a12..a702237 100644
 --- a/src/views/landing.ts
 +++ b/src/views/landing.ts
 @@ -287,6 +287,8 @@ ${AURORA}
@@ -301,14 +287,15 @@ index 9164a12..821ba97 100644
          Alle Zahlen beziehen sich auf den jeweiligen Kampagnenzeitraum.
        </p>
      </div>
-@@ -1136,6 +1138,139 @@ ${AURORA}
+@@ -1136,6 +1138,137 @@ ${AURORA}
          </div>
        </article>
  
 +      <!-- ─── Case 6 · Omid Mouazzen (TikTok, Clipping-Account @nikkiclips1) ── -->
 +      <!-- Zahlen laut Auftraggeber (November 2026): 1,3 Mio. Views nach 8 Tagen. Profilbild: YouTube-Kanal.
-+           Die drei Videos (vom Auftraggeber ausgewählt) laufen im offiziellen TikTok-Player direkt in der Kachel;
-+           darunter liegt ein Link aufs Video, falls der Player nicht lädt. -->
++           Die drei Kacheln führen auf die drei vom Auftraggeber ausgewählten Videos. Den eingebetteten
++           TikTok-Player haben wir verworfen (TikTok blendet oft „Schau dir dieses Video bei TikTok an“ ein);
++           Standbilder folgen als /img/cases/nikkiclips1-<id>.jpg, sobald der Auftraggeber sie schickt. -->
 +      <article class="case case--rev rv">
 +        <div class="case__inner">
 +          <div class="case__copy">
@@ -345,23 +332,20 @@ index 9164a12..821ba97 100644
 +              </div>
 +
 +              <div class="igw__grid">
-+                <div class="igw__cell igw__cell--tt">
++                <div class="igw__cell">
 +                  <a class="igw__poster" href="https://www.tiktok.com/@nikkiclips1/video/7697940793650187542" target="_blank" rel="noopener" aria-label="Video 1 von @nikkiclips1 auf TikTok ansehen">
 +                    <span class="pl" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 12 12" fill="#fff"><path d="M3 1.5v9l7-4.5-7-4.5Z"/></svg></span>
 +                  </a>
-+                  <iframe src="https://www.tiktok.com/player/v1/7697940793650187542?music_info=0&amp;description=0&amp;rel=0&amp;native_context_menu=0&amp;closed_caption=0&amp;progress_bar=0&amp;volume_control=0&amp;timestamp=0&amp;loop=1" title="TikTok-Video 1 von @nikkiclips1" loading="lazy" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>
 +                </div>
-+                <div class="igw__cell igw__cell--tt">
++                <div class="igw__cell">
 +                  <a class="igw__poster" href="https://www.tiktok.com/@nikkiclips1/video/7697936933170842902" target="_blank" rel="noopener" aria-label="Video 2 von @nikkiclips1 auf TikTok ansehen">
 +                    <span class="pl" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 12 12" fill="#fff"><path d="M3 1.5v9l7-4.5-7-4.5Z"/></svg></span>
 +                  </a>
-+                  <iframe src="https://www.tiktok.com/player/v1/7697936933170842902?music_info=0&amp;description=0&amp;rel=0&amp;native_context_menu=0&amp;closed_caption=0&amp;progress_bar=0&amp;volume_control=0&amp;timestamp=0&amp;loop=1" title="TikTok-Video 2 von @nikkiclips1" loading="lazy" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>
 +                </div>
-+                <div class="igw__cell igw__cell--tt">
++                <div class="igw__cell">
 +                  <a class="igw__poster" href="https://www.tiktok.com/@nikkiclips1/video/7696153649105341718" target="_blank" rel="noopener" aria-label="Video 3 von @nikkiclips1 auf TikTok ansehen">
 +                    <span class="pl" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 12 12" fill="#fff"><path d="M3 1.5v9l7-4.5-7-4.5Z"/></svg></span>
 +                  </a>
-+                  <iframe src="https://www.tiktok.com/player/v1/7696153649105341718?music_info=0&amp;description=0&amp;rel=0&amp;native_context_menu=0&amp;closed_caption=0&amp;progress_bar=0&amp;volume_control=0&amp;timestamp=0&amp;loop=1" title="TikTok-Video 3 von @nikkiclips1" loading="lazy" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>
 +                </div>
 +              </div>
 +
