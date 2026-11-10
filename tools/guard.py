@@ -87,20 +87,6 @@ def inventory(files: dict[str, str]) -> dict[str, set[str]]:
     return inv
 
 
-# Bewusst entfernt, auf ausdrückliche Vorgabe des Auftraggebers. Steht hier mit
-# Grund, damit der Wächter nur UNGEWOLLTE Verluste meldet.
-BEWUSST_ENTFERNT: dict[str, dict[str, str]] = {
-    "ids": {
-        # November 2026: Creator legen Kampagnen im selben Formular an wie Agentur
-        # und Kunde (/kampagnen/neu). Das alte Namensfenster der Übersicht fällt weg.
-        "campaign-modal": "Creator: gemeinsames Kampagnen-Formular",
-        "campaign-name": "Creator: gemeinsames Kampagnen-Formular",
-        "campaign-error": "Creator: gemeinsames Kampagnen-Formular",
-        "campaign-save": "Creator: gemeinsames Kampagnen-Formular",
-    },
-}
-
-
 def main() -> int:
     args = sys.argv[1:]
     old = args[0] if args else git("rev-list", "--max-parents=0", "HEAD").split()[0]
@@ -109,8 +95,7 @@ def main() -> int:
     a, b = inventory(files_at(old)), inventory(files_at(new))
     removed_total = 0
     for key in ("routes", "api", "fields", "ids", "data", "schema", "files"):
-        allowed = BEWUSST_ENTFERNT.get(key, {})
-        gone = sorted(g for g in a[key] - b[key] if g not in allowed)
+        gone = sorted(a[key] - b[key])
         added = len(b[key] - a[key])
         removed_total += len(gone)
         mark = "\x1b[32m✓\x1b[0m" if not gone else "\x1b[31m✘\x1b[0m"

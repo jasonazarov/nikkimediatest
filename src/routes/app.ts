@@ -30,7 +30,7 @@ import {
   type VideoCard,
 } from '../views/app'
 import type { AppEnv } from '../lib/types'
-import { newCampaignPage } from '../views/collaboration'
+import { customerNewCampaignPage } from '../views/customer-new'
 import type { Customer, Folder, Project } from '../db/schema'
 
 export const appRoutes = new Hono<AppEnv>()
@@ -176,22 +176,13 @@ appRoutes.get('/', async (c) => {
   return renderCustomerProjects(c, CUSTOMER_AREA, customer)
 })
 
-/** „Neue Kampagne“: dasselbe Formular wie bei den Agenturen (views/collaboration.ts,
- *  Vorgabe des Auftraggebers, November 2026): Name, Bereich, Plattformen, Views,
- *  Budget, Übersicht, verbindlicher Auftrag. */
+/** „Neue Kampagne“: Name, Laufzeit, Reichweite (views/customer-new.ts). */
 appRoutes.get('/neu', async (c) => {
   const customer = await customerForUser(c.env, c.get('user').id)
   if (!customer) return c.redirect('/app/einstellungen', 302)
   // Angefangener Entwurf steht schon drin (lib/drafts.ts), z. B. nach der Erinnerungsmail.
   const draft = await openDraft(c.env, c.get('user').id).catch(() => null)
-  return c.html(
-    newCampaignPage({
-      user: c.get('user'),
-      area: 'customer',
-      prefill: { name: draft?.name, views: draft?.views },
-      autosave: true,
-    }),
-  )
+  return c.html(customerNewCampaignPage({ user: c.get('user'), draft }))
 })
 
 /* ------------------------------------ 2 — Ordner innerhalb einer Kampagne */

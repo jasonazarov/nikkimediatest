@@ -22,7 +22,7 @@ import {
   ASSIGN_HEADLINE,
   campHero,
 } from './layout'
-import { CREATOR_CAMPAIGN_AREA, CREATOR_NEW_CAMPAIGN } from './app'
+import { CREATOR_CAMPAIGN_AREA } from './app'
 import { campaignHero, countHead, glyph, kpiLine, reachKpis, reachStamp, statusBadge, viewsMeta } from './work'
 import {
   CREATOR_PLATFORMS,
@@ -351,9 +351,10 @@ export function overviewPage(o: {
     o.active.length || banner ? 'mt-9' : 'mt-0',
   )
 
-  /* „Neue Kampagne“ führt in dasselbe Formular wie bei Agentur und Kunde
-     (/kampagnen/neu, Vorgabe des Auftraggebers, November 2026). */
-  const newButton = linkBtn(esc(campaignText.newItem), CREATOR_NEW_CAMPAIGN, 'primary', 'data-new-campaign')
+  /* „Neue Kampagne“ ist ein Link auf die Liste und öffnet mit JavaScript
+     gleich hier das Namensfeld — danach geht es direkt in die neue
+     Kampagne, wie beim Anlegen unter „Meine Kampagnen“. */
+  const newButton = linkBtn(esc(campaignText.newItem), CREATOR_CAMPAIGN_AREA.home, 'primary', 'data-new-campaign')
 
   const ownSection = `
         <section>
@@ -446,14 +447,36 @@ export function overviewPage(o: {
           </dl>
         </aside>`
 
+  const modal = `
+      <!-- Modal: Neue Kampagne -->
+      <div id="campaign-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4">
+        <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
+          <h2 class="font-display text-lg font-bold">${esc(campaignText.newItem)}</h2>
+          <p class="mt-1 text-sm text-slate-500">${esc(campaignText.nameHint)}</p>
+          <input id="campaign-name" type="text" maxlength="80" placeholder="${esc(campaignText.namePlaceholder)}"
+                 class="mt-4 w-full rounded-xl border border-slate-300 px-4 py-3 text-[15px] outline-none focus:border-brand focus:ring-4 focus:ring-brand/15">
+          <p id="campaign-error" class="mt-2 hidden text-sm font-medium text-red-600"></p>
+          ${
+            o.accounts
+              ? ''
+              : `<p class="mt-3 rounded-xl bg-amber-50 px-3 py-2.5 text-xs text-amber-900">Tipp: Verbinde unter <a href="/kampagnen/accounts" class="font-semibold underline">Meine Accounts</a> deine Kanäle: dann gehen die fertigen Clips dieser Kampagne automatisch darauf.</p>`
+          }
+          <div class="mt-5 flex justify-end gap-2">
+            <button type="button" data-close-modal class="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold hover:border-slate-400">Abbrechen</button>
+            <button type="button" id="campaign-save" class="rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-2 disabled:opacity-40">${esc(
+              campaignText.createButton,
+            )}</button>
+          </div>
+        </div>
+      </div>`
+
   /* Kampagnen-Kopf im Aufbau der Agentur (Vorgabe des Auftraggebers, November 2026),
      unter der Preisstaffelung, die ganz oben bleiben muss. Links die wichtigste
      Kampagne mit ihren Knöpfen, rechts „Neue Kampagne erstellen“. */
   const newSide = {
-    href: CREATOR_NEW_CAMPAIGN,
     attrs: 'data-new-campaign',
     title: 'Neue Kampagne erstellen',
-    text: 'Name, Bereich, Plattformen, Views und Budget. Clipper und Creator machen daraus Clips für deine Kanäle.',
+    text: 'Name eingeben, Rohmaterial hochladen. Clipper und Creator machen daraus Clips für deine Kanäle.',
     cta: 'Kampagne anlegen',
     icon: 'plus' as const,
   }
@@ -524,7 +547,8 @@ export function overviewPage(o: {
         <div class="min-w-0 space-y-10 lg:col-span-2">${ownSection}${inactiveSection}
         </div>
         ${profileCard}
-      </div>`
+      </div>` +
+    modal
 
   return shell({
     title: 'Übersicht',
@@ -532,6 +556,58 @@ export function overviewPage(o: {
     nav: CREATOR_NAV,
     active: '/kampagnen',
     body,
+    script: `
+(function () {
+  var modal = document.getElementById('campaign-modal');
+  var input = document.getElementById('campaign-name');
+  var error = document.getElementById('campaign-error');
+  var save = document.getElementById('campaign-save');
+  var target = ${jsonScript(CREATOR_CAMPAIGN_AREA.projectHref(''))};
+
+  function open(e) {
+    e.preventDefault();
+    input.value = '';
+    error.classList.add('hidden');
+    save.disabled = false;
+    modal.classList.remove('hidden'); modal.classList.add('flex');
+    input.focus();
+  }
+  function close() { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+  function fail(message) {
+    error.textContent = message;
+    error.classList.remove('hidden');
+    save.disabled = false;
+  }
+
+  function create() {
+    // Enter läuft am gesperrten Knopf vorbei — sonst legt ein Doppeltipp zwei Kampagnen an.
+    if (save.disabled) return;
+    var name = input.value.trim();
+    if (!name) return fail(${jsonScript('Bitte gib einen Namen ein.')});
+    error.classList.add('hidden');
+    save.disabled = true;
+    fetch('/api/app/projects', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ name: name })
+    })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (res) {
+        if (!res.ok || !res.d.id) throw new Error(res.d.error || ${jsonScript('Das hat nicht geklappt.')});
+        /* Direkt in die neue Kampagne — dort fragt sie nach dem Material,
+           ohne das sie für niemanden sichtbar wird. */
+        window.location.href = target + encodeURIComponent(res.d.id);
+      })
+      .catch(function (e) { fail(e.message); });
+  }
+
+  document.querySelectorAll('[data-new-campaign]').forEach(function (el) { el.addEventListener('click', open); });
+  document.querySelectorAll('[data-close-modal]').forEach(function (b) { b.addEventListener('click', close); });
+  modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+  save.addEventListener('click', create);
+  input.addEventListener('keydown', function (e) { if (e.key === 'Enter') create(); });
+})();`,
   })
 }
 

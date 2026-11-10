@@ -616,21 +616,3 @@ html.nmd .nmw-camp-hero__new:hover { transform: translateY(-2px); box-shadow: in
   .nmw-wait-row__chip { order: 3; }
 }
 @media (prefers-reduced-motion: reduce) { .nmw-wait-row__del { transition: none; } }
-
-/* ---------------------------------------------------------------------------
-   Kampagnenkarten: Umbenennen und Löschen beschriftet (Vorgabe des
-   Auftraggebers, November 2026: das kleine Papierkorb-Symbol war unübersichtlich).
-   Gilt für „Meine Kampagnen“ bei Kunde, Creator und Agentur.
-   ------------------------------------------------------------------------- */
-.nmw-card-acts { display: flex; gap: 8px; margin-top: 12px; }
-.nmw-card-act {
-  flex: 1 1 0; min-width: 0; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 8px 10px; border-radius: 10px; font-size: .8rem; font-weight: 700; line-height: 1.2; white-space: nowrap;
-  color: rgba(255, 255, 255, .78); background: rgba(255, 255, 255, .05);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14); transition: background .15s ease, color .15s ease;
-}
-.nmw-card-act:hover { background: rgba(255, 255, 255, .1); color: #fff; }
-.nmw-card-act--del { color: #fca5a5; box-shadow: inset 0 0 0 1px rgba(252, 165, 165, .35); }
-.nmw-card-act--del:hover { background: rgba(239, 68, 68, .16); color: #fff; }
-.nmw-card-act:disabled { opacity: .6; cursor: wait; }
-@media (prefers-reduced-motion: reduce) { .nmw-card-act { transition: none; } }
