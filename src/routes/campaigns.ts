@@ -44,6 +44,7 @@ import { clipCounts, renderWorkProject, renderWorkUpload, workPreview } from './
 import { campaignThumbs } from '../lib/thumbs'
 import { CREATOR_CAMPAIGN_AREA } from '../views/app'
 import { CREATOR_WORK_AREA } from '../views/work'
+import { newCampaignPage } from '../views/collaboration'
 import {
   accountsPage,
   assignedListPage,
@@ -316,6 +317,13 @@ campaignRoutes.get('/meine', async (c) => {
   const area = await areaOf(c)
   if (!area) return c.html(settingUpPage(), 200)
   return renderCustomerProjects(c, CREATOR_CAMPAIGN_AREA, area.customer)
+})
+
+/** „Neue Kampagne“: dasselbe Formular wie bei Agentur und Kunde (views/collaboration.ts). */
+campaignRoutes.get('/neu', async (c) => {
+  const area = await areaOf(c)
+  if (!area) return c.html(settingUpPage(), 200)
+  return c.html(newCampaignPage({ user: c.get('user'), area: 'creator' }))
 })
 
 campaignRoutes.get('/meine/:id', async (c) => {

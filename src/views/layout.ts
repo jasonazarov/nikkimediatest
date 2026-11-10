@@ -144,6 +144,11 @@ export interface ShellOptions {
   push?: boolean
   /** Zweite Zeile im Glückwunsch-Popup (?angelegt=1), wenn „Rohmaterial hochladen“ hier noch nicht geht. */
   popNext?: string
+  /**
+   * false = keine Abschnitte der Übersicht (Views-Grafik, Virale Clips, Kampagne pushen), obwohl
+   * der erste Menüpunkt markiert ist. Für Formulare wie „Neue Kampagne“ des Kunden (/app/neu).
+   */
+  overview?: false
 }
 
 /** Vorschläge des FAQ-Agenten je Bereich (assets/agent.js). Admin bekommt keinen Agenten. */
@@ -161,7 +166,7 @@ const AGENT_SUGGEST: Partial<Record<Role, string[]>> = {
  * ihnen steht das Feld deshalb UNTER dem Seiteninhalt, sonst darüber.
  */
 const viralPlacement = (o: ShellOptions): 'top' | 'bottom' | null => {
-  if (!o.nav.length || o.active !== o.nav[0].href) return null
+  if (o.overview === false || !o.nav.length || o.active !== o.nav[0].href) return null
   if (o.nav.some((n) => n.locked)) return null
   return o.user.role === 'clipper' || o.user.role === 'creator' ? 'bottom' : 'top'
 }

@@ -21,7 +21,7 @@ import {
   TOP_MARK,
   campHero,
 } from './layout'
-import { CUSTOMER_AREA, briefingStrip, type CustomerArea } from './app'
+import { CREATOR_CAMPAIGN_AREA, CUSTOMER_AREA, briefingStrip, type CustomerArea } from './app'
 import { stationsBar, viewsControl } from './form-window'
 import {
   AGENCY_PACKAGES,
@@ -493,10 +493,23 @@ ${ONE_PAGE_JS}
  */
 export function newCampaignPage(o: {
   user: User
+  /**
+   * Wer anlegt (Vorgabe des Auftraggebers, November 2026: überall dasselbe Formular).
+   * Bestimmt Menü, Rücklink, Adresse beim Absenden und wohin es danach geht:
+   *   agency    POST /api/collaboration/campaigns (Standard)
+   *   customer  POST /api/app/projects, danach /app/projekt/:id
+   *   creator   POST /api/app/projects, danach /kampagnen/meine/:id
+   */
+  area?: 'agency' | 'customer' | 'creator'
   locked?: boolean
   first?: 'neu' | 'wieder'
-  prefill?: { niche?: string | null; platforms?: string[] }
+  prefill?: { niche?: string | null; platforms?: string[]; name?: string | null; views?: number | null }
+  /** Kunde: jede Angabe schon beim Ausfüllen als Entwurf speichern (PUT /api/app/campaign-draft, lib/drafts.ts). */
+  autosave?: boolean
 }): string {
+  const kind = o.area ?? 'agency'
+  const own: CustomerArea | null = kind === 'customer' ? CUSTOMER_AREA : kind === 'creator' ? CREATOR_CAMPAIGN_AREA : null
+  const endpoint = own ? '/api/app/projects' : '/api/collaboration/campaigns'
   const firstName = o.user.fullName.split(' ')[0]
   const pickedNiche = o.prefill?.niche ?? null
   const pickedPlatforms = new Set(o.prefill?.platforms ?? [])
@@ -535,7 +548,7 @@ export function newCampaignPage(o: {
           ? pageTitle(`Willkommen, ${firstName}!`, 'Starte jetzt deine erste Kampagne: Name, Bereich, Plattformen, Views und Budget.')
           : o.first === 'wieder'
             ? pageTitle(`Hallo ${firstName}!`, 'Du hast gerade keine Kampagne. Starte eine neue: Name, Bereich, Plattformen, Views und Budget.')
-            : `<a href="${esc(o.locked ? '/collaboration' : AGENCY_CAMPAIGN_AREA.home)}" class="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-brand">← ${o.locked ? 'Übersicht' : 'Meine Kampagnen'}</a>
+            : `<a href="${esc(own ? own.home : o.locked ? '/collaboration' : AGENCY_CAMPAIGN_AREA.home)}" class="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-brand">← ${!own && o.locked ? 'Übersicht' : 'Meine Kampagnen'}</a>
       ${pageTitle('Neue Kampagne erstellen', 'Name, Bereich, Plattformen, Views und Budget. Danach siehst du, was 1.000 Views für deine Kampagne kosten.')}`
       }
 
@@ -547,10 +560,12 @@ export function newCampaignPage(o: {
           <fieldset class="nmg-sec" data-step="1" id="abschnitt-1">
             ${legend('Wie soll die Kampagne heißen?')}
             <label class="nmg-field mx-auto mt-8 flex max-w-xl items-center">
-              <input type="text" name="campaignName" autocomplete="off" maxlength="80" placeholder="${esc(AGENCY_CAMPAIGN_AREA.text.namePlaceholder)}"
-                     class="min-w-0 flex-1 bg-transparent font-display text-2xl font-extrabold outline-none">
+              <input type="text" name="campaignName" autocomplete="off" maxlength="80" placeholder="${esc((own ?? AGENCY_CAMPAIGN_AREA).text.namePlaceholder)}"
+                     value="${esc(o.prefill?.name ?? '')}" class="min-w-0 flex-1 bg-transparent font-display text-2xl font-extrabold outline-none">
             </label>
-            <p class="mt-3 text-center text-sm text-white/60">Ein Name, an dem du die Kampagne wiedererkennst, zum Beispiel der Name deines Kunden.</p>
+            <p class="mt-3 text-center text-sm text-white/60">${
+              own ? 'Ein Name, an dem du die Kampagne wiedererkennst.' : 'Ein Name, an dem du die Kampagne wiedererkennst, zum Beispiel der Name deines Kunden.'
+            }</p>
           </fieldset>
 
           <!-- Schritt 2: Bereich -->
@@ -639,6 +654,10 @@ export function newCampaignPage(o: {
   var step = 1, TOTAL = titles.length, sending = false;
   var range = form.viewsStep;
   var err = form.querySelector('[data-error]');
+  var ENDPOINT = ${jsonScript(endpoint)};
+  var PROJECT_HREF = ${jsonScript(own ? own.projectHref('{id}') : '')};
+  var PRE_VIEWS = ${jsonScript(o.prefill?.views ?? null)};
+  if (PRE_VIEWS) range.value = String(PRE_VIEWS);
   var short = function (n) {
     return n >= 1000000 ? (n / 1000000).toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' Mio.' : Math.round(n / 1000) + 'K';
   };
@@ -727,7 +746,7 @@ export function newCampaignPage(o: {
     if (sending) return;
     for (var n = 1; n <= TOTAL; n++) { var p = problem(n); if (p) { show(p); jumpTo(n); return; } }
     sending = true; render();
-    fetch('/api/collaboration/campaigns', {
+    fetch(ENDPOINT, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -741,15 +760,40 @@ export function newCampaignPage(o: {
     }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
       .then(function (res) {
         if (!res.ok) throw new Error(res.d.error || 'Das hat leider nicht geklappt.');
-        window.location.href = res.d.redirect || '/collaboration/meine';
+        // Kunde und Creator: die neue Kampagne öffnet sich mit dem Glückwunsch-Popup (shell(), ?angelegt=1).
+        window.location.href = res.d.redirect
+          || (PROJECT_HREF && res.d.id ? PROJECT_HREF.replace('{id}', encodeURIComponent(res.d.id)) + '?angelegt=1' : '/collaboration/meine');
       })
       .catch(function (e2) { sending = false; render(); show(e2.message); });
   });
-${ONE_PAGE_JS}
+${
+  o.autosave
+    ? `  /* Entwurf (lib/drafts.ts): jede Angabe kurz nach dem Tippen speichern. Abgebrochen meldet sich
+     nach 2 Stunden der Admin-Bereich, nach 24 Stunden kommt eine Erinnerung an den Kunden. */
+  var viewsTouched = Boolean(PRE_VIEWS), lastSaved = '', saveTimer = 0;
+  range.addEventListener('input', function () { viewsTouched = true; });
+  function saveDraft() {
+    window.clearTimeout(saveTimer);
+    saveTimer = window.setTimeout(function () {
+      var data = { name: form.campaignName.value.trim(), durationDays: null, views: viewsTouched ? Number(range.value) : null };
+      var json = JSON.stringify(data);
+      if (json === lastSaved || (!data.name && !data.views)) return;
+      lastSaved = json;
+      fetch('/api/app/campaign-draft', { method: 'PUT', headers: { 'content-type': 'application/json' }, body: json, keepalive: true }).catch(function () {});
+    }, 800);
+  }
+  form.addEventListener('input', saveDraft);
+  form.addEventListener('change', saveDraft);
+`
+    : ''
+}${ONE_PAGE_JS}
   render();
-  form.campaignName.focus();
+  if (!form.campaignName.value) form.campaignName.focus();
 })();`
 
+  if (own) {
+    return shell({ title: 'Neue Kampagne', user: o.user, nav: own.nav, active: own.active, body, script, overview: false })
+  }
   return agencyShell({
     title: o.first ? 'Kampagne starten' : 'Neue Kampagne',
     user: o.user,

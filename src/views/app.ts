@@ -119,9 +119,9 @@ export interface CustomerArea {
   projectHref: (id: string) => string
   folderHref: (id: string) => string
   /**
-   * Gesetzt bei Agenturen: „Neue Kampagne“ führt dorthin (zum Briefing) statt
-   * ein Namensfeld zu öffnen. Eine Agentur legt keine Kampagne ohne Views,
-   * Budget und Auftrag an (Vorgabe des Auftraggebers).
+   * „Neue Kampagne“ führt dorthin statt ein Namensfeld zu öffnen: bei Agentur,
+   * Kunde und Creator dasselbe Formular mit Name, Bereich, Plattformen, Views,
+   * Budget und Auftrag (Vorgabe des Auftraggebers, November 2026).
    */
   newHref?: string
   /** Nur Agenturen: Knöpfe „Creator buchen“ und „Clipper buchen“ für diese Kampagne (HTML). */
@@ -159,7 +159,7 @@ export const CUSTOMER_AREA: CustomerArea = {
   home: '/app',
   projectHref: (id) => `/app/projekt/${id}`,
   folderHref: (id) => `/app/ordner/${id}`,
-  // „Neue Kampagne“ öffnet das Formular mit Laufzeit und Reichweite (views/customer-new.ts).
+  // „Neue Kampagne“ öffnet dasselbe Formular wie bei den Agenturen (newCampaignPage in views/collaboration.ts).
   newHref: '/app/neu',
   openAfterCreate: false,
   accounts: 'project',
@@ -212,10 +212,14 @@ export const CUSTOMER_AREA: CustomerArea = {
  * Projekt in seinem Arbeitsbereich: Er lädt Rohmaterial hoch oder verlinkt
  * es, und die Clipper und Creator machen daraus Clips.
  */
+/** „Neue Kampagne“ des Creators: dasselbe Formular wie bei Agentur und Kunde. */
+export const CREATOR_NEW_CAMPAIGN = '/kampagnen/neu'
+
 export const CREATOR_CAMPAIGN_AREA: CustomerArea = {
   nav: CREATOR_NAV,
   active: '/kampagnen/meine',
   home: '/kampagnen/meine',
+  newHref: CREATOR_NEW_CAMPAIGN,
   projectHref: (id) => `/kampagnen/meine/${id}`,
   folderHref: (id) => `/kampagnen/ordner/${id}`,
   openAfterCreate: true,
@@ -462,24 +466,21 @@ export function projectsPage(o: {
       ],
       corner: statusBadge(p.status),
       // Außerhalb des Links: Umbenennen und Löschen öffnen nicht zugleich die Kampagne.
+      // Beschriftet statt nur Symbol (Vorgabe des Auftraggebers, November 2026: Löschen war unübersichtlich).
       footer: `
-            <div class="flex items-start justify-between gap-3">
-              <div class="min-w-0 flex-1">
-                ${metricStrip(p.metrics, 'de', { size: 'sm' })}
-                ${viaCreatorsLine(t.metricsViaCreators, p.metrics)}
-              </div>
-              <div class="-mr-1.5 -mt-1 flex shrink-0 gap-0.5">
-                <button type="button" data-rename-project="${esc(p.id)}" data-name="${esc(p.name)}" title="${esc(t.renameTitle)}" aria-label="${esc(t.renameTitle)}"
-                        class="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700">${svg(PENCIL)}</button>
-                <button type="button" data-del-project="${esc(p.id)}" data-accounts="${esc(p.accountCount)}" title="${esc(t.deleteTitle)}" aria-label="${esc(t.deleteTitle)}"
-                        class="rounded-lg p-1.5 text-slate-400 transition hover:bg-red-50 hover:text-red-600">${svg(TRASH)}</button>
-              </div>
+            <div class="min-w-0">
+              ${metricStrip(p.metrics, 'de', { size: 'sm' })}
+              ${viaCreatorsLine(t.metricsViaCreators, p.metrics)}
+            </div>
+            <div class="nmw-card-acts">
+              <button type="button" class="nmw-card-act" data-rename-project="${esc(p.id)}" data-name="${esc(p.name)}" aria-label="${esc(t.renameTitle)}: ${esc(p.name)}">${svg(PENCIL, 'h-4 w-4')} Umbenennen</button>
+              <button type="button" class="nmw-card-act nmw-card-act--del" data-del-project="${esc(p.id)}" data-accounts="${esc(p.accountCount)}" aria-label="${esc(t.deleteTitle)}: ${esc(p.name)}">${svg(TRASH, 'h-4 w-4')} Löschen</button>
             </div>`,
     }),
   )
 
-  /* Wo `area.newHref` gesetzt ist (Agenturen), öffnet „Neue Kampagne“ kein
-     Namensfeld, sondern führt zum Briefing. Gleiche Optik, nur ein Link. */
+  /* Wo `area.newHref` gesetzt ist (heute überall), öffnet „Neue Kampagne“ kein
+     Namensfeld, sondern führt ins gemeinsame Formular. Gleiche Optik, nur ein Link. */
   const opener = (cls: string, inner: string, id?: string) =>
     area.newHref
       ? `<a href="${esc(area.newHref)}"${id ? ` id="${id}"` : ''} class="${cls}">${inner}</a>`

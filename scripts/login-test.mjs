@@ -427,11 +427,30 @@ try {
     zaehle(`SELECT count(*) AS n FROM project_links l JOIN projects p ON p.id = l.project_id JOIN customers c ON c.id = p.customer_id JOIN users u ON u.id = c.user_id WHERE u.email='${NEU_KUNDE}';`) === 1,
   )
 
-  // „Neue Kampagne“ im Kunden-Dashboard: Laufzeit und Reichweite hängen an der Kampagne
+  // „Neue Kampagne“ im Kunden-Dashboard: dasselbe Formular wie bei den Agenturen
+  // (Name, Bereich, Plattformen, Views, Budget, verbindlicher Auftrag; Vorgabe des Auftraggebers)
   const kundeCookie = (kundeNeu.headers.get('set-cookie') ?? '').split(/,(?=\s*nm_)/).map((c) => c.trim().split(';')[0]).find((c) => c.startsWith('nm_session_customer=')) ?? ''
   const kundePost = (daten) => hole('/api/app/projects', { method: 'POST', headers: { 'content-type': 'application/json', cookie: kundeCookie }, body: JSON.stringify(daten) })
   const formularSeite = await hole('/app/neu', { headers: { cookie: kundeCookie } })
-  pruefe('Kunde: Formular „Neue Kampagne“ ist erreichbar', formularSeite.status === 200 && (await formularSeite.text()).includes('data-customer-campaign'), `HTTP ${formularSeite.status}`)
+  const formularHtml = await formularSeite.text()
+  pruefe(
+    'Kunde: „Neue Kampagne“ ist dasselbe Formular wie bei den Agenturen',
+    formularSeite.status === 200 && formularHtml.includes('data-new-campaign') && formularHtml.includes('name="binding"') && formularHtml.includes('"/api/app/projects"'),
+    `HTTP ${formularSeite.status}`,
+  )
+  const kampagneVoll = { name: 'Winter-Aktion', niche: 'E-Commerce', platforms: ['tiktok', 'instagram'], views: 2350000, budget: 11750, binding: true }
+  const ohneAuftrag = await kundePost({ ...kampagneVoll, binding: false })
+  const falschesBudget = await kundePost({ ...kampagneVoll, budget: 500 })
+  pruefe('Kunde: ohne verbindlichen Auftrag oder mit falschem Budget keine Kampagne', ohneAuftrag.status === 400 && falschesBudget.status === 400, `HTTP ${ohneAuftrag.status}/${falschesBudget.status}`)
+  const kundeVoll = await kundePost(kampagneVoll)
+  const kundeVollBody = await kundeVoll.json().catch(() => ({}))
+  pruefe(
+    'Kunde: Kampagne mit Bereich, Plattformen, 2.350.000 Views und 11.750 € ist angelegt',
+    kundeVoll.status === 200 &&
+      zaehle(`SELECT count(*) AS n FROM projects WHERE id='${kundeVollBody.id}' AND briefing_niche='E-Commerce' AND briefing_views=2350000 AND briefing_budget_cents=1175000 AND briefing_platforms LIKE '%tiktok%';`) === 1,
+    `HTTP ${kundeVoll.status} → ${JSON.stringify(kundeVollBody)}`,
+  )
+  // Der ältere Weg (Laufzeit und Reichweite) bleibt für noch offene Seiten bestehen.
   const falscheLaufzeit = await kundePost({ name: 'Herbst', durationDays: 45, views: 1000000 })
   const falscheViews = await kundePost({ name: 'Herbst', durationDays: 60, views: 1234567 })
   pruefe('Kunde: falsche Laufzeit und Reichweite werden abgewiesen', falscheLaufzeit.status === 400 && falscheViews.status === 400, `HTTP ${falscheLaufzeit.status}/${falscheViews.status}`)
@@ -539,6 +558,25 @@ try {
   const kampagnen = await hole('/kampagnen', { headers: { cookie: creatorCookie } })
   const kampagnenHtml = await kampagnen.text()
   pruefe('Creator sieht „Dein Kampagnen-Dashboard“', kampagnen.status === 200 && kampagnenHtml.includes('Dein Kampagnen-Dashboard'), `HTTP ${kampagnen.status}`)
+  const creatorFormular = await hole('/kampagnen/neu', { headers: { cookie: creatorCookie } })
+  const creatorFormularHtml = await creatorFormular.text()
+  pruefe(
+    'Creator: „Neue Kampagne“ ist dasselbe Formular wie bei den Agenturen',
+    creatorFormular.status === 200 && creatorFormularHtml.includes('data-new-campaign') && creatorFormularHtml.includes('/kampagnen/meine/{id}') && !creatorFormularHtml.includes('id="campaign-modal"'),
+    `HTTP ${creatorFormular.status}`,
+  )
+  const creatorKampagne = await hole('/api/app/projects', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', cookie: creatorCookie },
+    body: JSON.stringify({ name: 'Creator-Kampagne', niche: 'Fitness & Sport', platforms: ['youtube'], views: 500000, budget: 2500, binding: true }),
+  })
+  const creatorKampagneBody = await creatorKampagne.json().catch(() => ({}))
+  pruefe(
+    'Creator: Kampagne mit Bereich, Plattform, Views und Budget ist angelegt',
+    creatorKampagne.status === 200 &&
+      zaehle(`SELECT count(*) AS n FROM projects p JOIN customers cu ON cu.id = p.customer_id JOIN users u ON u.id = cu.user_id WHERE p.id='${creatorKampagneBody.id}' AND u.email='${NEU_CREATOR}' AND p.briefing_views=500000 AND p.briefing_budget_cents=250000;`) === 1,
+    `HTTP ${creatorKampagne.status} → ${JSON.stringify(creatorKampagneBody)}`,
+  )
   const creatorImKundenbereich = await hole('/app', { headers: { cookie: creatorCookie } })
   pruefe('Creator-Sitzung öffnet nicht den Kundenbereich', creatorImKundenbereich.status === 302, `HTTP ${creatorImKundenbereich.status}`)
   const creatorImClipperbereich = await hole('/work', { headers: { cookie: creatorCookie } })

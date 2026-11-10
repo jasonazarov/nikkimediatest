@@ -11,6 +11,7 @@ import {
   verifyPasswordLogin,
 } from '../lib/auth'
 import { audit } from '../lib/audit'
+import { formatEuro } from '../views/layout'
 import { saveDraft, submitDraft } from '../lib/drafts'
 import { setPushPopupDays } from '../lib/upsell'
 import { loginSelfTest } from '../lib/selftest'
@@ -163,6 +164,8 @@ import {
   openCooperationCode,
   releaseCooperationCode,
   isValidDuration,
+  parseNewCampaign,
+  pricePerThousandCents,
   isValidViews,
 } from '../lib/agency'
 import { finishCustomThumb, removeCustomThumb, startCustomThumb } from '../lib/thumbs'
@@ -1193,14 +1196,23 @@ appApi.post('/projects', async (c) => {
   if (!customer) return c.json({ error: 'Kein Kundenkonto.' }, 400)
 
   const body = await c.req.json().catch(() => ({}))
-  const name = str(body.name, 80)
+
+  /*
+   * Seit November 2026 legen Kunde und Creator ihre Kampagnen im selben Formular an
+   * wie Agenturen (Vorgabe des Auftraggebers): Name, Bereich, Plattformen, Views,
+   * Budget, verbindlicher Auftrag. Dieselben Prüfungen und Preise (parseNewCampaign).
+   */
+  const full = body.niche !== undefined || body.platforms !== undefined || body.binding !== undefined
+  const brief = full ? parseNewCampaign(body) : null
+  if (brief && 'error' in brief) return c.json({ error: brief.error }, 400)
+  const name = brief ? brief.name : str(body.name, 80)
   if (!name) return c.json({ error: 'Bitte gib einen Namen ein.' }, 400)
 
-  // Kunden-Formular „Neue Kampagne“ (/app/neu): Laufzeit und Reichweite. Ohne diese
-  // Angaben bleibt es beim bloßen Namen (Creator, ältere Aufrufe).
-  const withBrief = user.role === 'customer' && (body.durationDays !== undefined || body.views !== undefined)
+  // Älterer Kunden-Weg (Laufzeit und Reichweite) bleibt für offene Seiten bestehen.
+  // Ohne alle Angaben bleibt es beim bloßen Namen (ältere Aufrufe).
+  const withBrief = !brief && user.role === 'customer' && (body.durationDays !== undefined || body.views !== undefined)
   const durationDays = Number(body.durationDays)
-  const views = Number(body.views)
+  const views = brief ? brief.views : Number(body.views)
   if (withBrief && !isValidDuration(durationDays)) return c.json({ error: 'Bitte wähle die Laufzeit: 30, 60 oder 90 Tage.' }, 400)
   if (withBrief && !isValidViews(views)) return c.json({ error: 'Bitte wähle die gewünschte Reichweite.' }, 400)
 
@@ -1211,6 +1223,33 @@ appApi.post('/projects', async (c) => {
     name,
     folderName: 'Rohmaterial',
   })
+  if (brief) {
+    await getDb(c.env)
+      .update(schema.projects)
+      .set({
+        briefingViews: brief.views,
+        briefingBudgetCents: brief.budgetCents,
+        briefingNiche: brief.niche,
+        briefingPlatforms: brief.platforms.length ? JSON.stringify(brief.platforms) : null,
+        briefingDurationDays: isValidDuration(durationDays) ? durationDays : null,
+      })
+      .where(eq(schema.projects.id, project.id))
+    await mailCustomerCampaignAdmin(c.env, {
+      by: user.role === 'creator' ? 'creator' : 'kunde',
+      projectId: project.id,
+      campaign: name,
+      fullName: user.fullName,
+      company: customer.company,
+      email: user.email,
+      phone: user.phone,
+      duration: isValidDuration(durationDays) ? `${durationDays} Tage` : '–',
+      views: `${brief.views.toLocaleString('de-DE')} Views`,
+      niche: brief.niche ?? '–',
+      platforms: brief.platforms.map(agencyPlatformLabel).join(', '),
+      budget: formatEuro(brief.budgetCents),
+      perThousand: formatEuro(pricePerThousandCents(brief)),
+    }).catch(() => false)
+  }
   if (withBrief) {
     await getDb(c.env)
       .update(schema.projects)
@@ -1237,6 +1276,7 @@ appApi.post('/projects', async (c) => {
       name,
       by: user.role === 'customer' ? 'kunde' : user.role === 'creator' ? 'creator' : 'agentur',
       ...(withBrief ? { durationDays, views } : {}),
+      ...(brief ? { views: brief.views, budgetCents: brief.budgetCents, niche: brief.niche, platforms: brief.platforms, binding: true } : {}),
     },
   })
   // Der angefangene Entwurf (lib/drafts.ts) ist damit erledigt: keine Meldung, keine Erinnerung.
