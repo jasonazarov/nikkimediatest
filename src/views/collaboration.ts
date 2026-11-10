@@ -152,20 +152,6 @@ function pageSlice<T>(list: T[], page: number, size: number): { items: T[]; page
 const agencyShell = (o: { title: string; user: User; locked: boolean; active: string; body: string; script?: string }) =>
   shell({ title: o.title, user: o.user, nav: agencyNav(o.locked), active: o.active, body: o.body, script: o.script })
 
-/** Die drei Angaben aus dem Briefing als kleine Zeile. */
-function briefingChips(lead: AgencyLead): string {
-  const chip = (label: string, value: string) =>
-    `<span class="inline-flex flex-col rounded-xl bg-white/10 px-4 py-2.5 ring-1 ring-inset ring-white/15">
-       <small class="text-[10px] font-semibold uppercase tracking-wider text-white/60">${esc(label)}</small>
-       <b class="font-display text-base font-extrabold">${esc(value)}</b>
-     </span>`
-  return `<div class="mt-6 flex flex-wrap justify-center gap-2.5">
-      ${chip('Views', `${viewsShort(lead.viewsTarget)} Views`)}
-      ${chip('Budget', lead.budgetCents ? formatEuro(lead.budgetCents) : '–')}
-      ${chip('Auftrag', agencyPackageLabel(lead.package))}
-    </div>`
-}
-
 /** Was hinter den Schlössern wartet — vier gesperrte Karten. */
 function lockedPreview(): string {
   const items: [string, string][] = [
@@ -298,7 +284,12 @@ const ONE_PAGE_JS = `
  * Auftrag. Legt die erste Kampagne an; alles andere ist bis dahin gesperrt.
  * Jede weitere Kampagne entsteht über `newCampaignPage`.
  */
-export function briefingPage(o: { user: User; lead: AgencyLead }): string {
+/**
+ * Das Briefing (Views, Budget, Auftrag). Beim ersten Login und wieder, sobald
+ * eine Agentur keine eigene Kampagne mehr hat (alle gelöscht; Vorgabe des
+ * Auftraggebers, November 2026). `locked`: Menü mit Schlössern (Standard).
+ */
+export function briefingPage(o: { user: User; lead: AgencyLead; locked?: boolean }): string {
   const first = o.user.fullName.split(' ')[0]
   const titles = ['Views', 'Budget', 'Auftrag']
   const total = titles.length
@@ -318,7 +309,11 @@ export function briefingPage(o: { user: User; lead: AgencyLead }): string {
   ).join('')
 
   const body = `
-      ${pageTitle(`Willkommen, ${first}!`, 'Starte jetzt deine Kampagne, drei kurze Angaben, dann geht es los.')}
+      ${
+        o.lead.briefedAt
+          ? pageTitle(`Hallo ${first}!`, 'Du hast gerade keine Kampagne. Starte eine neue, drei kurze Angaben, dann geht es los.')
+          : pageTitle(`Willkommen, ${first}!`, 'Starte jetzt deine Kampagne, drei kurze Angaben, dann geht es los.')
+      }
 
       <section class="nmg text-white" id="briefing">
         <form class="p-6 sm:p-10" data-briefing novalidate>
@@ -461,7 +456,7 @@ ${ONE_PAGE_JS}
   render();
 })();`
 
-  return agencyShell({ title: 'Kampagne starten', user: o.user, locked: true, active: '/collaboration', body, script })
+  return agencyShell({ title: 'Kampagne starten', user: o.user, locked: o.locked ?? true, active: '/collaboration', body, script })
 }
 
 /* ------------------------------------------------ 1b — Neue Kampagne */
@@ -473,7 +468,8 @@ ${ONE_PAGE_JS}
  * verbindlicher Auftrag ist (Häkchen Pflicht). Schickt an
  * POST /api/collaboration/campaigns.
  */
-export function newCampaignPage(o: { user: User }): string {
+/** „Neue Kampagne erstellen“. `locked`: noch nicht freigeschaltet (Menü mit Schlössern, zurück zur Übersicht). */
+export function newCampaignPage(o: { user: User; locked?: boolean }): string {
   const titles = ['Name', 'Bereich', 'Plattformen', 'Views', 'Budget', 'Übersicht']
   const legend = (text: string) => `<legend class="font-display text-2xl font-extrabold leading-tight sm:text-3xl">${esc(text)}</legend>`
   const niches = INDUSTRIES.map(
@@ -718,14 +714,75 @@ ${ONE_PAGE_JS}
   form.campaignName.focus();
 })();`
 
-  return agencyShell({ title: 'Neue Kampagne', user: o.user, locked: false, active: AGENCY_CAMPAIGN_AREA.active, body, script })
+  return agencyShell({
+    title: 'Neue Kampagne',
+    user: o.user,
+    locked: o.locked ?? false,
+    active: o.locked ? '/collaboration' : AGENCY_CAMPAIGN_AREA.active,
+    body,
+    script,
+  })
 }
 
 /* ------------------------------------------ 2 — kalt: wir melden uns */
 
 export const CONTACT_HEADLINE = 'NIKKI MEDIA meldet sich bei dir.'
 
-export function waitingPage(o: { user: User; lead: AgencyLead }): string {
+/** Eine eigene Kampagne auf der Warteseite (noch nicht freigeschaltet). */
+export interface WaitingCampaign {
+  id: string
+  name: string
+  createdAt: number
+  views: number | null
+  budgetCents: number | null
+  pkg: string | null
+}
+
+const waitingRow = (c: WaitingCampaign) => {
+  const meta = [
+    c.views ? `${viewsShort(c.views)} Views` : null,
+    c.budgetCents ? `Budget ${formatEuro(c.budgetCents)}` : null,
+    c.pkg ? agencyPackageLabel(c.pkg) : null,
+    `angelegt ${new Date(c.createdAt * 1000).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Europe/Vienna' })}`,
+  ].filter((m): m is string => Boolean(m))
+  return `
+          <article class="nmw-wait-row" data-campaign="${esc(c.id)}">
+            <div class="min-w-0 flex-1">
+              <p class="nmw-wait-row__name">${esc(c.name)}</p>
+              <p class="nmw-wait-row__meta">${meta.map((m) => esc(m).replace(/ /g, '&nbsp;')).join(' · ')}</p>
+            </div>
+            <span class="nmw-wait-row__chip">Wartet auf Freischaltung</span>
+            <button type="button" class="nmw-wait-row__del" data-delete-campaign="${esc(c.id)}" data-name="${esc(c.name)}">Löschen</button>
+          </article>`
+}
+
+/** Löschen auf der Warteseite: nachfragen, dann DELETE /api/collaboration/campaigns/:id. */
+const DELETE_CAMPAIGN_JS = `
+  document.querySelectorAll('[data-delete-campaign]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var name = btn.getAttribute('data-name') || 'diese Kampagne';
+      if (!window.confirm('Kampagne \u201e' + name + '\u201c wirklich l\u00f6schen?')) return;
+      btn.disabled = true;
+      btn.textContent = 'L\u00f6scht \u2026';
+      fetch('/api/collaboration/campaigns/' + encodeURIComponent(btn.getAttribute('data-delete-campaign')), { method: 'DELETE' })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, d: d }; }); })
+        .then(function (res) {
+          if (!res.ok) throw new Error(res.d.error || 'Das hat leider nicht geklappt.');
+          window.location.href = res.d.redirect || '/collaboration';
+        })
+        .catch(function (e) { window.alert(e.message); btn.disabled = false; btn.textContent = 'L\u00f6schen'; });
+    });
+  });`
+
+/**
+ * Noch nicht freigeschaltet, aber mit Briefing: „NIKKI MEDIA meldet sich bei dir.“
+ * Darunter die EIGENEN Kampagnen, wie sie gerade in der Datenbank stehen
+ * (Vorgabe des Auftraggebers, November 2026): löschen und weitere anlegen
+ * geht schon vor der Freischaltung, etwa eine je Kunde. Ohne Kampagne zeigt
+ * die Übersicht wieder das Briefing (routes/collaboration.ts).
+ */
+export function waitingPage(o: { user: User; lead: AgencyLead; campaigns: WaitingCampaign[] }): string {
+  const n = o.campaigns.length
   const body = `
       <section class="overflow-hidden rounded-3xl bg-gradient-to-br from-[#010302] via-[#041a0f] to-[#0a4527] ring-1 ring-inset ring-[#2fe08c]/25 px-6 py-14 text-center text-white shadow-xl sm:px-12 sm:py-20" data-contact-headline>
         <span class="nmw-brand-glass mx-auto grid h-16 w-16 place-items-center rounded-2xl">
@@ -733,10 +790,22 @@ export function waitingPage(o: { user: User; lead: AgencyLead }): string {
         </span>
         <h1 class="mx-auto mt-7 max-w-3xl font-display text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl">${esc(CONTACT_HEADLINE)}</h1>
         <p class="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
-          Danke für dein Briefing, deine Kampagne ist bei uns angekommen. Wir setzen uns persönlich mit dir in Verbindung,
-          besprechen die Details und schalten dein Collaboration-Dashboard frei, sobald die Zusammenarbeit steht.
+          ${n > 1 ? `Danke für dein Briefing, deine ${n} Kampagnen sind bei uns angekommen.` : 'Danke für dein Briefing, deine Kampagne ist bei uns angekommen.'}
+          Wir setzen uns persönlich mit dir in Verbindung, besprechen die Details und schalten dein Collaboration-Dashboard frei,
+          sobald die Zusammenarbeit steht.
         </p>
-        ${briefingChips(o.lead)}
+      </section>
+
+      <section class="mt-8" data-waiting-campaigns>
+        <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 class="font-display text-2xl font-extrabold">${n > 1 ? 'Deine Kampagnen' : 'Deine Kampagne'}</h2>
+            <p class="mt-1 text-sm text-slate-500">Für jeden Kunden eine eigene Kampagne. Anlegen und löschen geht schon vor der Freischaltung.</p>
+          </div>
+          <a href="${esc(AGENCY_NEW_CAMPAIGN)}" class="${GOLD_BTN}" data-new-campaign>+ Neue Kampagne erstellen</a>
+        </div>
+        <div class="nmw-wait-list">${o.campaigns.map(waitingRow).join('')}
+        </div>
       </section>
 
       ${codeRedeemBox()}
@@ -752,7 +821,7 @@ export function waitingPage(o: { user: User; lead: AgencyLead }): string {
     locked: true,
     active: '/collaboration',
     body,
-    script: `(function () {${REDEEM_JS}\n})();`,
+    script: `(function () {${REDEEM_JS}\n${DELETE_CAMPAIGN_JS}\n})();`,
   })
 }
 

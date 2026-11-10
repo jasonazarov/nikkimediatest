@@ -724,9 +724,49 @@ try {
   const kaltCreator = await (await agenturHole('/collaboration/creator', kaltCookie)).text()
   pruefe('Kalter Lead sieht keine Creator', kaltCreator.includes('data-locked-page') && !kaltCreator.includes('data-creator='))
   const kaltUpload = await agenturHole('/api/app/projects', kaltCookie, { name: 'Versuch' })
-  pruefe('Kalter Lead kann nichts anlegen oder hochladen', kaltUpload.status === 403, `HTTP ${kaltUpload.status}`)
-  const kaltNeu = await agenturHole('/api/collaboration/campaigns', kaltCookie, { ...neueKampagne, name: 'Versuch' })
-  pruefe('Kalter Lead startet keine weitere Kampagne', kaltNeu.status === 403, `HTTP ${kaltNeu.status}`)
+  pruefe('Kalter Lead kann nichts hochladen und keine Kampagne ohne Briefing anlegen', kaltUpload.status === 403, `HTTP ${kaltUpload.status}`)
+
+  // Vorgabe des Auftraggebers (November 2026): gesperrt, aber mit Briefing, legt eine
+  // Agentur weitere Kampagnen an (eine je Kunde) und löscht sie wieder. Die Warteseite
+  // zeigt immer die Kampagnen, wie sie gerade sind; ohne Kampagne kommt das Briefing.
+  const kaltId = d1(`SELECT p.id FROM projects p JOIN customers c ON c.id = p.customer_id JOIN users u ON u.id = c.user_id WHERE u.email='${KALT}';`)[0]?.id
+  pruefe('Kalter Lead: Warteseite listet die Kampagne aus dem Briefing mit „Löschen“', !!kaltId && kaltSeite.includes(`data-delete-campaign="${kaltId}"`) && kaltSeite.includes('+ Neue Kampagne erstellen'))
+  const kaltNeuSeite = await agenturHole('/collaboration/neu', kaltCookie)
+  pruefe('Kalter Lead mit Briefing öffnet „Neue Kampagne“', kaltNeuSeite.status === 200 && (await kaltNeuSeite.text()).includes('name="campaignName"'), `HTTP ${kaltNeuSeite.status}`)
+  const kaltNeu = await agenturHole('/api/collaboration/campaigns', kaltCookie, { ...neueKampagne, name: 'Kunde Zwei' })
+  const kaltNeuBody = await kaltNeu.json().catch(() => ({}))
+  pruefe(
+    'Kalter Lead mit Briefing legt eine weitere Kampagne an, zurück auf die Warteseite',
+    kaltNeu.status === 200 && kaltNeuBody.redirect === '/collaboration?angelegt=1',
+    `HTTP ${kaltNeu.status} ${JSON.stringify(kaltNeuBody)}`,
+  )
+  const kaltZwei = await (await agenturHole('/collaboration', kaltCookie)).text()
+  pruefe('Warteseite zeigt beide Kampagnen, die neueste zuerst', kaltZwei.indexOf('Kunde Zwei') > 0 && kaltZwei.indexOf('Kunde Zwei') < kaltZwei.indexOf(`data-delete-campaign="${kaltId}"`))
+  const kaltNochGesperrt = await agenturHole('/api/app/projects', kaltCookie, { name: 'Versuch' })
+  pruefe('Auch mit zwei Kampagnen bleibt der Rest gesperrt (kein Upload)', kaltNochGesperrt.status === 403, `HTTP ${kaltNochGesperrt.status}`)
+  const fremdLoeschen = await hole(`/api/collaboration/campaigns/${kaltId}`, { method: 'DELETE', headers: { cookie: warmCookie } })
+  pruefe('Eine Agentur löscht keine fremde Kampagne', fremdLoeschen.status === 404, `HTTP ${fremdLoeschen.status}`)
+  const kaltIds = d1(`SELECT p.id FROM projects p JOIN customers c ON c.id = p.customer_id JOIN users u ON u.id = c.user_id WHERE u.email='${KALT}';`).map((r) => r.id)
+  let geloescht = true
+  for (const id of kaltIds) {
+    const r = await hole(`/api/collaboration/campaigns/${id}`, { method: 'DELETE', headers: { cookie: kaltCookie } })
+    if (r.status !== 200) geloescht = false
+  }
+  pruefe('Kalter Lead löscht seine Kampagnen (auch mit dem Cloud-Link aus dem Formular)', geloescht && kaltIds.length === 2 &&
+    zaehle(`SELECT count(*) AS n FROM projects p JOIN customers c ON c.id = p.customer_id JOIN users u ON u.id = c.user_id WHERE u.email='${KALT}';`) === 0)
+  const kaltLeer = await (await agenturHole('/collaboration', kaltCookie)).text()
+  pruefe('Ohne Kampagne zeigt die Übersicht wieder das Briefing', kaltLeer.includes('Wie viele Views möchtest du in Auftrag geben?') && kaltLeer.includes('Du hast gerade keine Kampagne'))
+  const kaltWieder = await agenturHole('/api/collaboration/briefing', kaltCookie, { views: 500000, budget: '2500', package: 'armee' })
+  const kaltWiederBody = await kaltWieder.json().catch(() => ({}))
+  pruefe(
+    'Erneutes Briefing legt genau eine neue Kampagne an, gesperrt bleibt gesperrt',
+    kaltWieder.status === 200 && kaltWiederBody.unlocked === false &&
+      zaehle(`SELECT count(*) AS n FROM projects p JOIN customers c ON c.id = p.customer_id JOIN users u ON u.id = c.user_id WHERE u.email='${KALT}';`) === 1,
+    JSON.stringify(kaltWiederBody),
+  )
+  const kaltDoppelt = await agenturHole('/api/collaboration/briefing', kaltCookie, { views: 500000, budget: '2500', package: 'armee' })
+  pruefe('Ein zweites Abschicken legt keine weitere Kampagne an', kaltDoppelt.status === 200 &&
+    zaehle(`SELECT count(*) AS n FROM projects p JOIN customers c ON c.id = p.customer_id JOIN users u ON u.id = c.user_id WHERE u.email='${KALT}';`) === 1)
 
   /* -------------------------------------------------- 5c. Demo-Konten */
   //

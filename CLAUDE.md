@@ -718,6 +718,15 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   für die Testdatenbank). Das Passwort kommt aus `AGENTUR_PASSWORT` oder wird abgefragt, es steht nirgends im Repo.
   Name ohne Leerzeichen wählen (z. B. „TheGuardians“), die Begrüßung nimmt das erste Wort. Lokale Demo mit Konto:
   `AGENTUR_EMAIL=<email> bash scripts/demo-lokal.sh`. Geprüft im Login-Test (7 Prüfungen, `npm test`).
+- **Agentur-Übersicht zeigt immer den aktuellen Stand der eigenen Kampagnen** (Vorgabe des Auftraggebers, November
+  2026): Hat eine Agentur (nicht Demo) keine eigene Kampagne, nie angelegt oder alle gelöscht, zeigt `/collaboration`
+  wieder das Briefing (`POST /api/collaboration/briefing` nimmt es dann erneut an, Doppelklick-Schutz über
+  `agency_leads.project_id IS NULL`). Gesperrt mit Kampagnen: die Warteseite listet genau diese (neueste zuerst,
+  `waitingCampaignsOf`), jede mit „Löschen“, dazu „+ Neue Kampagne erstellen“. Gesperrte Leads mit Briefing dürfen
+  weitere Kampagnen anlegen (`mayStartCampaign`, `/collaboration/neu`, `POST /api/collaboration/campaigns`, danach
+  zurück zur Warteseite) und eigene löschen (`DELETE /api/collaboration/campaigns/:id`; nicht bei Dateien, Clips oder
+  Team; Cloud-Links gehen mit; vorher `releaseAtProvider`). Upload und alles andere bleiben gesperrt.
+  Styles `dash-whop.css` („Warteseite der Agentur“). Geprüft im Login-Test.
 - **Vorschauen vor der Freigabe** (`docs/vorschau/<name>.patch`, siehe `docs/vorschau/LIESMICH.md`): eine
   Änderung, die der Auftraggeber erst lokal sehen will, liegt als Patch bei und ist NICHT im Code.
   `bash scripts/demo-lokal.sh <name>` spielt sie nur in eine Kopie unter `~/.nikki-vorschau/<name>` ein
