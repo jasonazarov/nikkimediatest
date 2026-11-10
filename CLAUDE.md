@@ -708,6 +708,16 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   Am 09.11.2026 mit der echten Zernio-Antwort geprüft (@nikkiclips1: 98 Videos, 1.568.045 Views, Zahlen gleich den
   öffentlichen TikTok-Seiten). Dieser Schnappschuss liegt als `tools/preview-data/nikkiclips1.json` und füllt die
   lokale Demo (Agentur-Kampagne „Omid Mouazzen“).
+- **Agentur-Konten mit Passwort statt Code** (Vorgabe des Auftraggebers, November 2026; erstes Konto
+  theguardians@nikki-media.com): KEIN Demo-Konto (`users.demo = 0`), sondern ein ganz normaler KALTER Lead wie nach
+  `/brands` ohne Cooperation-Code (Briefing, dann „NIKKI MEDIA meldet sich bei dir“, bis der Admin unter „Agenturen“
+  „Mark as warm“ bzw. „Grant access“ klickt). Einziger Unterschied: Login mit E-Mail + Passwort unter `/login/passwort`;
+  `/login` leitet solche Adressen dorthin und verschickt keinen Code. Erlaubt nur für Rolle `agency`, nicht Demo, mit
+  gesetztem Hash (`agencyPasswordLogin` in `src/lib/auth.ts`); Kunden, Clipper und Creator öffnen diese Tür nie.
+  Anlegen bzw. Passwort neu setzen NUR per Skript: `node scripts/agentur-konto.mjs <email> ["Name"]` (live; `--local`
+  für die Testdatenbank). Das Passwort kommt aus `AGENTUR_PASSWORT` oder wird abgefragt, es steht nirgends im Repo.
+  Name ohne Leerzeichen wählen (z. B. „TheGuardians“), die Begrüßung nimmt das erste Wort. Lokale Demo mit Konto:
+  `AGENTUR_EMAIL=<email> bash scripts/demo-lokal.sh`. Geprüft im Login-Test (7 Prüfungen, `npm test`).
 - **Vorschauen vor der Freigabe** (`docs/vorschau/<name>.patch`, siehe `docs/vorschau/LIESMICH.md`): eine
   Änderung, die der Auftraggeber erst lokal sehen will, liegt als Patch bei und ist NICHT im Code.
   `bash scripts/demo-lokal.sh <name>` spielt sie nur in eine Kopie unter `~/.nikki-vorschau/<name>` ein

@@ -192,7 +192,8 @@ export type PasswordCheck =
  * Grund (`falsch`), damit die Antwort keine Kontoauskunft gibt.
  *
  * `allowed` sagt, wer sich auf diesem Weg anmelden darf — ohne Angabe nur
- * Admins. Einzige Ausnahme ist das Demo-Konto der Agenturen (/login/demo).
+ * Admins. Ausnahmen: die Demo-Konten (/login/demo) und Agentur-Konten, denen
+ * der Administrator ein Passwort gesetzt hat (`agencyPasswordLogin`, /login/passwort).
  */
 export async function verifyPasswordLogin(
   env: Env,
@@ -224,6 +225,18 @@ export async function verifyPasswordLogin(
   await clearBlock(env, `pw:${mail}`)
   return { ok: true, userId: user.id }
 }
+
+/**
+ * Agentur-Konten mit Passwort (Vorgabe des Auftraggebers, November 2026): manche
+ * Agenturen melden sich mit E-Mail und Passwort an statt mit dem Code per Mail.
+ * Das Passwort setzt nur der Administrator (scripts/agentur-konto.mjs), es gibt
+ * keinen Weg, es selbst zu setzen. Nur Rolle `agency`, kein Demo-Konto (die haben
+ * /login/demo) und nur mit gesetztem Hash: ein Kunden-, Clipper- oder Creator-Konto
+ * öffnet diese Tür nie, auch nicht, falls dort je ein Hash landen sollte.
+ * Login unter /login/passwort; /login leitet solche Adressen dorthin.
+ */
+export const agencyPasswordLogin = (u: Pick<User, 'role' | 'demo' | 'passwordHash'>): boolean =>
+  u.role === 'agency' && u.demo !== 1 && Boolean(u.passwordHash)
 
 /** Setzt bzw. ersetzt das Passwort eines Kontos. */
 export async function setPassword(env: Env, userId: string, password: string): Promise<void> {

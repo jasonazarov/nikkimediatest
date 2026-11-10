@@ -141,7 +141,9 @@ export const agencyClientsLabel = (v: string | null | undefined) => labelIn([...
 /** Englisch für den Admin-Bereich. */
 export const agencyClientsLabelEn = (v: string | null | undefined) =>
   [...AGENCY_CLIENTS, ...LEGACY_CLIENTS].find((o) => o.value === v)?.labelEn ?? (v || '–')
-export const agencySourceLabel = (v: string) => labelIn(AGENCY_SOURCES, v)
+/** Vom Administrator angelegte Konten (scripts/agentur-konto.mjs): nur zur Anzeige, nicht im Formular. */
+const ADMIN_SOURCES = [{ value: 'admin', label: 'Vom Admin angelegt' }] as const
+export const agencySourceLabel = (v: string) => labelIn([...AGENCY_SOURCES, ...ADMIN_SOURCES], v)
 export const agencyFootageLabel = (v: string) => labelIn(AGENCY_FOOTAGE, v)
 export const agencyPackageLabel = (v: string | null | undefined) => labelIn(AGENCY_PACKAGES, v)
 export const agencySocialLabel = (v: string) => labelIn(AGENCY_SOCIALS, v)

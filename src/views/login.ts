@@ -6,8 +6,9 @@ interface LoginOptions {
    * 'code'     = achtstelligen Code eingeben
    * 'passwort' = Admin-Login mit Passwort, eigene Seite /login/admin
    * 'demo'     = Demo-Konten (Agentur, Creator, Clipper) mit Passwort, /login/demo (deutsch)
+   * 'konto'    = Agentur-Konten mit Passwort vom Administrator, /login/passwort (deutsch)
    */
-  stage: 'email' | 'code' | 'passwort' | 'demo'
+  stage: 'email' | 'code' | 'passwort' | 'demo' | 'konto'
   email?: string
   error?: string
   notice?: string
@@ -18,6 +19,23 @@ interface LoginOptions {
    */
   lang?: Lang
 }
+
+/** E-Mail, Passwort und Knopf für die deutschen Passwort-Logins (Agentur-Konten mit Passwort). */
+const passwordFields = (email: string | undefined) => `
+          <div>
+            <label for="email" class="mb-1.5 block text-sm font-semibold text-slate-600">E-Mail-Adresse</label>
+            <input id="email" name="email" type="email" required ${email ? '' : 'autofocus'} autocomplete="username" inputmode="email"
+                   value="${esc(email ?? '')}"
+                   class="w-full rounded-xl border border-slate-300 px-4 py-3 text-[15px] outline-none transition focus:border-brand focus:ring-4 focus:ring-brand/15">
+          </div>
+          <div>
+            <label for="password" class="mb-1.5 block text-sm font-semibold text-slate-600">Passwort</label>
+            <input id="password" name="password" type="password" required ${email ? 'autofocus' : ''} autocomplete="current-password"
+                   class="w-full rounded-xl border border-slate-300 px-4 py-3 text-[15px] outline-none transition focus:border-brand focus:ring-4 focus:ring-brand/15">
+          </div>
+          <button class="w-full rounded-xl bg-brand px-4 py-3 text-[15px] font-bold text-white transition hover:bg-brand-2">
+            Einloggen
+          </button>`
 
 /** Alle sichtbaren Texte der Anmeldeseite, je Sprache einmal. */
 const TEXT = {
@@ -122,6 +140,11 @@ export function loginPage(o: LoginOptions): string {
             )}" class="font-semibold text-brand hover:underline">${esc(t.newCode)}</a>
           </p>
         </form>`
+      : o.stage === 'konto'
+      ? `
+        <form method="post" action="/login/passwort" class="space-y-4">
+          ${nextField}${passwordFields(o.email)}
+        </form>`
       : o.stage === 'demo'
       ? `
         <form method="post" action="/login/demo" class="space-y-4">
@@ -173,7 +196,15 @@ export function loginPage(o: LoginOptions): string {
         </form>`
 
   const heading =
-    o.stage === 'email' ? t.headEmail : o.stage === 'code' ? t.headCode : o.stage === 'demo' ? 'Demo-Zugang' : t.headAdmin
+    o.stage === 'email'
+      ? t.headEmail
+      : o.stage === 'code'
+        ? t.headCode
+        : o.stage === 'demo'
+          ? 'Demo-Zugang'
+          : o.stage === 'konto'
+            ? 'Einloggen'
+            : t.headAdmin
   const sub =
     o.stage === 'email'
       ? t.subEmail
@@ -181,7 +212,9 @@ export function loginPage(o: LoginOptions): string {
         ? t.subCode
         : o.stage === 'demo'
           ? 'Anmeldung mit E-Mail und Passwort für Demo-Konten.'
-          : t.subAdmin
+          : o.stage === 'konto'
+            ? 'Melde dich mit deiner E-Mail-Adresse und deinem Passwort an.'
+            : t.subAdmin
 
   return `<!DOCTYPE html>
 <html lang="${lang}" class="h-full nmd">

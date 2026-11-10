@@ -53,6 +53,14 @@ fi
 echo "▸ 2/4  Testdatenbank mit erfundenen Daten anlegen"
 python3 tools/preview.py seed
 
+# Agentur-Konto mit Passwort zum Ausprobieren (scripts/agentur-konto.mjs), nur in der Testdatenbank:
+#     AGENTUR_EMAIL=agentur@beispiel.de bash scripts/demo-lokal.sh
+# Das Skript fragt nach dem Passwort (unsichtbar) und speichert nur seinen Hash.
+if [ -n "${AGENTUR_EMAIL:-}" ]; then
+  echo "▸ Agentur-Konto ${AGENTUR_EMAIL} in der Testdatenbank anlegen"
+  node scripts/agentur-konto.mjs "${AGENTUR_EMAIL}" --local --persist-to "$STATE"
+fi
+
 echo "▸ 3/4  Fachartikel-Entwürfe in die Testdatenbank (nur lokal veröffentlicht)"
 npx wrangler d1 execute nikki-media --local --persist-to "$STATE" --command "DELETE FROM articles" >/dev/null 2>&1
 CI=1 node scripts/fachartikel-import.mjs --local >/dev/null 2>&1

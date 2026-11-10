@@ -24,6 +24,7 @@ import { createServer } from 'node:net'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { DEMO_CLIPPER_EMAIL, DEMO_CREATOR_EMAIL, DEMO_EMAIL, JASON_DEMO, demoAccountSql, jasonDemoSql } from './demo-account.mjs'
+import { agencyAccountSql } from './agentur-konto.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const STATE = join(ROOT, '.wrangler', 'login-test-state')
@@ -783,6 +784,51 @@ try {
     'Jasons Demo-Konten: Code-Login schickt keinen Code, sondern zum Passwort-Login',
     jasonCode.status === 303 && String(jasonCode.headers.get('location')).startsWith('/login/demo'),
     `HTTP ${jasonCode.status} → ${jasonCode.headers.get('location')}`,
+  )
+
+  // Agentur-Konto mit Passwort vom Admin (scripts/agentur-konto.mjs): KEIN Demo-Konto,
+  // ein kalter Lead wie nach /brands, nur mit E-Mail + Passwort statt Code.
+  const PW_AGENTUR = 'pw-agentur@agentur-test.local'
+  const PW_AGENTUR_PW = 'Agentur-Test-4242-x'
+  d1(agencyAccountSql(PW_AGENTUR, 'PW Agentur', PW_AGENTUR_PW))
+  pruefe(
+    'Agentur mit Passwort: angelegt als kalter Lead, kein Demo-Konto',
+    zaehle(`SELECT count(*) AS n FROM agency_leads a JOIN users u ON u.id = a.user_id WHERE u.email='${PW_AGENTUR}' AND u.role='agency' AND u.demo=0 AND a.demo=0 AND a.warm=0 AND a.access_at IS NULL AND a.briefed_at IS NULL AND u.password_hash IS NOT NULL;`) === 1,
+  )
+  const pwCodeWeg = await post('/login', { email: PW_AGENTUR })
+  pruefe(
+    'Agentur mit Passwort: /login schickt keinen Code, sondern zum Passwort-Feld',
+    pwCodeWeg.status === 303 && String(pwCodeWeg.headers.get('location')).startsWith('/login/passwort?email=') &&
+      zaehle(`SELECT count(*) AS n FROM login_codes WHERE email='${PW_AGENTUR}';`) === 0,
+    `HTTP ${pwCodeWeg.status} → ${pwCodeWeg.headers.get('location')}`,
+  )
+  const pwFalsch = await post('/login/passwort', { email: PW_AGENTUR, password: 'falsch-falsch' })
+  pruefe('Agentur mit Passwort: falsches Passwort wird abgewiesen', pwFalsch.status === 200 && !sitzungAus(pwFalsch, 'agency'), `HTTP ${pwFalsch.status}`)
+  const pwDemo = await post('/login/passwort', { email: DEMO_EMAIL, password: DEMO_PW })
+  const pwOhne = await post('/login/passwort', { email: WARM, password: PW_AGENTUR_PW })
+  d1(`UPDATE users SET password_hash = (SELECT password_hash FROM users WHERE email='${PW_AGENTUR}') WHERE email='${CUSTOMER}';`)
+  const pwKunde = await post('/login/passwort', { email: CUSTOMER, password: PW_AGENTUR_PW })
+  d1(`UPDATE users SET password_hash = NULL WHERE email='${CUSTOMER}';`)
+  pruefe(
+    'Passwort-Login für Agenturen öffnet weder Demo- noch Agentur-Konten ohne Passwort noch Kunden',
+    [pwDemo, pwOhne, pwKunde].every((r) => r.status === 200 && !sitzungAus(r, 'agency') && !sitzungAus(r, 'customer')),
+    [pwDemo, pwOhne, pwKunde].map((r) => r.status).join(' '),
+  )
+  const pwLogin = await post('/login/passwort', { email: PW_AGENTUR, password: PW_AGENTUR_PW })
+  const pwCookie = sitzungFuer(pwLogin, 'agency')
+  pruefe(
+    'Agentur mit Passwort: E-Mail + Passwort führen ins Collaboration-Dashboard',
+    pwLogin.status === 302 && pwLogin.headers.get('location') === '/collaboration' && !!pwCookie,
+    `HTTP ${pwLogin.status} → ${pwLogin.headers.get('location')}`,
+  )
+  const pwSeite = await (await agenturHole('/collaboration', pwCookie)).text()
+  pruefe('Agentur mit Passwort: zuerst das Briefing, wie jeder neue Lead', pwSeite.includes('Wie viele Views möchtest du in Auftrag geben?'))
+  const pwBriefing = await agenturHole('/api/collaboration/briefing', pwCookie, { views: 1000000, budget: 5000, package: 'armee_influencer' })
+  const pwBriefingBody = await pwBriefing.json().catch(() => ({}))
+  pruefe(
+    'Agentur mit Passwort: nach dem Briefing gesperrt, bis der Admin freigibt (kalter Lead)',
+    pwBriefing.status === 200 && pwBriefingBody.unlocked === false,
+    JSON.stringify(pwBriefingBody),
   )
 
   const demoUebersicht = await (await agenturHole('/collaboration', demoCookie)).text()

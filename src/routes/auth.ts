@@ -12,6 +12,7 @@ import {
   normalizeEmail,
   verifyLoginCode,
   verifyPasswordLogin,
+  agencyPasswordLogin,
 } from '../lib/auth'
 import { audit } from '../lib/audit'
 import { mailLoginCode, mailLoginTrouble } from '../lib/mail'
@@ -234,6 +235,51 @@ authRoutes.post('/login/demo', async (c) => {
   return completeLogin(c, user, homeFor(user.role), 'passwort')
 })
 
+/* --------------------------------------------- Agentur-Konten mit Passwort
+
+   Vorgabe des Auftraggebers (November 2026): ein Agentur-Konto, dem der
+   Administrator ein Passwort gesetzt hat (scripts/agentur-konto.mjs), meldet
+   sich mit E-Mail und Passwort an statt mit dem Code per Mail. Kein Demo-Konto:
+   echte Daten, und der Zugang folgt denselben Regeln wie bei jedem anderen
+   Agentur-Lead (kalt, bis der Administrator ihn warm setzt oder freigibt).
+   Jedes andere Konto bekommt hier dieselbe Absage wie ein falsches Passwort.
+   -------------------------------------------------------------------------- */
+
+authRoutes.get('/login/passwort', async (c) => {
+  const next = safeNext(c.req.query('next'))
+  if (await currentUser(c.env, c, 'agency')) return c.redirect(next ?? homeFor('agency'), 302)
+  return c.html(loginPage({ stage: 'konto', email: c.req.query('email') ?? '', next }))
+})
+
+authRoutes.post('/login/passwort', async (c) => {
+  const form = await c.req.parseBody()
+  const email = normalizeEmail(String(form.email ?? ''))
+  const password = String(form.password ?? '')
+  const next = safeNext(String(form.next ?? '') || undefined)
+  const fail = (error: string) => c.html(loginPage({ stage: 'konto', email, next, error }))
+
+  if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email) || !password) {
+    return fail('Bitte gib E-Mail-Adresse und Passwort ein.')
+  }
+  if (!(await consumeRateLimit(c.env, `pwreq:${clientIp(c)}`, 20, 3600))) {
+    return fail('Zu viele Anfragen. Bitte versuche es in einer Stunde erneut.')
+  }
+
+  const check = await verifyPasswordLogin(c.env, email, password, agencyPasswordLogin)
+  if (!check.ok) {
+    return fail(
+      check.reason === 'gesperrt'
+        ? `Zu viele Fehlversuche. Bitte versuche es in ${check.retryInMin ?? 30} Minuten erneut.`
+        : 'E-Mail-Adresse oder Passwort ist falsch.',
+    )
+  }
+
+  const [user] = await getDb(c.env).select().from(schema.users).where(eq(schema.users.id, check.userId)).limit(1)
+  if (!user) return fail('E-Mail-Adresse oder Passwort ist falsch.')
+  // Nur in den Agentur-Bereich: ein `next` woandershin führte ohnehin zur Anmeldung zurück.
+  return completeLogin(c, user, next?.startsWith('/collaboration') ? next : homeFor(user.role), 'passwort')
+})
+
 /* ------------------------------------------------------ Login per E-Mail-Code
 
    Der Weg für Kunden und Clipper — und ausschließlich für die.
@@ -287,6 +333,12 @@ authRoutes.post('/login', async (c) => {
   // Demo-Konten haben kein Postfach, sie melden sich mit Passwort an.
   if (user?.demo === 1 && user.role !== 'admin') {
     return c.redirect(`/login/demo?email=${encodeURIComponent(email)}`, 303)
+  }
+
+  // Agentur-Konten mit Passwort (vom Administrator gesetzt): kein Code per Mail,
+  // sondern gleich das Passwort-Feld.
+  if (user && agencyPasswordLogin(user)) {
+    return c.redirect(`/login/passwort?email=${encodeURIComponent(email)}${next ? `&next=${encodeURIComponent(next)}` : ''}`, 303)
   }
 
   if (darfCodeLogin(user)) {
