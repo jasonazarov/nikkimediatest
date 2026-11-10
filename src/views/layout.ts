@@ -142,6 +142,8 @@ export interface ShellOptions {
   analytics?: boolean
   /** Seite trägt selbst eine `upsellSection` (Kampagnenseite) — lädt assets/upsell.js. */
   push?: boolean
+  /** Zweite Zeile im Glückwunsch-Popup (?angelegt=1), wenn „Rohmaterial hochladen“ hier noch nicht geht. */
+  popNext?: string
 }
 
 /** Vorschläge des FAQ-Agenten je Bereich (assets/agent.js). Admin bekommt keinen Agenten. */
@@ -468,7 +470,7 @@ export function shell(o: ShellOptions): string {
     <span class="nmg-pop__ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7.5"/></svg></span>
     <h2 id="nmg-pop-t">Glückwunsch!</h2>
     <p>Du hast deine Kampagne erfolgreich bei <b>NIKKI MEDIA</b> angelegt.</p>
-    <p class="nmg-pop__sub">Als Nächstes: Lade dein Rohmaterial hoch oder füge einen Cloud-Link ein.</p>
+    <p class="nmg-pop__sub">${esc(o.popNext ?? 'Als Nächstes: Lade dein Rohmaterial hoch oder füge einen Cloud-Link ein.')}</p>
     <button type="button" class="nmg-pop__btn" data-pop-close>Weiter</button>
   </div>
 </div>

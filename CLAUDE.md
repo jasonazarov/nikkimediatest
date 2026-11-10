@@ -328,8 +328,12 @@ OHNE Cooperation-Code einträgt, ist **kalt**; MIT Code **warm**. Codes
 erstellt nur der Admin unter „Agenturen“ (`/admin/agenturen`, Knopf
 „+ Cooperation-Code erstellen“): sechs Zeichen, jeder genau EINMAL gültig
 (Einlösen per `UPDATE … WHERE used_at IS NULL`). Ein kalter Lead kann einen
-Code später im Dashboard einlösen. Beide füllen nach dem Login das Briefing
-aus (Views 100K–10 Mio., Budget, Auftrag → „Kampagne starten“). Jede
+Code später im Dashboard einlösen. Beide legen nach dem Login ihre ERSTE
+Kampagne im selben Formular an wie jede weitere (seit November 2026, Vorgabe des
+Auftraggebers; früher das Briefing mit Views, Budget, Auftrag): `newCampaignPage`
+mit `first`, Bereich und Plattformen aus dem /brands-Eintrag vorausgewählt; die erste
+Kampagne setzt `agency_leads.briefed_at`/`views_target`/`budget_cents`, schaltet warme
+Leads frei und hängt den Cloud-Link aus dem Formular an. Jede
 weitere Kampagne entsteht über „Neue Kampagne erstellen“ (Box über „Deine
 Kampagne“ in der Übersicht, `/collaboration/neu`, Vorgabe des Auftraggebers):
 Name, Bereich (`INDUSTRIES`), Plattformen, Views, Budget, dann der Preis pro
@@ -720,8 +724,10 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   `AGENTUR_EMAIL=<email> bash scripts/demo-lokal.sh`. Geprüft im Login-Test (7 Prüfungen, `npm test`).
 - **Agentur-Übersicht zeigt immer den aktuellen Stand der eigenen Kampagnen** (Vorgabe des Auftraggebers, November
   2026): Hat eine Agentur (nicht Demo) keine eigene Kampagne, nie angelegt oder alle gelöscht, zeigt `/collaboration`
-  wieder das Briefing (`POST /api/collaboration/briefing` nimmt es dann erneut an, Doppelklick-Schutz über
-  `agency_leads.project_id IS NULL`). Gesperrt mit Kampagnen: die Warteseite listet genau diese (neueste zuerst,
+  das Formular für die erste Kampagne (dasselbe wie „Neue Kampagne“, `POST /api/collaboration/campaigns` erkennt die
+  erste, Doppelklick-Schutz über `agency_leads.project_id IS NULL`; Admin-Mail `mailAgencyCampaignAdmin` mit `first`).
+  Das frühere Briefing (`briefingPage`, `POST /api/collaboration/briefing`) ist nicht mehr verlinkt, bleibt aber bestehen.
+  Kunden haben schon immer nur ein Formular (`/app/neu`); Creator und Clipper haben keine View-Aufträge. Gesperrt mit Kampagnen: die Warteseite listet genau diese (neueste zuerst,
   `waitingCampaignsOf`), jede mit „Löschen“, dazu „+ Neue Kampagne erstellen“. Gesperrte Leads mit Briefing dürfen
   weitere Kampagnen anlegen (`mayStartCampaign`, `/collaboration/neu`, `POST /api/collaboration/campaigns`, danach
   zurück zur Warteseite) und eigene löschen (`DELETE /api/collaboration/campaigns/:id`; nicht bei Dateien, Clips oder

@@ -49,9 +49,11 @@ import type { AgencyLead, User } from '../db/schema'
 
    Drei Zustände, in dieser Reihenfolge (siehe lib/agency.ts):
 
-     1. Briefing fehlt     Die Übersicht IST das Briefing: Views, Budget,
-                           Auftrag, „Kampagne starten“. Alles andere ist
-                           gesperrt (Schloss im Menü).
+     1. keine Kampagne     Die Übersicht IST das Formular für die erste
+                           Kampagne (dasselbe wie „Neue Kampagne“, seit
+                           November 2026). Alles andere ist gesperrt.
+                           (Das frühere Briefing, briefingPage, ist nicht
+                           mehr verlinkt; der Weg dorthin bleibt bestehen.)
      2. kalt, gesperrt     „NIKKI MEDIA meldet sich bei dir.“ — groß. Dazu
                            das Feld, um einen Cooperation-Code einzulösen.
      3. freigeschaltet     Alle Kampagnen mit ihren Clips, alle Creator und
@@ -150,7 +152,18 @@ function pageSlice<T>(list: T[], page: number, size: number): { items: T[]; page
 }
 
 const agencyShell = (o: { title: string; user: User; locked: boolean; active: string; body: string; script?: string }) =>
-  shell({ title: o.title, user: o.user, nav: agencyNav(o.locked), active: o.active, body: o.body, script: o.script })
+  shell({
+    title: o.title,
+    user: o.user,
+    nav: agencyNav(o.locked),
+    active: o.active,
+    body: o.body,
+    script: o.script,
+    // Gesperrt gibt es noch keinen Upload: das Popup nach dem Anlegen sagt, was wirklich als Nächstes kommt.
+    popNext: o.locked
+      ? 'Als Nächstes: NIKKI MEDIA meldet sich bei dir und schaltet dein Dashboard frei. Weitere Kunden kannst du schon jetzt als eigene Kampagne anlegen.'
+      : undefined,
+  })
 
 /** Was hinter den Schlössern wartet — vier gesperrte Karten. */
 function lockedPreview(): string {
@@ -468,21 +481,38 @@ ${ONE_PAGE_JS}
  * verbindlicher Auftrag ist (Häkchen Pflicht). Schickt an
  * POST /api/collaboration/campaigns.
  */
-/** „Neue Kampagne erstellen“. `locked`: noch nicht freigeschaltet (Menü mit Schlössern, zurück zur Übersicht). */
-export function newCampaignPage(o: { user: User; locked?: boolean }): string {
+/**
+ * „Neue Kampagne erstellen“: Name, Bereich, Plattformen, Views, Budget, Übersicht.
+ * Dasselbe Formular für die ERSTE Kampagne einer Agentur (Vorgabe des
+ * Auftraggebers, November 2026: nicht mehr das frühere Briefing mit „Auftrag“).
+ *
+ *   locked   noch nicht freigeschaltet (Menü mit Schlössern)
+ *   first    'neu' = noch nie eine Kampagne, 'wieder' = alle gelöscht; dann
+ *            Begrüßung statt Rücklink, steht auf der Übersicht
+ *   prefill  Bereich und Plattformen aus dem Eintrag auf /brands vorausgewählt
+ */
+export function newCampaignPage(o: {
+  user: User
+  locked?: boolean
+  first?: 'neu' | 'wieder'
+  prefill?: { niche?: string | null; platforms?: string[] }
+}): string {
+  const firstName = o.user.fullName.split(' ')[0]
+  const pickedNiche = o.prefill?.niche ?? null
+  const pickedPlatforms = new Set(o.prefill?.platforms ?? [])
   const titles = ['Name', 'Bereich', 'Plattformen', 'Views', 'Budget', 'Übersicht']
   const legend = (text: string) => `<legend class="font-display text-2xl font-extrabold leading-tight sm:text-3xl">${esc(text)}</legend>`
   const niches = INDUSTRIES.map(
     (n) => `
             <label class="cursor-pointer">
-              <input type="radio" name="niche" value="${esc(n)}" class="peer sr-only">
+              <input type="radio" name="niche" value="${esc(n)}" class="peer sr-only"${n === pickedNiche ? ' checked' : ''}>
               <span class="inline-flex rounded-full border-2 border-white/15 bg-white/5 px-4 py-2 text-sm font-bold transition hover:border-white/30 peer-checked:border-brand peer-checked:bg-brand/15 peer-checked:text-brand-2 peer-focus-visible:ring-4 peer-focus-visible:ring-brand/40">${esc(n)}</span>
             </label>`,
   ).join('')
   const platforms = AGENCY_PLATFORMS.map(
     (p) => `
             <label class="group relative block cursor-pointer">
-              <input type="checkbox" name="platforms" value="${esc(p.value)}" class="peer sr-only">
+              <input type="checkbox" name="platforms" value="${esc(p.value)}" class="peer sr-only"${pickedPlatforms.has(p.value) ? ' checked' : ''}>
               <span class="flex h-full flex-col items-center rounded-2xl border-2 border-white/15 bg-white/5 px-4 py-5 text-center transition group-hover:border-white/30 peer-checked:border-brand peer-checked:bg-brand/10 peer-focus-visible:ring-4 peer-focus-visible:ring-brand/40">
                 <span class="grid h-12 w-12 place-items-center rounded-xl bg-white"><img src="/img/platforms/${esc(p.value)}.svg" alt="" class="h-7 w-7"></span>
                 <b class="mt-3 font-display text-base font-extrabold">${esc(p.label)}</b>
@@ -500,8 +530,14 @@ export function newCampaignPage(o: { user: User; locked?: boolean }): string {
               </div>`
 
   const body = `
-      <a href="${esc(AGENCY_CAMPAIGN_AREA.home)}" class="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-brand">← Meine Kampagnen</a>
-      ${pageTitle('Neue Kampagne erstellen', 'Name, Bereich, Plattformen, Views und Budget. Danach siehst du, was 1.000 Views für deine Kampagne kosten.')}
+      ${
+        o.first === 'neu'
+          ? pageTitle(`Willkommen, ${firstName}!`, 'Starte jetzt deine erste Kampagne: Name, Bereich, Plattformen, Views und Budget.')
+          : o.first === 'wieder'
+            ? pageTitle(`Hallo ${firstName}!`, 'Du hast gerade keine Kampagne. Starte eine neue: Name, Bereich, Plattformen, Views und Budget.')
+            : `<a href="${esc(o.locked ? '/collaboration' : AGENCY_CAMPAIGN_AREA.home)}" class="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-brand">← ${o.locked ? 'Übersicht' : 'Meine Kampagnen'}</a>
+      ${pageTitle('Neue Kampagne erstellen', 'Name, Bereich, Plattformen, Views und Budget. Danach siehst du, was 1.000 Views für deine Kampagne kosten.')}`
+      }
 
       <section class="nmg text-white" id="neue-kampagne">
         <form class="p-6 sm:p-10" data-new-campaign novalidate>
@@ -715,10 +751,10 @@ ${ONE_PAGE_JS}
 })();`
 
   return agencyShell({
-    title: 'Neue Kampagne',
+    title: o.first ? 'Kampagne starten' : 'Neue Kampagne',
     user: o.user,
     locked: o.locked ?? false,
-    active: o.locked ? '/collaboration' : AGENCY_CAMPAIGN_AREA.active,
+    active: o.locked || o.first ? '/collaboration' : AGENCY_CAMPAIGN_AREA.active,
     body,
     script,
   })
@@ -790,7 +826,7 @@ export function waitingPage(o: { user: User; lead: AgencyLead; campaigns: Waitin
         </span>
         <h1 class="mx-auto mt-7 max-w-3xl font-display text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl">${esc(CONTACT_HEADLINE)}</h1>
         <p class="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
-          ${n > 1 ? `Danke für dein Briefing, deine ${n} Kampagnen sind bei uns angekommen.` : 'Danke für dein Briefing, deine Kampagne ist bei uns angekommen.'}
+          ${n > 1 ? `Danke, deine ${n} Kampagnen sind bei uns angekommen.` : 'Danke, deine Kampagne ist bei uns angekommen.'}
           Wir setzen uns persönlich mit dir in Verbindung, besprechen die Details und schalten dein Collaboration-Dashboard frei,
           sobald die Zusammenarbeit steht.
         </p>
@@ -839,7 +875,7 @@ export function lockedPage(o: { user: User; lead: AgencyLead; title: string; act
         <p class="mx-auto mt-3 max-w-lg text-slate-500">${
           briefed
             ? 'NIKKI MEDIA meldet sich bei dir und schaltet dein Dashboard frei, sobald die Zusammenarbeit steht. Mit einem Cooperation-Code geht es sofort.'
-            : 'Starte zuerst deine Kampagne, drei kurze Angaben in der Übersicht.'
+            : 'Starte zuerst deine erste Kampagne in der Übersicht.'
         }</p>
         <div class="mt-7">
           <a href="/collaboration" class="${GOLD_BTN}">${briefed ? 'Zur Übersicht' : 'Kampagne starten'}</a>
@@ -1025,7 +1061,8 @@ export function overviewPage(o: {
       ${campHero({
         eyebrow: 'Deine Kampagne',
         chip: 'Briefing',
-        title: agencyPackageLabel(o.lead.package),
+        // Seit die erste Kampagne im normalen Formular entsteht, hat nicht jede Agentur einen „Auftrag“.
+        title: o.lead.package ? agencyPackageLabel(o.lead.package) : (o.campaigns.find((c) => c.own)?.name ?? 'Deine Kampagne'),
         stats: [
           { value: viewsShort(o.lead.viewsTarget), label: 'Views', valueFirst: true },
           { label: 'Budget', value: o.lead.budgetCents ? formatEuro(o.lead.budgetCents) : '–' },

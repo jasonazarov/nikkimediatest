@@ -646,22 +646,37 @@ try {
   const warmLogin = await post('/login/code', { email: WARM, code: '24681357', next: '/collaboration' })
   const warmCookie = agenturSitzung(warmLogin)
   pruefe('Mit dem Code landet die Agentur im Collaboration-Dashboard', warmLogin.status === 302 && warmLogin.headers.get('location') === '/collaboration' && !!warmCookie, `HTTP ${warmLogin.status}`)
+  // Die erste Kampagne entsteht im selben Formular wie jede weitere (Vorgabe des
+  // Auftraggebers, November 2026), Bereich und Plattformen aus /brands vorausgewählt.
   const briefingSeite = await (await agenturHole('/collaboration', warmCookie)).text()
-  pruefe('Erst kommt das Briefing („Wie viele Views …“)', briefingSeite.includes('Wie viele Views möchtest du in Auftrag geben?'))
+  pruefe(
+    'Erst kommt die erste Kampagne im normalen Formular (Name, Bereich, Plattformen, Views, Budget)',
+    ['Willkommen', 'Wie soll die Kampagne heißen?', 'In welchem Bereich ist die Kampagne?', 'Wie viele Views möchtest du in Auftrag geben?', 'Rechtsverbindlicher Auftrag']
+      .every((t) => briefingSeite.includes(t)) && !briefingSeite.includes('Was möchtest du beauftragen?'),
+  )
+  pruefe(
+    'Bereich und Plattformen aus dem Eintrag sind vorausgewählt',
+    briefingSeite.includes('value="E-Commerce" class="peer sr-only" checked') && briefingSeite.includes('value="tiktok" class="peer sr-only" checked'),
+  )
   const vorBriefing = await (await agenturHole('/collaboration/kampagnen', warmCookie)).text()
-  pruefe('Vor dem Briefing ist auch ein warmer Lead gesperrt', vorBriefing.includes('data-locked-page'))
-  const warmBriefing = await agenturHole('/api/collaboration/briefing', warmCookie, { views: 1000000, budget: 5000, package: 'armee_influencer' })
+  pruefe('Vor der ersten Kampagne ist auch ein warmer Lead gesperrt', vorBriefing.includes('data-locked-page'))
+  const ersteKampagne = { name: 'Erste Kampagne', niche: 'E-Commerce', platforms: ['tiktok', 'instagram'], views: 1000000, budget: '5000', binding: true }
+  const warmBriefing = await agenturHole('/api/collaboration/campaigns', warmCookie, ersteKampagne)
   const warmBriefingBody = await warmBriefing.json().catch(() => ({}))
-  pruefe('Warmer Lead ist nach dem Briefing freigeschaltet', warmBriefing.status === 200 && warmBriefingBody.unlocked === true, JSON.stringify(warmBriefingBody))
+  pruefe(
+    'Warmer Lead ist nach der ersten Kampagne freigeschaltet',
+    warmBriefing.status === 200 && warmBriefingBody.unlocked === true && warmBriefingBody.redirect === '/collaboration?freigeschaltet=1&angelegt=1',
+    JSON.stringify(warmBriefingBody),
+  )
   const warmKampagnen = await (await agenturHole('/collaboration/kampagnen', warmCookie)).text()
   pruefe('Freigeschaltet: Kampagnen ohne Schloss', !warmKampagnen.includes('data-locked-page') && warmKampagnen.includes('Alle Kampagnen von NIKKI MEDIA'))
   pruefe(
-    'Das Briefing legt die erste Kampagne samt Link an',
+    'Die erste Kampagne trägt den Link aus dem Formular auf /brands',
     zaehle(`SELECT count(*) AS n FROM agency_leads a JOIN projects p ON p.id = a.project_id JOIN project_links l ON l.project_id = p.id JOIN users u ON u.id = a.user_id WHERE u.email='${WARM}';`) === 1,
   )
   pruefe(
-    'Das Briefing hängt an der ersten Kampagne',
-    zaehle(`SELECT count(*) AS n FROM agency_leads a JOIN projects p ON p.id = a.project_id JOIN users u ON u.id = a.user_id WHERE u.email='${WARM}' AND p.briefing_views=1000000 AND p.briefing_budget_cents=500000 AND p.briefing_package='armee_influencer';`) === 1,
+    'Die Angaben hängen an der ersten Kampagne und am Eintrag',
+    zaehle(`SELECT count(*) AS n FROM agency_leads a JOIN projects p ON p.id = a.project_id JOIN users u ON u.id = a.user_id WHERE u.email='${WARM}' AND p.name='Erste Kampagne' AND p.briefing_views=1000000 AND p.briefing_budget_cents=500000 AND a.views_target=1000000 AND a.briefed_at IS NOT NULL;`) === 1,
   )
 
   // Jede weitere Kampagne beginnt mit dem Briefing — „Neue Kampagne“ ist ein
@@ -716,9 +731,15 @@ try {
 
   legeCode(KALT, '13572468')
   const kaltCookie = agenturSitzung(await post('/login/code', { email: KALT, code: '13572468', next: '/collaboration' }))
-  const kaltBriefing = await agenturHole('/api/collaboration/briefing', kaltCookie, { views: 250000, budget: '1250', package: 'armee' })
+  const kaltNeuVorher = await agenturHole('/collaboration/neu', kaltCookie)
+  pruefe('Ohne Kampagne führt „Neue Kampagne“ zur Übersicht mit dem Formular', kaltNeuVorher.status === 302 && kaltNeuVorher.headers.get('location') === '/collaboration', `HTTP ${kaltNeuVorher.status}`)
+  const kaltBriefing = await agenturHole('/api/collaboration/campaigns', kaltCookie, { ...neueKampagne, name: 'Kalt Erste', niche: 'E-Commerce', views: 250000, budget: '1250' })
   const kaltBriefingBody = await kaltBriefing.json().catch(() => ({}))
-  pruefe('Kalter Lead bleibt nach dem Briefing gesperrt', kaltBriefing.status === 200 && kaltBriefingBody.unlocked === false, JSON.stringify(kaltBriefingBody))
+  pruefe(
+    'Kalter Lead bleibt nach der ersten Kampagne gesperrt, zurück auf die Warteseite',
+    kaltBriefing.status === 200 && kaltBriefingBody.unlocked === false && kaltBriefingBody.redirect === '/collaboration?angelegt=1',
+    JSON.stringify(kaltBriefingBody),
+  )
   const kaltSeite = await (await agenturHole('/collaboration', kaltCookie)).text()
   pruefe('Kalter Lead sieht „NIKKI MEDIA meldet sich bei dir.“', kaltSeite.includes('NIKKI MEDIA meldet sich bei dir.'))
   const kaltCreator = await (await agenturHole('/collaboration/creator', kaltCookie)).text()
@@ -730,13 +751,13 @@ try {
   // Agentur weitere Kampagnen an (eine je Kunde) und löscht sie wieder. Die Warteseite
   // zeigt immer die Kampagnen, wie sie gerade sind; ohne Kampagne kommt das Briefing.
   const kaltId = d1(`SELECT p.id FROM projects p JOIN customers c ON c.id = p.customer_id JOIN users u ON u.id = c.user_id WHERE u.email='${KALT}';`)[0]?.id
-  pruefe('Kalter Lead: Warteseite listet die Kampagne aus dem Briefing mit „Löschen“', !!kaltId && kaltSeite.includes(`data-delete-campaign="${kaltId}"`) && kaltSeite.includes('+ Neue Kampagne erstellen'))
+  pruefe('Kalter Lead: Warteseite listet die erste Kampagne mit „Löschen“', !!kaltId && kaltSeite.includes(`data-delete-campaign="${kaltId}"`) && kaltSeite.includes('+ Neue Kampagne erstellen'))
   const kaltNeuSeite = await agenturHole('/collaboration/neu', kaltCookie)
-  pruefe('Kalter Lead mit Briefing öffnet „Neue Kampagne“', kaltNeuSeite.status === 200 && (await kaltNeuSeite.text()).includes('name="campaignName"'), `HTTP ${kaltNeuSeite.status}`)
+  pruefe('Kalter Lead mit erster Kampagne öffnet „Neue Kampagne“', kaltNeuSeite.status === 200 && (await kaltNeuSeite.text()).includes('name="campaignName"'), `HTTP ${kaltNeuSeite.status}`)
   const kaltNeu = await agenturHole('/api/collaboration/campaigns', kaltCookie, { ...neueKampagne, name: 'Kunde Zwei' })
   const kaltNeuBody = await kaltNeu.json().catch(() => ({}))
   pruefe(
-    'Kalter Lead mit Briefing legt eine weitere Kampagne an, zurück auf die Warteseite',
+    'Kalter Lead legt eine weitere Kampagne an, zurück auf die Warteseite',
     kaltNeu.status === 200 && kaltNeuBody.redirect === '/collaboration?angelegt=1',
     `HTTP ${kaltNeu.status} ${JSON.stringify(kaltNeuBody)}`,
   )
@@ -755,17 +776,17 @@ try {
   pruefe('Kalter Lead löscht seine Kampagnen (auch mit dem Cloud-Link aus dem Formular)', geloescht && kaltIds.length === 2 &&
     zaehle(`SELECT count(*) AS n FROM projects p JOIN customers c ON c.id = p.customer_id JOIN users u ON u.id = c.user_id WHERE u.email='${KALT}';`) === 0)
   const kaltLeer = await (await agenturHole('/collaboration', kaltCookie)).text()
-  pruefe('Ohne Kampagne zeigt die Übersicht wieder das Briefing', kaltLeer.includes('Wie viele Views möchtest du in Auftrag geben?') && kaltLeer.includes('Du hast gerade keine Kampagne'))
-  const kaltWieder = await agenturHole('/api/collaboration/briefing', kaltCookie, { views: 500000, budget: '2500', package: 'armee' })
+  pruefe('Ohne Kampagne zeigt die Übersicht wieder das Formular für die erste Kampagne', kaltLeer.includes('Wie soll die Kampagne heißen?') && kaltLeer.includes('Du hast gerade keine Kampagne'))
+  const kaltWieder = await agenturHole('/api/collaboration/campaigns', kaltCookie, { ...neueKampagne, name: 'Kalt Neustart' })
   const kaltWiederBody = await kaltWieder.json().catch(() => ({}))
   pruefe(
-    'Erneutes Briefing legt genau eine neue Kampagne an, gesperrt bleibt gesperrt',
+    'Neue erste Kampagne: genau eine, gesperrt bleibt gesperrt',
     kaltWieder.status === 200 && kaltWiederBody.unlocked === false &&
       zaehle(`SELECT count(*) AS n FROM projects p JOIN customers c ON c.id = p.customer_id JOIN users u ON u.id = c.user_id WHERE u.email='${KALT}';`) === 1,
     JSON.stringify(kaltWiederBody),
   )
-  const kaltDoppelt = await agenturHole('/api/collaboration/briefing', kaltCookie, { views: 500000, budget: '2500', package: 'armee' })
-  pruefe('Ein zweites Abschicken legt keine weitere Kampagne an', kaltDoppelt.status === 200 &&
+  const kaltAlt = await agenturHole('/api/collaboration/briefing', kaltCookie, { views: 500000, budget: '2500', package: 'armee' })
+  pruefe('Der alte Briefing-Weg legt neben einer Kampagne nichts an', kaltAlt.status === 200 &&
     zaehle(`SELECT count(*) AS n FROM projects p JOIN customers c ON c.id = p.customer_id JOIN users u ON u.id = c.user_id WHERE u.email='${KALT}';`) === 1)
 
   /* -------------------------------------------------- 5c. Demo-Konten */
@@ -862,11 +883,11 @@ try {
     `HTTP ${pwLogin.status} → ${pwLogin.headers.get('location')}`,
   )
   const pwSeite = await (await agenturHole('/collaboration', pwCookie)).text()
-  pruefe('Agentur mit Passwort: zuerst das Briefing, wie jeder neue Lead', pwSeite.includes('Wie viele Views möchtest du in Auftrag geben?'))
-  const pwBriefing = await agenturHole('/api/collaboration/briefing', pwCookie, { views: 1000000, budget: 5000, package: 'armee_influencer' })
+  pruefe('Agentur mit Passwort: zuerst die erste Kampagne, wie jeder neue Lead', pwSeite.includes('Wie soll die Kampagne heißen?'))
+  const pwBriefing = await agenturHole('/api/collaboration/campaigns', pwCookie, { name: 'PW Erste', niche: 'E-Commerce', platforms: ['tiktok'], views: 1000000, budget: '5000', binding: true })
   const pwBriefingBody = await pwBriefing.json().catch(() => ({}))
   pruefe(
-    'Agentur mit Passwort: nach dem Briefing gesperrt, bis der Admin freigibt (kalter Lead)',
+    'Agentur mit Passwort: nach der ersten Kampagne gesperrt, bis der Admin freigibt (kalter Lead)',
     pwBriefing.status === 200 && pwBriefingBody.unlocked === false,
     JSON.stringify(pwBriefingBody),
   )

@@ -195,7 +195,7 @@ const FAQ: readonly (readonly [question: string, answer: string])[] = [
   ],
   [
     'Was ist ein Cooperation-Code?',
-    'Ein persönlicher Zugangscode für ausgewählte Partner. Ihr bekommt ihn nach einem Erstgespräch mit unserem Team. Wer ihn im Formular einträgt, erhält nach dem Briefing sofort vollen Einblick in unser Collaboration-Dashboard, laufende Kampagnen, Creator und Clipper. Jeder Code gilt genau einmal.',
+    'Ein persönlicher Zugangscode für ausgewählte Partner. Ihr bekommt ihn nach einem Erstgespräch mit unserem Team. Wer ihn im Formular einträgt, erhält nach dem Anlegen der ersten Kampagne sofort vollen Einblick in unser Collaboration-Dashboard, laufende Kampagnen, Creator und Clipper. Jeder Code gilt genau einmal.',
   ],
   [
     'Wir haben noch keinen Code, können wir uns trotzdem eintragen?',
@@ -215,7 +215,7 @@ const FAQ: readonly (readonly [question: string, answer: string])[] = [
   ],
   [
     'Wie wird abgerechnet?',
-    'Individuell. Im Briefing nennt ihr, wie viele Views ihr anpeilt und welches Budget ihr dafür einplant. Darauf abgestimmt bekommt ihr ein Angebot, das zu euch und euren Kunden passt.',
+    'Individuell. Beim Anlegen einer Kampagne nennt ihr, wie viele Views ihr anpeilt und welches Budget ihr dafür einplant. Darauf abgestimmt bekommt ihr ein Angebot, das zu euch und euren Kunden passt.',
   ],
   [
     'Wie schnell kann es losgehen?',

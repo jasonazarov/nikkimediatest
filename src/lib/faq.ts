@@ -152,7 +152,7 @@ export const FAQ: FaqEntry[] = [
   {
     id: 'coop-code',
     q: 'Was ist ein Cooperation-Code?',
-    a: 'Ein persönlicher Zugangscode für ausgewählte Partner. Ihr bekommt ihn nach einem Erstgespräch mit unserem Team. Wer ihn im Formular einträgt, erhält nach dem Briefing sofort vollen Einblick in unser Collaboration-Dashboard, laufende Kampagnen, Creator und Clipper. Jeder Code gilt genau einmal. Ohne Code könnt ihr euch trotzdem eintragen, dann schaltet unser Team euren Zugang nach einem Gespräch frei.',
+    a: 'Ein persönlicher Zugangscode für ausgewählte Partner. Ihr bekommt ihn nach einem Erstgespräch mit unserem Team. Wer ihn im Formular einträgt, erhält nach dem Anlegen der ersten Kampagne sofort vollen Einblick in unser Collaboration-Dashboard, laufende Kampagnen, Creator und Clipper. Jeder Code gilt genau einmal. Ohne Code könnt ihr euch trotzdem eintragen, dann schaltet unser Team euren Zugang nach einem Gespräch frei.',
     keys: ['code', 'cooperation', 'zugang', 'freischalten', 'freigabe', 'einladung', 'ohne'],
     on: ['agenturen'],
   },

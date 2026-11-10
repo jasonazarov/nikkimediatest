@@ -74,7 +74,7 @@ import {
   demoCreators,
   demoTeam,
 } from '../lib/demo'
-import type { AgencyLead, Customer } from '../db/schema'
+import type { AgencyLead, Customer, User } from '../db/schema'
 import type { AppEnv, Env } from '../lib/types'
 
 /*
@@ -339,6 +339,19 @@ async function waitingCampaignsOf(env: Env, customerId: string): Promise<Waiting
  */
 const mayStartCampaign = (lead: AgencyLead) => agencyUnlocked(lead) || Boolean(lead.briefedAt)
 
+/**
+ * Die erste Kampagne entsteht im selben Formular wie jede weitere (Vorgabe des
+ * Auftraggebers, November 2026; früher das Briefing mit Views, Budget, Auftrag).
+ * Bereich und Plattformen aus dem Eintrag auf /brands sind vorausgewählt.
+ */
+const firstCampaignPage = (user: User, lead: AgencyLead, locked: boolean) =>
+  newCampaignPage({
+    user,
+    locked,
+    first: lead.briefedAt ? 'wieder' : 'neu',
+    prefill: { niche: lead.niche, platforms: leadPlatforms(lead) },
+  })
+
 /* ------------------------------------------------------------- Zugang */
 
 interface AgencyCtx {
@@ -376,13 +389,13 @@ collaborationRoutes.get('/', async (c) => {
   if (!ctx) return c.html(noLeadPage(user))
   const open = agencyUnlocked(ctx.lead)
   if (ctx.lead.demo) {
-    if (!ctx.lead.briefedAt) return c.html(briefingPage({ user, lead: ctx.lead }))
+    if (!ctx.lead.briefedAt) return c.html(firstCampaignPage(user, ctx.lead, !open))
   } else {
     // Immer der aktuelle Stand (Vorgabe des Auftraggebers, November 2026): ohne
-    // eigene Kampagne, also nie angelegt oder alle gelöscht, wieder das Briefing;
-    // gesperrt mit Kampagnen die Warteseite mit genau diesen Kampagnen.
+    // eigene Kampagne, also nie angelegt oder alle gelöscht, das Formular für die
+    // erste Kampagne; gesperrt mit Kampagnen die Warteseite mit genau diesen.
     const own = ctx.customer ? await waitingCampaignsOf(c.env, ctx.customer.id) : []
-    if (!ctx.lead.briefedAt || !own.length) return c.html(briefingPage({ user, lead: ctx.lead, locked: !open }))
+    if (!ctx.lead.briefedAt || !own.length) return c.html(firstCampaignPage(user, ctx.lead, !open))
     if (!open) return c.html(waitingPage({ user, lead: ctx.lead, campaigns: own }))
   }
   if (!open) return c.html(waitingPage({ user, lead: ctx.lead, campaigns: [] }))
@@ -630,10 +643,9 @@ collaborationRoutes.get('/meine', async (c) => {
 collaborationRoutes.get('/neu', async (c) => {
   const ctx = await ctxOf(c)
   if (!ctx) return c.html(noLeadPage(c.get('user')))
-  // Gesperrt, aber mit Briefing: weitere Kampagnen gehen schon (siehe mayStartCampaign).
-  if (!mayStartCampaign(ctx.lead)) {
-    return c.html(lockedPage({ user: c.get('user'), lead: ctx.lead, title: 'Meine Kampagnen', active: '/collaboration/meine' }))
-  }
+  // Gesperrt, aber mit erster Kampagne: weitere gehen schon (siehe mayStartCampaign).
+  // Ohne: die erste entsteht auf der Übersicht.
+  if (!mayStartCampaign(ctx.lead)) return c.redirect('/collaboration', 302)
   if (!ctx.customer) return c.html(noLeadPage(c.get('user')))
   return c.html(newCampaignPage({ user: c.get('user'), locked: !agencyUnlocked(ctx.lead) }))
 })
@@ -798,9 +810,14 @@ collaborationApi.post('/briefing', async (c) => {
 collaborationApi.post('/campaigns', async (c) => {
   const user = c.get('user')
   const lead = await agencyLeadForUser(c.env, user.id)
-  if (!lead || !mayStartCampaign(lead)) return c.json({ error: 'Dein Zugang ist noch nicht freigeschaltet.' }, 403)
+  if (!lead) return c.json({ error: 'Kein Zugang hinterlegt.' }, 400)
   const customer = await customerForUser(c.env, user.id)
   if (!customer) return c.json({ error: 'Kein Arbeitsbereich hinterlegt.' }, 400)
+  // Die ERSTE Kampagne (nie eine angelegt oder alle gelöscht) darf jede Agentur
+  // starten, sie ersetzt das frühere Briefing. Weitere: siehe mayStartCampaign.
+  const first = (await waitingCampaignsOf(c.env, customer.id)).length === 0
+  if (!first && !mayStartCampaign(lead)) return c.json({ error: 'Dein Zugang ist noch nicht freigeschaltet.' }, 403)
+  const wasOpen = agencyUnlocked(lead)
 
   const brief = parseNewCampaign(await c.req.json().catch(() => ({})))
   if ('error' in brief) return c.json({ error: brief.error }, 400)
@@ -810,23 +827,52 @@ collaborationApi.post('/campaigns', async (c) => {
   }
 
   const project = await createBriefedCampaign(c.env, customer.id, name, brief)
+
+  // Erste Kampagne: was früher das Briefing tat. Am Eintrag festhalten (Views,
+  // Budget, wann), einen WARMEN Lead freischalten, den Link aus dem Formular auf
+  // /brands anhängen (nur beim allerersten Mal). Doppelklick-Schutz:
+  // `project_id IS NULL` (eine gelöschte Kampagne leert die Spalte).
+  let open = wasOpen
+  if (first) {
+    const ts = nowSec()
+    const briefedAt = lead.briefedAt ?? ts
+    const accessAt = lead.accessAt ?? (lead.warm ? ts : null)
+    const updated = await getDb(c.env)
+      .update(schema.agencyLeads)
+      .set({ viewsTarget: brief.views, budgetCents: brief.budgetCents, briefedAt, projectId: project.id, accessAt })
+      .where(and(eq(schema.agencyLeads.id, lead.id), sql`${schema.agencyLeads.projectId} IS NULL`))
+      .returning({ id: schema.agencyLeads.id })
+    if (!updated.length) {
+      await getDb(c.env).delete(schema.projects).where(eq(schema.projects.id, project.id))
+      return c.json({ ok: true, redirect: '/collaboration' })
+    }
+    if (lead.footageLink && !lead.briefedAt) {
+      await addProjectLink(c.env, { projectId: project.id, url: lead.footageLink, addedBy: user.id })
+      c.executionCtx.waitUntil(notifyMaterialAdded(c.env, project.id))
+    }
+    open = agencyUnlocked({ briefedAt, accessAt })
+  }
+
   await audit(c.env, {
     actorId: user.id,
-    action: 'agency.campaign_started',
-    entity: 'project',
-    entityId: project.id,
+    action: first ? 'agency.briefed' : 'agency.campaign_started',
+    entity: first ? 'agency' : 'project',
+    entityId: first ? lead.id : project.id,
     payload: {
+      projectId: project.id,
       views: brief.views,
       budgetCents: brief.budgetCents,
       niche: brief.niche,
       platforms: brief.platforms,
       binding: true,
+      ...(first ? { first: true, again: Boolean(lead.briefedAt), warm: Boolean(lead.warm), unlocked: open } : {}),
     },
   })
 
   if (!lead.demo) {
     c.executionCtx.waitUntil(
       mailAgencyCampaignAdmin(c.env, {
+        first: first ? { warm: Boolean(lead.warm), unlocked: open } : undefined,
         leadId: lead.id,
         projectId: project.id,
         campaign: name,
@@ -844,8 +890,13 @@ collaborationApi.post('/campaigns', async (c) => {
   }
 
   // Gesperrt gibt es noch keine Kampagnenseite: zurück zur Warteseite mit der neuen Kampagne.
-  const redirect = agencyUnlocked(lead) ? `${AGENCY_CAMPAIGN_AREA.projectHref(project.id)}?angelegt=1` : '/collaboration?angelegt=1'
-  return c.json({ ok: true, id: project.id, redirect })
+  // Gerade erst freigeschaltet (warmer Lead, erste Kampagne): Übersicht mit Glückwunsch.
+  const redirect = !open
+    ? '/collaboration?angelegt=1'
+    : !wasOpen
+      ? '/collaboration?freigeschaltet=1&angelegt=1'
+      : `${AGENCY_CAMPAIGN_AREA.projectHref(project.id)}?angelegt=1`
+  return c.json({ ok: true, id: project.id, unlocked: open, redirect })
 })
 
 /**

@@ -17,8 +17,9 @@ import type { AgencyLead } from '../db/schema'
             Cooperation-Code. Den vergibt der Administrator nach einem
             Erstgespräch; jeder Code gilt genau einmal.
 
-   Beide füllen nach dem Login das Briefing aus („Kampagne starten“). Zugang
-   hat erst, wer freigegeben ist (`access_at`) UND das Briefing abgeschickt
+   Beide legen nach dem Login ihre erste Kampagne an (dasselbe Formular wie
+   „Neue Kampagne“; früher das Briefing). Zugang
+   hat erst, wer freigegeben ist (`access_at`) UND die erste Kampagne angelegt
    hat (`briefed_at`). Ein warmer Lead wird mit dem Briefing freigegeben, ein
    kalter vom Administrator.
 

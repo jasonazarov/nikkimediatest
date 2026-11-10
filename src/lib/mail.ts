@@ -805,7 +805,7 @@ export function mailAgencySignupAdmin(
       h1(o.warm ? '🔥 Warmer Lead über /brands' : 'Neuer kalter Lead über /brands') +
         p(
           o.warm
-            ? `Eingetragen mit dem Cooperation-Code <strong>${esc(o.code ?? '')}</strong>. Sobald das Briefing abgeschickt ist, hat der Lead Zugang zu Kampagnen, Creatorn und Clippern.`
+            ? `Eingetragen mit dem Cooperation-Code <strong>${esc(o.code ?? '')}</strong>. Sobald die erste Kampagne angelegt ist, hat der Lead Zugang zu Kampagnen, Creatorn und Clippern.`
             : 'Ohne Cooperation-Code: der Zugang bleibt gesperrt, bis du ihn im Admin-Bereich unter „Agenturen“ freigibst.',
         ) +
         dl([
@@ -871,10 +871,15 @@ export function mailAgencyBriefingAdmin(
   })
 }
 
-/** 6c² — Agentur startet eine WEITERE Kampagne (verbindlich beauftragt) → Jason */
+/**
+ * 6c² — Agentur startet eine Kampagne (verbindlich beauftragt) → Jason. Mit
+ * `first` die ERSTE Kampagne (seit November 2026 im selben Formular wie jede
+ * weitere): dann mit warm/kalt und ob der Zugang jetzt offen ist.
+ */
 export function mailAgencyCampaignAdmin(
   env: Env,
   o: {
+    first?: { warm: boolean; unlocked: boolean }
     leadId: string
     projectId: string
     campaign: string
@@ -892,13 +897,22 @@ export function mailAgencyCampaignAdmin(
   return send(env, {
     to: env.ADMIN_EMAIL,
     replyTo: o.email,
-    subject: `Neue Kampagne: ${o.campaign} (${o.company || o.fullName})`,
+    subject: o.first
+      ? `Kampagne gestartet: ${o.campaign} (${o.company || o.fullName}, ${o.first.warm ? 'warm' : 'kalt'})`
+      : `Neue Kampagne: ${o.campaign} (${o.company || o.fullName})`,
     html: layout(
       env,
-      'Neue Kampagne',
-      h1('Eine Agentur hat eine weitere Kampagne gestartet') +
-        p('Verbindlich beauftragt. Das Briefing hängt an der Kampagne. Sobald Material darin liegt, braucht sie ein Team.') +
+      o.first ? 'Kampagne gestartet' : 'Neue Kampagne',
+      h1(o.first ? 'Eine Agentur hat ihre erste Kampagne gestartet' : 'Eine Agentur hat eine weitere Kampagne gestartet') +
+        p(
+          o.first
+            ? o.first.unlocked
+              ? 'Verbindlich beauftragt. Der Zugang ist freigeschaltet, die Agentur sieht jetzt Kampagnen, Creator und Clipper.'
+              : 'Verbindlich beauftragt. Kalter Lead: der Zugang bleibt gesperrt. Die Agentur sieht „NIKKI MEDIA meldet sich bei dir“, bitte melde dich bei ihr.'
+            : 'Verbindlich beauftragt. Das Briefing hängt an der Kampagne. Sobald Material darin liegt, braucht sie ein Team.',
+        ) +
         dl([
+          ...(o.first ? ([['Lead', o.first.warm ? 'Warm (Cooperation-Code)' : 'Kalt']] as [string, string][]) : []),
           ['Kampagne', o.campaign],
           ['Name', o.fullName],
           ['Firma', o.company || '–'],
@@ -910,7 +924,8 @@ export function mailAgencyCampaignAdmin(
           ['Budget', o.budget],
           ['Preis pro 1.000 Views', o.perThousand],
         ]) +
-        button(`${env.APP_URL}/admin/projekte/${o.projectId}`, 'Kampagne im Admin-Bereich öffnen'),
+        button(`${env.APP_URL}/admin/projekte/${o.projectId}`, 'Kampagne im Admin-Bereich öffnen') +
+        (o.first ? button(`${env.APP_URL}/admin/agenturen/${o.leadId}`, 'Agentur im Admin-Bereich öffnen') : ''),
     ),
   })
 }

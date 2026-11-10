@@ -494,7 +494,7 @@ export const agenturenPage = (articles: Article[] = []): string =>
       <p class="g-lead">Vom ersten Briefing bis zum viralen Clip bleibt alles in eurem Collaboration-Dashboard dokumentiert.</p>
     </div>
     ${steps([
-      ['Kunden eintragen', 'Formular unten ausfüllen, Adresse per Code bestätigen. Im Briefing nennt ihr Views, Budget und Plattformen.'],
+      ['Kunden eintragen', 'Formular unten ausfüllen, Adresse per Code bestätigen. In der ersten Kampagne nennt ihr Views, Budget und Plattformen.'],
       ['Material liefern', 'Rohmaterial hochladen oder einen Cloud-Link hinterlegen. Hat euer Kunde keins, produzieren unsere Creator es mit.'],
       ['Team wird zugeordnet', 'NIKKI MEDIA stellt Clipper und Creator für die Kampagne zusammen und wärmt die Accounts in der Nische auf.'],
       ['Reichweite messen', 'Jeder veröffentlichte Clip kommt mit echten Zahlen ins Dashboard, die viralsten ganz oben.'],
@@ -506,7 +506,7 @@ export const agenturenPage = (articles: Article[] = []): string =>
   <div class="g-wrap g-split">
     <div>
       <h2 class="g-h2">Was euer Dashboard freischaltet</h2>
-      <p class="g-lead">Mit Cooperation-Code sofort nach dem Briefing, ohne Code nach einem kurzen Gespräch mit unserem Team.</p>
+      <p class="g-lead">Mit Cooperation-Code sofort nach der ersten Kampagne, ohne Code nach einem kurzen Gespräch mit unserem Team.</p>
     </div>
     ${ticks([
       'Alle Kampagnen mit fertigen Clips ansehen und herunterladen',
