@@ -462,18 +462,15 @@ export function projectsPage(o: {
       ],
       corner: statusBadge(p.status),
       // Außerhalb des Links: Umbenennen und Löschen öffnen nicht zugleich die Kampagne.
+      // Beschriftet statt nur Symbol (Vorgabe des Auftraggebers, November 2026: Löschen war unübersichtlich).
       footer: `
-            <div class="flex items-start justify-between gap-3">
-              <div class="min-w-0 flex-1">
-                ${metricStrip(p.metrics, 'de', { size: 'sm' })}
-                ${viaCreatorsLine(t.metricsViaCreators, p.metrics)}
-              </div>
-              <div class="-mr-1.5 -mt-1 flex shrink-0 gap-0.5">
-                <button type="button" data-rename-project="${esc(p.id)}" data-name="${esc(p.name)}" title="${esc(t.renameTitle)}" aria-label="${esc(t.renameTitle)}"
-                        class="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700">${svg(PENCIL)}</button>
-                <button type="button" data-del-project="${esc(p.id)}" data-accounts="${esc(p.accountCount)}" title="${esc(t.deleteTitle)}" aria-label="${esc(t.deleteTitle)}"
-                        class="rounded-lg p-1.5 text-slate-400 transition hover:bg-red-50 hover:text-red-600">${svg(TRASH)}</button>
-              </div>
+            <div class="min-w-0">
+              ${metricStrip(p.metrics, 'de', { size: 'sm' })}
+              ${viaCreatorsLine(t.metricsViaCreators, p.metrics)}
+            </div>
+            <div class="nmw-card-acts">
+              <button type="button" class="nmw-card-act" data-rename-project="${esc(p.id)}" data-name="${esc(p.name)}" aria-label="${esc(t.renameTitle)}: ${esc(p.name)}">${svg(PENCIL, 'h-4 w-4')} Umbenennen</button>
+              <button type="button" class="nmw-card-act nmw-card-act--del" data-del-project="${esc(p.id)}" data-accounts="${esc(p.accountCount)}" aria-label="${esc(t.deleteTitle)}: ${esc(p.name)}">${svg(TRASH, 'h-4 w-4')} Löschen</button>
             </div>`,
     }),
   )

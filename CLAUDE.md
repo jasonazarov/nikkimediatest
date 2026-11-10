@@ -586,6 +586,10 @@ Routen, APIs, Formularfeldern oder Abläufen; `python3 tools/guard.py` beweist d
   („Customer request“). Der CRM-Eintrag aus dem ersten Formular bleibt wie bisher; die weiteren Angaben kommen
   zusätzlich per Mail an `ADMIN_EMAIL` (`mailCustomerCampaignAdmin`). In der Kunden-Übersicht steht „Meine
   Kampagnen“ vor „Kampagne pushen“ (`PUSH_MARK` in `layout.ts`).
+- **Kampagnenkarten: „Umbenennen“ und „Löschen“ beschriftet** (Vorgabe des Auftraggebers, November 2026: das kleine
+  Papierkorb-Symbol war unübersichtlich): unter jeder Karte in „Meine Kampagnen“ bei Kunde, Creator und Agentur
+  (`projectsPage` in `src/views/app.ts`, Styles `.nmw-card-act` in `dash-whop.css`). Die Formulare für „Neue Kampagne“
+  bleiben je Bereich wie sie sind (ausdrücklich NICHT vereinheitlichen).
 - **Glückwunsch-Popup nach dem Anlegen einer Kampagne** (Vorgabe des Auftraggebers, November 2026; `shell()` in
   `layout.ts`, Styles `dash-whop.css`): erscheint bei `?angelegt=1` in jedem Dashboard. Gesetzt nach „Neue
   Kampagne“ von Kunde, Agentur und Creator und nach dem ersten Agentur-Briefing. Der Zusatz verschwindet sofort
