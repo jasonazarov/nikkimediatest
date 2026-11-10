@@ -31,7 +31,7 @@ index 35003cf..df99aff 100644
  /* ---------- Warteseite der Agentur: die eigenen Kampagnen (Vorgabe des Auftraggebers, November 2026) ----------
     Vor der Freischaltung je Kampagne eine Glaszeile mit „Löschen“, darüber „Neue Kampagne erstellen“.
 diff --git a/src/routes/collaboration.ts b/src/routes/collaboration.ts
-index 50fc5cd..8e0aa63 100644
+index 63a239c..8ec3c8c 100644
 --- a/src/routes/collaboration.ts
 +++ b/src/routes/collaboration.ts
 @@ -117,7 +117,15 @@ async function allCampaigns(
@@ -63,10 +63,10 @@ index 50fc5cd..8e0aa63 100644
    })
  }
 diff --git a/src/views/collaboration.ts b/src/views/collaboration.ts
-index d3ee23e..5f7faa0 100644
+index e228f13..c804e72 100644
 --- a/src/views/collaboration.ts
 +++ b/src/views/collaboration.ts
-@@ -868,6 +868,11 @@ export interface AgencyCampaign {
+@@ -904,6 +904,11 @@ export interface AgencyCampaign {
    views: number
    clippers: number
    creators: number
@@ -78,7 +78,7 @@ index d3ee23e..5f7faa0 100644
  }
  
  export interface AgencyCreator {
-@@ -926,6 +931,21 @@ const campaignCardOf = (c: AgencyCampaign) =>
+@@ -962,6 +967,21 @@ const campaignCardOf = (c: AgencyCampaign) =>
      ],
    })
  
@@ -100,7 +100,7 @@ index d3ee23e..5f7faa0 100644
  const initials = (name: string) =>
    name
      .split(/\s+/)
-@@ -1008,6 +1028,13 @@ export function overviewPage(o: {
+@@ -1044,6 +1064,13 @@ export function overviewPage(o: {
  }): string {
    const first = o.user.fullName.split(' ')[0]
    const latest = o.campaigns.slice(0, 6)
@@ -114,13 +114,14 @@ index d3ee23e..5f7faa0 100644
    const body = `
        ${
          o.justUnlocked
-@@ -1023,13 +1050,10 @@ export function overviewPage(o: {
+@@ -1059,14 +1086,10 @@ export function overviewPage(o: {
        <!-- Deine Kampagne + Neue Kampagne ganz oben (Vorgabe des Auftraggebers, November 2026):
             beide in Markengrün als Liquid Glass. Views-Grafik, Virale Clips und Push folgen danach (TOP_MARK). -->
        ${campHero({
 -        eyebrow: 'Deine Kampagne',
 -        chip: 'Briefing',
--        title: agencyPackageLabel(o.lead.package),
+-        // Seit die erste Kampagne im normalen Formular entsteht, hat nicht jede Agentur einen „Auftrag“.
+-        title: o.lead.package ? agencyPackageLabel(o.lead.package) : (o.campaigns.find((c) => c.own)?.name ?? 'Deine Kampagne'),
 -        stats: [
 -          { value: viewsShort(o.lead.viewsTarget), label: 'Views', valueFirst: true },
 -          { label: 'Budget', value: o.lead.budgetCents ? formatEuro(o.lead.budgetCents) : '–' },
@@ -133,10 +134,10 @@ index d3ee23e..5f7faa0 100644
          ghosts: [
            { href: '/collaboration/creator', label: 'Creator buchen' },
 diff --git a/src/views/layout.ts b/src/views/layout.ts
-index 0dc2f55..cbcd926 100644
+index 49bab7b..8afeee1 100644
 --- a/src/views/layout.ts
 +++ b/src/views/layout.ts
-@@ -227,8 +227,33 @@ export interface CampHero {
+@@ -229,8 +229,33 @@ export interface CampHero {
    mainAttrs?: string
    /** Die ganz klickbare Kachel rechts; fehlt sie, nimmt die große Kachel die volle Breite. */
    side?: { href?: string; attrs?: string; title: string; text: string; cta: string; icon: HeroIcon }
@@ -170,7 +171,7 @@ index 0dc2f55..cbcd926 100644
  const heroButton = (l: HeroLink, cls: string) => {
    const inner = `${l.icon ? heroSvg(l.icon, 'h-4 w-4') : ''}${esc(l.label)}`
    return l.href ? `<a href="${esc(l.href)}" class="${cls}"${l.attrs ? ` ${l.attrs}` : ''}>${inner}</a>` : `<button type="button" class="${cls}"${l.attrs ? ` ${l.attrs}` : ''}>${inner}</button>`
-@@ -267,9 +292,13 @@ export function campHero(o: CampHero): string {
+@@ -269,9 +294,13 @@ export function campHero(o: CampHero): string {
                <span class="text-xs font-bold uppercase tracking-[.16em] text-brand-2">${esc(o.eyebrow)}</span>
                ${o.chip ? `<span class="nmw-camp-hero__live"><i aria-hidden="true"></i>${esc(o.chip)}</span>` : ''}
              </div>
