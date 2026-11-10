@@ -740,7 +740,7 @@ export interface WaitingCampaign {
 
 const waitingRow = (c: WaitingCampaign) => {
   const meta = [
-    c.views ? `${viewsShort(c.views)} Views` : null,
+    c.views ? `${formatCompact(c.views, 'de')} Views` : null,
     c.budgetCents ? `Budget ${formatEuro(c.budgetCents)}` : null,
     c.pkg ? agencyPackageLabel(c.pkg) : null,
     `angelegt ${new Date(c.createdAt * 1000).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Europe/Vienna' })}`,

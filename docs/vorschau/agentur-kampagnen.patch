@@ -1,8 +1,8 @@
 diff --git a/public/assets/dash-whop.css b/public/assets/dash-whop.css
-index a1a71b9..342164b 100644
+index 35003cf..df99aff 100644
 --- a/public/assets/dash-whop.css
 +++ b/public/assets/dash-whop.css
-@@ -590,3 +590,24 @@ html.nmd .nmw-camp-hero__new:hover { transform: translateY(-2px); box-shadow: in
+@@ -590,6 +590,27 @@ html.nmd .nmw-camp-hero__new:hover { transform: translateY(-2px); box-shadow: in
  .nmw-camp-hero__new:hover .nmw-camp-hero__cta span { transform: translateX(3px); }
  .nmw-camp-hero__cta span { transition: transform .15s ease; }
  @media (prefers-reduced-motion: reduce) { html.nmd .nmw-camp-hero__new, .nmw-camp-hero__cta span { transition: none; } }
@@ -27,11 +27,14 @@ index a1a71b9..342164b 100644
 +.nmw-camp-hero__row:hover .nmw-camp-hero__row-go { transform: translateX(3px); }
 +@media (max-width: 640px) { .nmw-camp-hero__row-chip { display: none; } }
 +@media (prefers-reduced-motion: reduce) { .nmw-camp-hero__row, .nmw-camp-hero__row-go { transition: none; } }
+ 
+ /* ---------- Warteseite der Agentur: die eigenen Kampagnen (Vorgabe des Auftraggebers, November 2026) ----------
+    Vor der Freischaltung je Kampagne eine Glaszeile mit „Löschen“, darüber „Neue Kampagne erstellen“.
 diff --git a/src/routes/collaboration.ts b/src/routes/collaboration.ts
-index cf0c9e6..2951e4d 100644
+index 50fc5cd..8e0aa63 100644
 --- a/src/routes/collaboration.ts
 +++ b/src/routes/collaboration.ts
-@@ -115,7 +115,15 @@ async function allCampaigns(
+@@ -117,7 +117,15 @@ async function allCampaigns(
    const db = getDb(env)
    const others = and(ne(schema.users.role, 'agency'), eq(schema.users.demo, 0))
    const projects = await db
@@ -48,7 +51,7 @@ index cf0c9e6..2951e4d 100644
      .from(schema.projects)
      .innerJoin(schema.customers, eq(schema.customers.id, schema.projects.customerId))
      .innerJoin(schema.users, eq(schema.users.id, schema.customers.userId))
-@@ -158,6 +166,10 @@ async function allCampaigns(
+@@ -160,6 +168,10 @@ async function allCampaigns(
        views: totals.get(p.id)?.views ?? 0,
        clippers: team.filter((m) => m.role === 'clipper').length,
        creators: team.filter((m) => m.role === 'creator').length,
@@ -60,10 +63,10 @@ index cf0c9e6..2951e4d 100644
    })
  }
 diff --git a/src/views/collaboration.ts b/src/views/collaboration.ts
-index 3db2454..91ed8fb 100644
+index d3ee23e..5f7faa0 100644
 --- a/src/views/collaboration.ts
 +++ b/src/views/collaboration.ts
-@@ -799,6 +799,11 @@ export interface AgencyCampaign {
+@@ -868,6 +868,11 @@ export interface AgencyCampaign {
    views: number
    clippers: number
    creators: number
@@ -75,7 +78,7 @@ index 3db2454..91ed8fb 100644
  }
  
  export interface AgencyCreator {
-@@ -857,6 +862,21 @@ const campaignCardOf = (c: AgencyCampaign) =>
+@@ -926,6 +931,21 @@ const campaignCardOf = (c: AgencyCampaign) =>
      ],
    })
  
@@ -97,7 +100,7 @@ index 3db2454..91ed8fb 100644
  const initials = (name: string) =>
    name
      .split(/\s+/)
-@@ -939,6 +959,13 @@ export function overviewPage(o: {
+@@ -1008,6 +1028,13 @@ export function overviewPage(o: {
  }): string {
    const first = o.user.fullName.split(' ')[0]
    const latest = o.campaigns.slice(0, 6)
@@ -111,7 +114,7 @@ index 3db2454..91ed8fb 100644
    const body = `
        ${
          o.justUnlocked
-@@ -954,13 +981,10 @@ export function overviewPage(o: {
+@@ -1023,13 +1050,10 @@ export function overviewPage(o: {
        <!-- Deine Kampagne + Neue Kampagne ganz oben (Vorgabe des Auftraggebers, November 2026):
             beide in Markengrün als Liquid Glass. Views-Grafik, Virale Clips und Push folgen danach (TOP_MARK). -->
        ${campHero({
