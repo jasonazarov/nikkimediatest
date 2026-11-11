@@ -1,0 +1,32 @@
+User-agent: *
+Allow: /
+Disallow: /anfrage/
+Disallow: /admin/
+Disallow: /api/
+Disallow: /rueckmeldung/
+Disallow: /rueckmeldung-4-wochen/
+Disallow: /aufnahmebogen/
+Disallow: /intern/
+
+# KI-Suchdienste ausdrücklich erlaubt (ChatGPT, Claude, Perplexity, Gemini, Apple, Bing)
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-User
+User-agent: Claude-SearchBot
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: Bingbot
+Allow: /
+Disallow: /anfrage/
+Disallow: /admin/
+Disallow: /api/
+Disallow: /rueckmeldung/
+Disallow: /rueckmeldung-4-wochen/
+Disallow: /aufnahmebogen/
+Disallow: /intern/
+
+Sitemap: https://marinabetke.de/sitemap.xml

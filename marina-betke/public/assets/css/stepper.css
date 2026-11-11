@@ -1,0 +1,216 @@
+/* ==========================================================================
+   Stepper auf /terminbuchung/: Aufbau von Nikki Media, Optik von Marina Betke
+   (Farben und Schriften aus style.css: --nacht, --papier, --kupfer …).
+   ========================================================================== */
+
+.stepper { max-width: 720px; margin: 30px 0 0; scroll-margin-top: 120px; }
+.stepper [hidden] { display: none !important; }
+
+.stepper__card,
+.stepper__end {
+  position: relative;
+  padding: clamp(20px, 4vw, 34px);
+  border: 1px solid var(--linie);
+  border-radius: 22px;
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgba(216, 155, 103, .10), transparent 60%),
+    var(--flaeche);
+  box-shadow: 0 30px 70px -38px rgba(16, 42, 54, .45), 0 2px 0 rgba(255, 255, 255, .7) inset;
+}
+.stepper__card { margin: 0; }
+
+/* ---------- Kopf: Schritt n von 6 · Titel, Punkte, Balken ---------- */
+.stepper__meta {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  margin: 0 0 12px;
+}
+.stepper__label {
+  font: 700 13px/1.3 'Hanken Grotesk', system-ui, sans-serif;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--kupfer-tief);
+}
+.stepper__dots { display: inline-flex; gap: 6px; flex: none; }
+.stepper__dots i {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--linie); transition: background .3s, transform .3s;
+}
+.stepper__dots i.is-on { background: var(--kupfer); transform: scale(1.12); }
+.stepper__bar { height: 5px; border-radius: 5px; background: var(--papier-2); overflow: hidden; margin: 0 0 26px; }
+.stepper__bar i {
+  display: block; height: 100%; border-radius: inherit;
+  background: linear-gradient(90deg, var(--kupfer-tief), var(--kupfer));
+  transition: width .45s cubic-bezier(.2, .7, .2, 1);
+}
+
+/* ---------- Schritt ---------- */
+.stepper__panel { border: 0; margin: 0; padding: 0; min-width: 0; }
+.stepper__panel.is-in { animation: stepIn .34s cubic-bezier(.2, .7, .2, 1) both; }
+@keyframes stepIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+.stepper__q {
+  display: block; float: none; width: 100%; padding: 0;
+  margin: 0 0 18px;
+  font-family: 'Bricolage Grotesque', Georgia, serif; font-weight: 500;
+  font-size: clamp(22px, 3.6vw, 29px); line-height: 1.22; color: var(--nacht);
+  outline: none;
+}
+.stepper__hint { margin: -6px 0 18px; color: var(--leise); font-size: 15px; line-height: 1.55; }
+.stepper__hint--after { margin: 16px 0 0; }
+.stepper__intel {
+  margin: -4px 0 18px; padding: 14px 16px;
+  border-left: 3px solid var(--kupfer); border-radius: 0 12px 12px 0;
+  background: var(--papier); color: #2f3c42; font-size: 15.5px; line-height: 1.55;
+}
+
+/* ---------- Antwort-Raster: Handy untereinander, Desktop nebeneinander ---------- */
+.opts { display: grid; gap: 10px; grid-template-columns: 1fr; }
+[data-panel="1"] .opts { grid-template-columns: 1fr 1fr; }   /* Nein / Ja immer nebeneinander */
+@media (min-width: 640px) {
+  .opts--2 { grid-template-columns: 1fr 1fr; }
+  .opts--3 { grid-template-columns: repeat(3, 1fr); }
+  .opts--4 { grid-template-columns: repeat(4, 1fr); }
+}
+@media (min-width: 340px) and (max-width: 639px) {
+  .opts--4 { grid-template-columns: 1fr 1fr; }
+}
+
+.opt { position: relative; display: block; cursor: pointer; }
+.opt input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+.opt__box {
+  position: relative; display: flex; flex-direction: column; justify-content: center;
+  height: 100%; min-height: 60px; padding: 15px 40px 15px 18px;
+  border: 1.5px solid var(--linie); border-radius: 14px; background: #fff;
+  color: var(--nacht); font-size: 17px; line-height: 1.35;
+  transition: border-color .2s, background .2s, box-shadow .2s, transform .15s;
+}
+.opt__box b { font-weight: 600; }
+.opt__box small { display: block; margin-top: 3px; color: var(--leise); font-size: 14.5px; font-weight: 400; }
+.opt:hover .opt__box { border-color: var(--kupfer); box-shadow: 0 10px 24px -18px rgba(150, 87, 38, .6); }
+.opt:active .opt__box { transform: scale(.99); }
+.opt input:focus-visible + .opt__box { outline: 3px solid var(--kupfer-tief); outline-offset: 2px; }
+.opt input:checked + .opt__box {
+  border-color: var(--kupfer-tief); background: #fff6ec;
+  box-shadow: inset 0 0 0 1px var(--kupfer-tief);
+}
+.opt__check {
+  position: absolute; top: 50%; right: 14px; transform: translateY(-50%) scale(.6);
+  display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--kupfer-tief); color: #fff; opacity: 0; transition: opacity .2s, transform .2s;
+}
+.opt__check svg { width: 11px; height: 11px; }
+.opt input:checked + .opt__box .opt__check { opacity: 1; transform: translateY(-50%) scale(1); }
+.opts--2 .opt__box, .opts--3 .opt__box, .opts--4 .opt__box { text-align: center; align-items: center; padding: 15px 18px; }
+.opts--2 .opt__check, .opts--3 .opt__check, .opts--4 .opt__check { top: 10px; right: 10px; transform: scale(.6); }
+.opts--2 .opt input:checked + .opt__box .opt__check,
+.opts--3 .opt input:checked + .opt__box .opt__check,
+.opts--4 .opt input:checked + .opt__box .opt__check { transform: scale(1); }
+[data-panel="2"] .opt__box { text-align: left; align-items: flex-start; padding-right: 40px; }
+.stepper.is-busy .opt { pointer-events: none; }
+
+/* ---------- Preise und Sprachnachricht im Schritt „Rahmen“ ---------- */
+.stepper__preise { list-style: none; margin: 0 0 18px; padding: 4px 16px; border: 1px solid var(--linie); border-radius: 14px; background: #fff; }
+.stepper__preise li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 10px 0; border-top: 1px solid rgba(16, 42, 54, .1); }
+.stepper__preise li:first-child { border-top: 0; }
+.stepper__preise small { display: block; font-size: 14px; color: var(--leise); font-weight: 400; }
+.stepper__preise b { color: var(--nacht); white-space: nowrap; }
+.stepper__preise span b { white-space: normal; }
+.stepper .sprach-preis { margin-top: 22px; }
+
+/* ---------- Kontakt ---------- */
+.fields { display: grid; gap: 16px; }
+.field { display: block; }
+.field__l { display: block; margin: 0 0 6px; font-weight: 700; color: var(--nacht); }
+.field__l em { font-style: normal; font-weight: 400; color: var(--leise); }
+.field__hint { display: block; margin-top: 6px; font-size: 14px; line-height: 1.45; color: var(--leise); }
+.field input, .field select, .phonebox select, .phonebox input {
+  display: block; width: 100%; min-height: 54px; padding: 12px 16px;
+  border: 1.5px solid var(--linie); border-radius: 12px; background: #fff;
+  color: var(--tinte); font: 400 17px/1.3 'Hanken Grotesk', system-ui, sans-serif;
+}
+.field select, .phonebox select {
+  appearance: none; -webkit-appearance: none; padding-right: 40px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16' fill='none' stroke='%23102a36' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 14px center;
+}
+.field input:focus, .field select:focus, .phonebox select:focus, .phonebox input:focus {
+  outline: 3px solid rgba(183, 111, 50, .45); outline-offset: 1px; border-color: var(--kupfer-tief);
+}
+.field input[aria-invalid="true"], .phonebox input[aria-invalid="true"] { border-color: var(--fehler); }
+.phonebox { display: grid; grid-template-columns: minmax(0, 190px) minmax(0, 1fr); gap: 8px; }
+@media (max-width: 480px) { .phonebox { grid-template-columns: 1fr; } }
+
+.check {
+  display: grid; grid-template-columns: 26px 1fr; gap: 12px; align-items: start;
+  margin: 20px 0 0; padding: 16px; border: 1px solid var(--linie); border-radius: 14px; background: #fff;
+  font-size: 14.5px; line-height: 1.55; color: #2f3c42; cursor: pointer;
+}
+.check input { width: 24px; height: 24px; margin: 1px 0 0; accent-color: var(--kupfer-tief); cursor: pointer; }
+.check input[aria-invalid="true"] { outline: 2px solid var(--fehler); outline-offset: 2px; }
+.check a { text-decoration: underline; }
+.hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+/* ---------- Fehler und Navigation ---------- */
+.stepper__err { margin: 18px 0 0; padding: 12px 14px; border-radius: 12px; background: #f8e9e6; color: #8a2b22; font-size: 15px; font-weight: 600; }
+.stepper__err p { margin: 0; }
+.stepper__err-wa { display: inline-block; margin-top: 6px; color: #8a2b22; text-decoration: underline; }
+
+.stepper__nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 24px; }
+.stepper__back {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-left: -8px; padding: 0 10px;
+  border: 0; border-radius: 10px; background: none; color: var(--kupfer-tief);
+  font: 700 15px 'Hanken Grotesk', system-ui, sans-serif; cursor: pointer;
+}
+.stepper__back:hover { background: var(--papier); }
+.stepper__next { margin-left: auto; }
+.stepper__next[disabled] { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+.stepper__next[disabled]:hover { background: var(--kupfer); color: var(--nacht); }
+.stepper__next[disabled]:hover .btn__chip { transform: none; }
+@media (max-width: 560px) {
+  .stepper__nav { flex-wrap: wrap; }
+  .stepper__next { width: 100%; justify-content: center; }
+  .stepper__back { order: 2; }
+}
+
+/* ---------- Abschlüsse ---------- */
+.stepper__end p { margin: 0 0 14px; color: #2f3c42; font-size: 17px; line-height: 1.65; }
+.stepper__end .stepper__q { margin-bottom: 14px; }
+.stepper__end .stepper__back { margin-top: 8px; }
+.stepper__small { font-size: 14.5px !important; color: var(--leise) !important; margin-top: 12px !important; }
+.stepper__icon { display: inline-grid; place-items: center; width: 46px; height: 46px; margin-bottom: 14px; border-radius: 50%; background: #e3efe7; color: #1f7a4d; }
+.stepper__nr { font-size: 15px !important; color: var(--leise) !important; }
+.stepper__nr strong { color: var(--nacht); letter-spacing: .06em; }
+.stepper__cta { margin: 6px 0 10px; }
+.stepper .btn.stepper__wa { background: var(--nacht); color: #fff; }
+.stepper .btn.stepper__wa:hover { background: var(--nacht-tief); color: #fff; }
+.stepper .btn.stepper__wa:hover .btn__chip { background: #25d366; color: #fff; }
+.stepper__hilfe { list-style: none; margin: 6px 0 16px; padding: 0; display: grid; gap: 10px; }
+.stepper__hilfe li { padding: 14px 16px; border: 1px solid var(--linie); border-radius: 12px; background: #fff; font-size: 16px; color: #2f3c42; }
+.stepper__hilfe span { display: block; color: var(--leise); font-size: 14.5px; margin-bottom: 2px; }
+.stepper__hilfe a { font-weight: 800; font-size: 19px; color: var(--nacht); text-decoration: underline; text-underline-offset: 3px; }
+.stepper__noscript { margin: 0; color: #2f3c42; }
+@media (max-width: 560px) { .stepper__cta { width: 100%; white-space: normal; justify-content: center; text-align: center; } }
+
+/* ---------- Ladebildschirm (wie Nikki Media, in Marinas Nachtblau) ---------- */
+html.is-loading { overflow: hidden; }
+.loadscreen {
+  position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center; padding: 24px;
+  background: radial-gradient(80% 60% at 50% 30%, rgba(216, 155, 103, .18), transparent 70%), var(--nacht-tief);
+  color: var(--flaeche); animation: loadIn .25s ease both;
+}
+.loadscreen[hidden] { display: none; }
+@keyframes loadIn { from { opacity: 0; } to { opacity: 1; } }
+.loadscreen__in { width: min(420px, 100%); text-align: center; }
+.loadscreen__mark { position: relative; display: inline-grid; place-items: center; width: 132px; height: 132px; margin-bottom: 18px; }
+.loadscreen__ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.loadscreen__ring-track { fill: none; stroke: rgba(253, 249, 244, .1); stroke-width: 6; }
+.loadscreen__ring-arc { fill: none; stroke: var(--kupfer); stroke-width: 6; stroke-linecap: round; filter: drop-shadow(0 0 10px rgba(216, 155, 103, .55)); }
+.loadscreen__pct { font: 700 30px 'Bricolage Grotesque', Georgia, serif; color: #fff; }
+.loadscreen__brand { margin: 0 0 6px; font: 700 12px 'Hanken Grotesk', system-ui, sans-serif; letter-spacing: .18em; text-transform: uppercase; color: var(--kupfer); }
+.loadscreen__title { margin: 0 0 8px; font: 500 clamp(24px, 4vw, 30px)/1.2 'Bricolage Grotesque', Georgia, serif; color: #fff; }
+.loadscreen__sub { margin: 0 0 22px; color: var(--leise-hell); font-size: 16px; min-height: 1.6em; }
+.loadscreen__bar { height: 4px; border-radius: 4px; background: rgba(253, 249, 244, .1); overflow: hidden; }
+.loadscreen__bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--kupfer-tief), var(--kupfer-hell)); }
+
+@media (prefers-reduced-motion: reduce) {
+  .stepper__panel.is-in, .loadscreen { animation: none; }
+  .stepper__bar i, .opt__box { transition: none; }
+}
+@media (max-width: 480px) { .stepper__label { letter-spacing: .07em; font-size: 12px; } }
